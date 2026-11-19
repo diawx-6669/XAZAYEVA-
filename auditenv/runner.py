@@ -48,6 +48,8 @@ def harden_evaluator() -> bool:
     """Mark the evaluator process non-dumpable (Linux prctl PR_SET_DUMPABLE=0): its
     /proc/<pid>/environ, mem, fd and maps become unreadable for other non-root processes,
     so the agent cannot read the seed salt or open file handles of its parent."""
+    if os.environ.get("AUDITENV_INSECURE_DUMPABLE") == "1":  # only for the isolation test's positive control
+        return False
     try:
         import ctypes
 

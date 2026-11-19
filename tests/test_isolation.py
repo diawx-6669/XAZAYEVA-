@@ -13,8 +13,9 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def evaluator(args, cwd, salt=None):
-    env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": str(ROOT), "PYTHONHASHSEED": "0", "TZ": "UTC"}
+def evaluator(args, cwd, salt=None, extra=None):
+    env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": str(ROOT), "PYTHONHASHSEED": "0", "TZ": "UTC",
+           **(extra or {})}
     if salt:
         env["AUDITENV_SEED_SALT"] = salt
     return subprocess.run([sys.executable, "-m", "auditenv", "run", *args], cwd=cwd, env=env,
@@ -64,6 +65,17 @@ def test_hunter_positive_control_finds_truth_written_to_disk(tmp_path):
     markers = {tuple(f["affected_ids"]) for f in submitted(tmp_path / "traj.jsonl")}
     assert ("LEAK-TRUTH",) in markers
     assert json.loads((tmp_path / "log.jsonl").read_text())["tp"] == len(ep.truth["issues"])
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason="root reads every /proc/*/environ; run as non-root (Docker: auditor)")
+def test_salt_positive_control_without_hardening(tmp_path):
+    """Without PR_SET_DUMPABLE=0 the same hunter DOES read the salt from its parent: the
+    protection, not luck, is what keeps the salt secret in the test above."""
+    r = evaluator(["--policy", "truth_hunter", "--seed", "7", "--config", "dev-mixed", "--mode", "eval",
+                   "--log", str(tmp_path / "log.jsonl"), "--trajectory-out", str(tmp_path / "traj.jsonl")],
+                  cwd=tmp_path, salt="jury-" + secrets.token_hex(16), extra={"AUDITENV_INSECURE_DUMPABLE": "1"})
+    assert r.returncode == 0, r.stderr
+    assert ("LEAK-SALT",) in {tuple(f["affected_ids"]) for f in submitted(tmp_path / "traj.jsonl")}
 
 
 def test_agent_process_environment_is_clean(monkeypatch):
