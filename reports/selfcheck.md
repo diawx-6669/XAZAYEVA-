@@ -1,16 +1,16 @@
 # AuditEnv self-check
 
-Эпизоды: 20 (5 clean-only, 5 interaction-heavy, 10 dev-mixed). Время: 8.6 c.
+Эпизоды: 20 (5 clean-only, 5 interaction-heavy, 10 dev-mixed). Время: 9.1 c.
 
 ## Табло
 
 | Блок | Пройдено | Баллы |
 |---|---|---|
-| Контракт и изоляция | 19/20 | 23.8 / 25 |
+| Контракт и изоляция | 20/20 | 25.0 / 25 |
 | Данные и эталон | 20/20 | 25.0 / 25 |
-| Надёжность награды | 19/20 | 23.8 / 25 |
+| Надёжность награды | 20/20 | 25.0 / 25 |
 | Воспроизводимость и обобщение | 20/20 | 15.0 / 15 |
-| **Итого (без «Инженерии», 10 баллов оценивает жюри)** | | **87.5 / 90** |
+| **Итого (без «Инженерии», 10 баллов оценивает жюри)** | | **90.0 / 90** |
 
 ### Контракт и изоляция
 
@@ -32,8 +32,7 @@
 - PASS — eval mode: reward 0, info {}, result only in grader log
 - PASS — two env instances do not interfere
 - PASS — reset() isolates episode state
-- FAIL — invalid findings -> -1, terminated, logged  
-  `TypeError: unsupported operand type(s) for &=: 'bool' and 'str'`
+- PASS — invalid findings -> -1, terminated, logged
 - PASS — leakscan clean on all trajectories; records read-only
 
 ### Данные и эталон
@@ -67,7 +66,7 @@
 - PASS — duplicated findings never add reward
 - PASS — flag_all scores <= -0.5 everywhere
 - PASS — all types x all docs scores <= 0
-- FAIL — 10 vs 50 steps differ by exactly 0.08
+- PASS — 10 vs 50 steps differ by exactly 0.08
 - PASS — explanation text has no effect
 - PASS — persuasive wrong answer gets no TP
 - PASS — guessed IDs get no TP
@@ -109,20 +108,20 @@
 
 | Политика | P | R | F1 | Возврат | Возврат (эксп.) | Шаги | Время, мс (ср/макс) | Агент видел награду |
 |---|---|---|---|---|---|---|---|---|
-| random_explorer | 0.000 | 0.000 | 0.300 | -0.417 | -0.417 | 30.0 | 73 / 96 | нет |
-| simple_reconcile | 0.591 | 0.615 | 0.642 | 0.265 | 0.265 | 13.7 | 66 / 79 | нет |
-| flag_all | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 4.0 | 68 / 78 | нет |
-| oracle | 0.700 | 0.700 | 1.000 | 1.000 | -0.400 | 1.0 | 2 / 2 | нет |
+| random_explorer | 0.000 | 0.000 | 0.300 | -0.417 | -0.417 | 30.0 | 77 / 90 | нет |
+| simple_reconcile | 0.591 | 0.615 | 0.642 | 0.265 | 0.265 | 13.7 | 78 / 95 | нет |
+| flag_all | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 4.0 | 73 / 87 | нет |
+| oracle | 0.700 | 0.700 | 1.000 | 1.000 | -0.400 | 1.0 | 2 / 3 | нет |
 | attack:twins | 0.023 | 0.312 | 0.042 | -0.915 | -1.000 | 1.0 | 5 / 7 | нет |
 | attack:type_bruteforce | 0.175 | 0.700 | 0.580 | 0.160 | -0.400 | 1.0 | 3 / 4 | нет |
-| attack:amount_bruteforce | 0.068 | 0.610 | 0.422 | -0.156 | -0.400 | 1.0 | 4 / 12 | нет |
-| attack:guess_ids | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 1.0 | 3 / 3 | нет |
-| attack:evidence_spam | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 1.0 | 3 / 3 | нет |
-| attack:junk_explanation | 0.700 | 0.700 | 1.000 | 1.000 | -0.400 | 1.0 | 3 / 4 | нет |
-| attack:persuasive_wrong | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 1.0 | 3 / 4 | нет |
+| attack:amount_bruteforce | 0.068 | 0.610 | 0.422 | -0.156 | -0.400 | 1.0 | 4 / 15 | нет |
+| attack:guess_ids | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 1.0 | 4 / 5 | нет |
+| attack:evidence_spam | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 1.0 | 3 / 4 | нет |
+| attack:junk_explanation | 0.700 | 0.700 | 1.000 | 1.000 | -0.400 | 1.0 | 4 / 6 | нет |
+| attack:persuasive_wrong | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 1.0 | 5 / 6 | нет |
 | attack:wrong_currency | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 1.0 | 3 / 4 | нет |
-| attack:all_types_all_docs | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 1.0 | 5 / 7 | нет |
-| attack:empty | 0.000 | 0.000 | 0.300 | -0.400 | -0.400 | 1.0 | 3 / 3 | нет |
+| attack:all_types_all_docs | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 1.0 | 5 / 6 | нет |
+| attack:empty | 0.000 | 0.000 | 0.300 | -0.400 | -0.400 | 1.0 | 3 / 4 | нет |
 
 ## Разбор сбоев simple_reconcile
 

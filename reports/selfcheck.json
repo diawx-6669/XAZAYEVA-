@@ -92,9 +92,9 @@
     "ok": true
    },
    {
-    "error": "Traceback (most recent call last):\n  File \"/home/user/XAZAYEVA-/auditenv/selfcheck.py\", line 294, in run_checks\n    ok = bool(fn())\n              ^^^^\n  File \"/home/user/XAZAYEVA-/auditenv/selfcheck.py\", line 252, in c_invalid_findings\n    ok &= out[1] == -1.0 and out[2] is True and log.records[0][\"valid\"] is False and log.records[0][\"error\"]\nTypeError: unsupported operand type(s) for &=: 'bool' and 'str'\n",
+    "error": null,
     "name": "invalid findings -> -1, terminated, logged",
-    "ok": false
+    "ok": true
    },
    {
     "error": null,
@@ -340,7 +340,7 @@
    {
     "error": null,
     "name": "10 vs 50 steps differ by exactly 0.08",
-    "ok": false
+    "ok": true
    },
    {
     "error": null,
@@ -415,171 +415,171 @@
    "P": 0.0,
    "R": 0.0,
    "agent_saw_reward": false,
-   "max_time_ms": 95.77608500012502,
+   "max_time_ms": 90.07329800033403,
    "policy": "random_explorer",
    "return": -0.4174,
    "return_exp": -0.4174,
    "steps": 30,
-   "time_ms": 72.94790349998266
+   "time_ms": 76.87747204997777
   },
   {
    "F1": 0.6422005772005772,
    "P": 0.5908333333333333,
    "R": 0.615,
    "agent_saw_reward": false,
-   "max_time_ms": 78.62833900003352,
+   "max_time_ms": 95.37273199975971,
    "policy": "simple_reconcile",
    "return": 0.26480115440115437,
    "return_exp": 0.26480115440115437,
    "steps": 13.7,
-   "time_ms": 65.61118649999571
+   "time_ms": 78.43265515002713
   },
   {
    "F1": 0.0,
    "P": 0.0,
    "R": 0.0,
    "agent_saw_reward": false,
-   "max_time_ms": 78.27997599997616,
+   "max_time_ms": 87.18043399994713,
    "policy": "flag_all",
    "return": -1.0,
    "return_exp": -1.0,
    "steps": 4,
-   "time_ms": 67.9032763500004
+   "time_ms": 73.46126409995577
   },
   {
    "F1": 1.0,
    "P": 0.7,
    "R": 0.7,
    "agent_saw_reward": false,
-   "max_time_ms": 2.204247999998188,
+   "max_time_ms": 2.6432480003677483,
    "policy": "oracle",
    "return": 1.0,
    "return_exp": -0.4,
    "steps": 1,
-   "time_ms": 1.7344292500183656
+   "time_ms": 2.0175445500626665
   },
   {
    "F1": 0.04240262307268949,
    "P": 0.023333333333333334,
    "R": 0.31166666666666665,
    "agent_saw_reward": false,
-   "max_time_ms": 6.682622999960586,
+   "max_time_ms": 6.922418000158359,
    "policy": "attack:twins",
    "return": -0.915194753854621,
    "return_exp": -1.0,
    "steps": 1,
-   "time_ms": 5.1835828999628575
+   "time_ms": 4.757140400033677
   },
   {
    "F1": 0.5800000000000001,
    "P": 0.175,
    "R": 0.7,
    "agent_saw_reward": false,
-   "max_time_ms": 4.4329410000045755,
+   "max_time_ms": 4.445557000053668,
    "policy": "attack:type_bruteforce",
    "return": 0.16,
    "return_exp": -0.4,
    "steps": 1,
-   "time_ms": 3.4788865499990607
+   "time_ms": 3.2078969999702167
   },
   {
    "F1": 0.4221339444868857,
    "P": 0.06818181818181819,
    "R": 0.61,
    "agent_saw_reward": false,
-   "max_time_ms": 11.891239999840764,
+   "max_time_ms": 14.856740000141144,
    "policy": "attack:amount_bruteforce",
    "return": -0.15573211102622866,
    "return_exp": -0.4,
    "steps": 1,
-   "time_ms": 3.8486411000008047
+   "time_ms": 4.295706149991929
   },
   {
    "F1": 0.0,
    "P": 0.0,
    "R": 0.0,
    "agent_saw_reward": false,
-   "max_time_ms": 3.228626999998596,
+   "max_time_ms": 4.5700659998146875,
    "policy": "attack:guess_ids",
    "return": -1.0,
    "return_exp": -1.0,
    "steps": 1,
-   "time_ms": 2.866193200009093
+   "time_ms": 3.5316809999812904
   },
   {
    "F1": 0.0,
    "P": 0.0,
    "R": 0.0,
    "agent_saw_reward": false,
-   "max_time_ms": 3.207081000027756,
+   "max_time_ms": 4.112313999939943,
    "policy": "attack:evidence_spam",
    "return": -1.0,
    "return_exp": -1.0,
    "steps": 1,
-   "time_ms": 2.626762199975019
+   "time_ms": 3.42305430003762
   },
   {
    "F1": 1.0,
    "P": 0.7,
    "R": 0.7,
    "agent_saw_reward": false,
-   "max_time_ms": 3.843187000029502,
+   "max_time_ms": 5.6935930001600354,
    "policy": "attack:junk_explanation",
    "return": 1.0,
    "return_exp": -0.4,
    "steps": 1,
-   "time_ms": 2.822504099992784
+   "time_ms": 3.843706099951305
   },
   {
    "F1": 0.0,
    "P": 0.0,
    "R": 0.0,
    "agent_saw_reward": false,
-   "max_time_ms": 3.790664000007382,
+   "max_time_ms": 5.95117000011669,
    "policy": "attack:persuasive_wrong",
    "return": -1.0,
    "return_exp": -1.0,
    "steps": 1,
-   "time_ms": 3.1551934500157586
+   "time_ms": 4.803259800041815
   },
   {
    "F1": 0.0,
    "P": 0.0,
    "R": 0.0,
    "agent_saw_reward": false,
-   "max_time_ms": 4.121494999935749,
+   "max_time_ms": 3.702334000081464,
    "policy": "attack:wrong_currency",
    "return": -1.0,
    "return_exp": -1.0,
    "steps": 1,
-   "time_ms": 3.0441366000218295
+   "time_ms": 3.174399799945604
   },
   {
    "F1": 0.0,
    "P": 0.0,
    "R": 0.0,
    "agent_saw_reward": false,
-   "max_time_ms": 6.562642999824675,
+   "max_time_ms": 6.433484999888606,
    "policy": "attack:all_types_all_docs",
    "return": -1.0,
    "return_exp": -1.0,
    "steps": 1,
-   "time_ms": 5.1743081999916285
+   "time_ms": 5.2381533000698255
   },
   {
    "F1": 0.3,
    "P": 0.0,
    "R": 0.0,
    "agent_saw_reward": false,
-   "max_time_ms": 3.3184839999194082,
+   "max_time_ms": 4.265908999968815,
    "policy": "attack:empty",
    "return": -0.4,
    "return_exp": -0.4,
    "steps": 1,
-   "time_ms": 2.823687949990017
+   "time_ms": 3.470969350019004
   }
  ],
- "elapsed_s": 8.6,
+ "elapsed_s": 9.1,
  "episodes": [
   "clean-only#9001",
   "clean-only#9002",
@@ -629,10 +629,10 @@
  },
  "max_total": 90,
  "score": {
-  "contract": 23.75,
+  "contract": 25.0,
   "data": 25.0,
   "repro": 15.0,
-  "reward": 23.75
+  "reward": 25.0
  },
- "total": 87.5
+ "total": 90.0
 }
