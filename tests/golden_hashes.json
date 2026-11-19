@@ -1,0 +1,14 @@
+{
+ "dev-mixed#22": {
+  "public": "098df6e8bf464c00dbc3e28dbb8d3282e85eb707c4a27ac3510e0ff2d82e1a0f",
+  "truth": "038745e23246c0ad6666c5a6cc514bce917a0d42883caa00eaec42a3f10a50d4"
+ },
+ "interaction-heavy#33": {
+  "public": "e60614fc1dde7377b9d204c3bacfb7daba47c48547bdda3128f7fab0ed4e64ed",
+  "truth": "cdd4736d418d440f7d217a205379edda9318d1d8ba58b6ccb5f756e590acc386"
+ },
+ "train-easy#11": {
+  "public": "6129e75205e74cc3ec888333bc17966d46b68cfa567198109e2237e478f3a3c1",
+  "truth": "ab0ba5a4e10566efae0123cc70a967c29658c1b240c3a1b930a28900c9e5f4b7"
+ }
+}

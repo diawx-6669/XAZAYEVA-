@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "train": [
+    {"config": "train-easy", "seeds": [101, 102, 103, 104, 105, 106, 107, 108, 109, 110]}
+  ],
+  "dev": [
+    {"config": "dev-mixed", "seeds": [201, 202, 203, 204, 205]},
+    {"config": "interaction-heavy", "seeds": [206, 207, 208]},
+    {"config": "clean-only", "seeds": [209, 210]}
+  ],
+  "selfcheck": [
+    {"config": "clean-only", "seeds": [9001, 9002, 9003, 9004, 9005]},
+    {"config": "interaction-heavy", "seeds": [9006, 9007, 9008, 9009, 9010]},
+    {"config": "dev-mixed", "seeds": [9011, 9012, 9013, 9014, 9015, 9016, 9017, 9018, 9019, 9020]}
+  ]
+}

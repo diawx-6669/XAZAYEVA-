@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "auditenv/policy.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["policy_id", "fx_rate_date", "fx_rate_date_basis", "fx_missing_rate", "fx_rate_meaning", "fx_conversion",
+               "period_boundary", "rounding", "recognition", "payment_allocation", "ar_relief_rate",
+               "fx_difference_account", "unapplied_cash", "credit_notes", "accounts"],
+  "properties": {
+    "policy_id": {"const": "policy"},
+    "fx_rate_date": {"const": "transaction_date"},
+    "fx_rate_date_basis": {"type": "string"},
+    "fx_missing_rate": {"const": "previous_business_day"},
+    "fx_rate_meaning": {"type": "string"},
+    "fx_conversion": {"type": "string"},
+    "period_boundary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["start", "end", "timezone", "inclusive_start", "inclusive_end"],
+      "properties": {"start": {"type": "string"}, "end": {"type": "string"}, "timezone": {"type": "string"},
+                     "inclusive_start": {"const": true}, "inclusive_end": {"const": false}}
+    },
+    "rounding": {"const": "ROUND_HALF_EVEN"},
+    "recognition": {"const": "invoice_issue_date"},
+    "payment_allocation": {"const": "invoice_refs_in_order_up_to_open_balance"},
+    "ar_relief_rate": {"type": "string"},
+    "fx_difference_account": {"const": "7900"},
+    "unapplied_cash": {"type": "string"},
+    "credit_notes": {"type": "string"},
+    "accounts": {"type": "object", "additionalProperties": {"type": "string"}}
+  }
+}

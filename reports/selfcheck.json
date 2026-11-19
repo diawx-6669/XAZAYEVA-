@@ -1,0 +1,638 @@
+{
+ "blocks": {
+  "contract": [
+   {
+    "error": null,
+    "name": "reset() shape and first observation",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "step() 5-tuple, reward 0 while exploring",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "observations follow observation.schema.json",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "page limit 50 enforced",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "cursors stable, full pagination exact",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "foreign/garbled cursors rejected",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "unknown tool -> unknown_tool, step spent",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "unknown / other-table ID -> same not_found",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "malformed actions -> bad_args",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "100 steps without submit -> truncated, empty answer",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "submit on step 100 allowed",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "time limit -> truncated",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "step after end -> episode_over, result frozen",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "calculator rejects code/power/names/long/div0/deep",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "calculator exact decimal arithmetic",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "eval mode: reward 0, info {}, result only in grader log",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "two env instances do not interfere",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "reset() isolates episode state",
+    "ok": true
+   },
+   {
+    "error": "Traceback (most recent call last):\n  File \"/home/user/XAZAYEVA-/auditenv/selfcheck.py\", line 294, in run_checks\n    ok = bool(fn())\n              ^^^^\n  File \"/home/user/XAZAYEVA-/auditenv/selfcheck.py\", line 252, in c_invalid_findings\n    ok &= out[1] == -1.0 and out[2] is True and log.records[0][\"valid\"] is False and log.records[0][\"error\"]\nTypeError: unsupported operand type(s) for &=: 'bool' and 'str'\n",
+    "name": "invalid findings -> -1, terminated, logged",
+    "ok": false
+   },
+   {
+    "error": null,
+    "name": "leakscan clean on all trajectories; records read-only",
+    "ok": true
+   }
+  ],
+  "data": [
+   {
+    "error": null,
+    "name": "clean-only#9001 (0 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "clean-only#9002 (0 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "clean-only#9003 (0 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "clean-only#9004 (0 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "clean-only#9005 (0 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "interaction-heavy#9006 (5 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "interaction-heavy#9007 (3 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "interaction-heavy#9008 (3 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "interaction-heavy#9009 (5 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "interaction-heavy#9010 (4 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9011 (4 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9012 (1 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9013 (4 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9014 (3 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9015 (4 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9016 (0 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9017 (2 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9018 (3 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9019 (1 issues)",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9020 (1 issues)",
+    "ok": true
+   }
+  ],
+  "repro": [
+   {
+    "error": null,
+    "name": "clean-only#9001 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "clean-only#9002 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "clean-only#9003 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "clean-only#9004 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "clean-only#9005 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "interaction-heavy#9006 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "interaction-heavy#9007 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "interaction-heavy#9008 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "interaction-heavy#9009 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "interaction-heavy#9010 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9011 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9012 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9013 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9014 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9015 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9016 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9017 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9018 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9019 twin",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "dev-mixed#9020 twin",
+    "ok": true
+   }
+  ],
+  "reward": [
+   {
+    "error": null,
+    "name": "oracle answer beats silence on erroneous books",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "silence beats false accusations on clean books",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "twins attack (x30) gains nothing",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "duplicated findings never add reward",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "flag_all scores <= -0.5 everywhere",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "all types x all docs scores <= 0",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "10 vs 50 steps differ by exactly 0.08",
+    "ok": false
+   },
+   {
+    "error": null,
+    "name": "explanation text has no effect",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "persuasive wrong answer gets no TP",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "guessed IDs get no TP",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "evidence spam without a valid set gets no TP",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "wrong currency gets no TP",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "type brute force < oracle",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "amount brute force < oracle",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "malformed findings -> -1",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "foreign episode_id -> -1",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "finding order does not change F1",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "re-submission is ignored",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "truncation grades an empty answer",
+    "ok": true
+   },
+   {
+    "error": null,
+    "name": "tolerance: +-1 matches, +-2 does not",
+    "ok": true
+   }
+  ]
+ },
+ "diagnostics": [
+  {
+   "F1": 0.3,
+   "P": 0.0,
+   "R": 0.0,
+   "agent_saw_reward": false,
+   "max_time_ms": 95.77608500012502,
+   "policy": "random_explorer",
+   "return": -0.4174,
+   "return_exp": -0.4174,
+   "steps": 30,
+   "time_ms": 72.94790349998266
+  },
+  {
+   "F1": 0.6422005772005772,
+   "P": 0.5908333333333333,
+   "R": 0.615,
+   "agent_saw_reward": false,
+   "max_time_ms": 78.62833900003352,
+   "policy": "simple_reconcile",
+   "return": 0.26480115440115437,
+   "return_exp": 0.26480115440115437,
+   "steps": 13.7,
+   "time_ms": 65.61118649999571
+  },
+  {
+   "F1": 0.0,
+   "P": 0.0,
+   "R": 0.0,
+   "agent_saw_reward": false,
+   "max_time_ms": 78.27997599997616,
+   "policy": "flag_all",
+   "return": -1.0,
+   "return_exp": -1.0,
+   "steps": 4,
+   "time_ms": 67.9032763500004
+  },
+  {
+   "F1": 1.0,
+   "P": 0.7,
+   "R": 0.7,
+   "agent_saw_reward": false,
+   "max_time_ms": 2.204247999998188,
+   "policy": "oracle",
+   "return": 1.0,
+   "return_exp": -0.4,
+   "steps": 1,
+   "time_ms": 1.7344292500183656
+  },
+  {
+   "F1": 0.04240262307268949,
+   "P": 0.023333333333333334,
+   "R": 0.31166666666666665,
+   "agent_saw_reward": false,
+   "max_time_ms": 6.682622999960586,
+   "policy": "attack:twins",
+   "return": -0.915194753854621,
+   "return_exp": -1.0,
+   "steps": 1,
+   "time_ms": 5.1835828999628575
+  },
+  {
+   "F1": 0.5800000000000001,
+   "P": 0.175,
+   "R": 0.7,
+   "agent_saw_reward": false,
+   "max_time_ms": 4.4329410000045755,
+   "policy": "attack:type_bruteforce",
+   "return": 0.16,
+   "return_exp": -0.4,
+   "steps": 1,
+   "time_ms": 3.4788865499990607
+  },
+  {
+   "F1": 0.4221339444868857,
+   "P": 0.06818181818181819,
+   "R": 0.61,
+   "agent_saw_reward": false,
+   "max_time_ms": 11.891239999840764,
+   "policy": "attack:amount_bruteforce",
+   "return": -0.15573211102622866,
+   "return_exp": -0.4,
+   "steps": 1,
+   "time_ms": 3.8486411000008047
+  },
+  {
+   "F1": 0.0,
+   "P": 0.0,
+   "R": 0.0,
+   "agent_saw_reward": false,
+   "max_time_ms": 3.228626999998596,
+   "policy": "attack:guess_ids",
+   "return": -1.0,
+   "return_exp": -1.0,
+   "steps": 1,
+   "time_ms": 2.866193200009093
+  },
+  {
+   "F1": 0.0,
+   "P": 0.0,
+   "R": 0.0,
+   "agent_saw_reward": false,
+   "max_time_ms": 3.207081000027756,
+   "policy": "attack:evidence_spam",
+   "return": -1.0,
+   "return_exp": -1.0,
+   "steps": 1,
+   "time_ms": 2.626762199975019
+  },
+  {
+   "F1": 1.0,
+   "P": 0.7,
+   "R": 0.7,
+   "agent_saw_reward": false,
+   "max_time_ms": 3.843187000029502,
+   "policy": "attack:junk_explanation",
+   "return": 1.0,
+   "return_exp": -0.4,
+   "steps": 1,
+   "time_ms": 2.822504099992784
+  },
+  {
+   "F1": 0.0,
+   "P": 0.0,
+   "R": 0.0,
+   "agent_saw_reward": false,
+   "max_time_ms": 3.790664000007382,
+   "policy": "attack:persuasive_wrong",
+   "return": -1.0,
+   "return_exp": -1.0,
+   "steps": 1,
+   "time_ms": 3.1551934500157586
+  },
+  {
+   "F1": 0.0,
+   "P": 0.0,
+   "R": 0.0,
+   "agent_saw_reward": false,
+   "max_time_ms": 4.121494999935749,
+   "policy": "attack:wrong_currency",
+   "return": -1.0,
+   "return_exp": -1.0,
+   "steps": 1,
+   "time_ms": 3.0441366000218295
+  },
+  {
+   "F1": 0.0,
+   "P": 0.0,
+   "R": 0.0,
+   "agent_saw_reward": false,
+   "max_time_ms": 6.562642999824675,
+   "policy": "attack:all_types_all_docs",
+   "return": -1.0,
+   "return_exp": -1.0,
+   "steps": 1,
+   "time_ms": 5.1743081999916285
+  },
+  {
+   "F1": 0.3,
+   "P": 0.0,
+   "R": 0.0,
+   "agent_saw_reward": false,
+   "max_time_ms": 3.3184839999194082,
+   "policy": "attack:empty",
+   "return": -0.4,
+   "return_exp": -0.4,
+   "steps": 1,
+   "time_ms": 2.823687949990017
+  }
+ ],
+ "elapsed_s": 8.6,
+ "episodes": [
+  "clean-only#9001",
+  "clean-only#9002",
+  "clean-only#9003",
+  "clean-only#9004",
+  "clean-only#9005",
+  "interaction-heavy#9006",
+  "interaction-heavy#9007",
+  "interaction-heavy#9008",
+  "interaction-heavy#9009",
+  "interaction-heavy#9010",
+  "dev-mixed#9011",
+  "dev-mixed#9012",
+  "dev-mixed#9013",
+  "dev-mixed#9014",
+  "dev-mixed#9015",
+  "dev-mixed#9016",
+  "dev-mixed#9017",
+  "dev-mixed#9018",
+  "dev-mixed#9019",
+  "dev-mixed#9020"
+ ],
+ "failure_analysis": {
+  "fp_reasons": {
+   "ids_mismatch": 2,
+   "unmatched": 8,
+   "wrong_type": 3
+  },
+  "recall_by_type": {
+   "duplicate_invoice": {
+    "found": 6,
+    "total": 6
+   },
+   "fx_rate": {
+    "found": 7,
+    "total": 13
+   },
+   "payment_allocation": {
+    "found": 15,
+    "total": 15
+   },
+   "period_cutoff": {
+    "found": 9,
+    "total": 9
+   }
+  }
+ },
+ "max_total": 90,
+ "score": {
+  "contract": 23.75,
+  "data": 25.0,
+  "repro": 15.0,
+  "reward": 23.75
+ },
+ "total": 87.5
+}

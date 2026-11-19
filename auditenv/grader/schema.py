@@ -24,6 +24,10 @@ def validate_findings(obj, episode_id: str):
     if errors:
         e = errors[0]
         return "schema:" + "/".join(str(p) for p in e.absolute_path) + ":" + e.validator
+    # JSON Schema treats 5.0 as an integer; money must be a real int (never float/bool).
+    for k, f in enumerate(obj["findings"]):
+        if type(f["claimed_amount_minor"]) is not int:
+            return f"schema:findings/{k}/claimed_amount_minor:int_required"
     if obj["episode_id"] != episode_id:
         return "episode_id_mismatch"
     return None

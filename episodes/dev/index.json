@@ -1,0 +1,107 @@
+[
+ {
+  "episode_id": "ep-3bwbxj4nsy",
+  "config": "dev-mixed",
+  "seed": 201,
+  "n_issues": 2,
+  "types": [
+   "duplicate_invoice",
+   "payment_allocation"
+  ],
+  "digest": "e5636ff3ad00c11fdfb57f6d494906c06e9a8cbf04edc3592ae10f4c72251aa7"
+ },
+ {
+  "episode_id": "ep-yee4e3r3ar",
+  "config": "dev-mixed",
+  "seed": 202,
+  "n_issues": 0,
+  "types": [],
+  "digest": "a1e9b289a7d4ec546d34fdcd2310c4bf0e0f354cdf008d76f9c0886db10e2059"
+ },
+ {
+  "episode_id": "ep-vw9vceq4qf",
+  "config": "dev-mixed",
+  "seed": 203,
+  "n_issues": 4,
+  "types": [
+   "duplicate_invoice",
+   "fx_rate",
+   "fx_rate",
+   "payment_allocation"
+  ],
+  "digest": "640644231a79543893c63cc235be0c9e438c212c17ad464f90dae7e8d04c4267"
+ },
+ {
+  "episode_id": "ep-eedmc2zyem",
+  "config": "dev-mixed",
+  "seed": 204,
+  "n_issues": 0,
+  "types": [],
+  "digest": "ca8e130b6361dc38bb7125b4c0c68f1e48d657880357b680ff1762cadaaa1ae1"
+ },
+ {
+  "episode_id": "ep-ghqjfb86vj",
+  "config": "dev-mixed",
+  "seed": 205,
+  "n_issues": 2,
+  "types": [
+   "fx_rate",
+   "payment_allocation"
+  ],
+  "digest": "04e11880d4fed9e73a84dc7423501dfca4c3069ec069f93c8648f87c04ead6a6"
+ },
+ {
+  "episode_id": "ep-vq9n3qwk8v",
+  "config": "interaction-heavy",
+  "seed": 206,
+  "n_issues": 6,
+  "types": [
+   "duplicate_invoice",
+   "duplicate_invoice",
+   "fx_rate",
+   "fx_rate",
+   "fx_rate",
+   "payment_allocation"
+  ],
+  "digest": "c9ccf13da0e32757a2eb32a84c9efd84328dc2fcca414f69dd682b263202efef"
+ },
+ {
+  "episode_id": "ep-byttstzrqb",
+  "config": "interaction-heavy",
+  "seed": 207,
+  "n_issues": 3,
+  "types": [
+   "fx_rate",
+   "payment_allocation",
+   "payment_allocation"
+  ],
+  "digest": "76e56dca3c43ff5fe71e262bfe0ccba276af147bde43da2315cf7e2550c013ac"
+ },
+ {
+  "episode_id": "ep-htfdvq2mvr",
+  "config": "interaction-heavy",
+  "seed": 208,
+  "n_issues": 2,
+  "types": [
+   "duplicate_invoice",
+   "fx_rate"
+  ],
+  "digest": "caf3270b5afa768b92ffaededd27eca4a3cd6442245794fd14501ea8186efa37"
+ },
+ {
+  "episode_id": "ep-ap6e6dpf7p",
+  "config": "clean-only",
+  "seed": 209,
+  "n_issues": 0,
+  "types": [],
+  "digest": "7a95899d8e8504a1522748162fdb043e409b87e0659b1bfaf813be586b52b817"
+ },
+ {
+  "episode_id": "ep-etjx7zm8qz",
+  "config": "clean-only",
+  "seed": 210,
+  "n_issues": 0,
+  "types": [],
+  "digest": "f26622ca956b6786fb334c3538d67f0bc34aeb249a4a550533baadf3bfc921ab"
+ }
+]

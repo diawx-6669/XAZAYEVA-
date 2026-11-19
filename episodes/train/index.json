@@ -1,0 +1,110 @@
+[
+ {
+  "episode_id": "ep-p2ndc2nyey",
+  "config": "train-easy",
+  "seed": 101,
+  "n_issues": 0,
+  "types": [],
+  "digest": "b8cf4f9a5a78aafbda1f122d0dec60346751edaf0370cc7529e2936e567e0a46"
+ },
+ {
+  "episode_id": "ep-wtma6rce3f",
+  "config": "train-easy",
+  "seed": 102,
+  "n_issues": 1,
+  "types": [
+   "duplicate_invoice"
+  ],
+  "digest": "09c8b00f6d6f9a937eea7fd4d8630f589d1222f324179dcf3d467fd1e3811cec"
+ },
+ {
+  "episode_id": "ep-4qgxw85smv",
+  "config": "train-easy",
+  "seed": 103,
+  "n_issues": 2,
+  "types": [
+   "payment_allocation",
+   "period_cutoff"
+  ],
+  "digest": "8d01a5a1c494252a11daeef7efcabe985b9d711b8d7e3363157fc5b6440e1822"
+ },
+ {
+  "episode_id": "ep-rntewpty5c",
+  "config": "train-easy",
+  "seed": 104,
+  "n_issues": 2,
+  "types": [
+   "fx_rate",
+   "fx_rate"
+  ],
+  "digest": "1b3e12ed35ef08709796a44aed6de2fb4221365e516d567719546315cc889489"
+ },
+ {
+  "episode_id": "ep-rmhcqsyns9",
+  "config": "train-easy",
+  "seed": 105,
+  "n_issues": 3,
+  "types": [
+   "duplicate_invoice",
+   "fx_rate",
+   "period_cutoff"
+  ],
+  "digest": "558606aa21d9af313ef1a02e5f39b18c3763514f6967a9e7c038dc0a2c0a1cb8"
+ },
+ {
+  "episode_id": "ep-jpekadpkeb",
+  "config": "train-easy",
+  "seed": 106,
+  "n_issues": 1,
+  "types": [
+   "payment_allocation"
+  ],
+  "digest": "f718fdb5ce2eb44129d9c85c6300a44599504fea6ae238d618709554be7a8906"
+ },
+ {
+  "episode_id": "ep-57e8bktrhw",
+  "config": "train-easy",
+  "seed": 107,
+  "n_issues": 2,
+  "types": [
+   "duplicate_invoice",
+   "period_cutoff"
+  ],
+  "digest": "6ba72f43feb71e994a71f938176104d3086d32aa7ae8b374ab1f69766857d055"
+ },
+ {
+  "episode_id": "ep-mt68p5wbd2",
+  "config": "train-easy",
+  "seed": 108,
+  "n_issues": 3,
+  "types": [
+   "duplicate_invoice",
+   "fx_rate",
+   "payment_allocation"
+  ],
+  "digest": "c0cf8c868585444ce36d7e8a56c72e8f1fc1a15485bd634c1d5e5d3091213570"
+ },
+ {
+  "episode_id": "ep-t7w2w69599",
+  "config": "train-easy",
+  "seed": 109,
+  "n_issues": 3,
+  "types": [
+   "fx_rate",
+   "payment_allocation",
+   "period_cutoff"
+  ],
+  "digest": "595f0bc163dfcb4c603e3ee4f5ee07c94f4e640d7d4a881a12979bf4d72f2a7e"
+ },
+ {
+  "episode_id": "ep-8htn7y36fp",
+  "config": "train-easy",
+  "seed": 110,
+  "n_issues": 2,
+  "types": [
+   "fx_rate",
+   "payment_allocation"
+  ],
+  "digest": "5985c6fa090cb28ea32db950d2a9ea05b648cda06fe8fe49284bb8af15110fbc"
+ }
+]

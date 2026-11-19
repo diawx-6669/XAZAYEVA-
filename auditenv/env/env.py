@@ -59,6 +59,10 @@ class AuditEnv:
         self.run_meta: dict = {}
         self._data = None
         self._done = True
+        self._steps = 0
+        self._terminated = True
+        self._truncated = False
+        self.last_grade = None
 
     # ----------------------------------------------------------------- reset
     def reset(self, seed=None, config=None, *, episode_dir=None, episode=None, options=None):
@@ -113,8 +117,9 @@ class AuditEnv:
     # ------------------------------------------------------------------ step
     def step(self, action):
         if self._data is None or self._done:
-            return ({"error": {"code": EPISODE_OVER}, "steps_remaining": max(0, self._remaining()) if self._data else 0},
-                    0.0, self._terminated if self._data else True, self._truncated, {})
+            remaining = max(0, self._remaining()) if self._data else 0
+            return {"error": {"code": EPISODE_OVER}, "steps_remaining": remaining}, 0.0, self._terminated, \
+                self._truncated, {}
         if self.clock() - self._t0 > self.time_limit:
             return self._finish(None, truncated=True, obs_body={"error": {"code": EPISODE_OVER}}, count=False)
         self._steps += 1

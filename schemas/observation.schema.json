@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "auditenv/observation.schema.json",
+  "oneOf": [
+    {
+      "title": "first observation (reset)",
+      "type": "object", "additionalProperties": false,
+      "required": ["task", "manifest", "policy_summary", "steps_remaining"],
+      "properties": {"task": {"type": "string"}, "manifest": {"type": "object"}, "policy_summary": {"type": "object"},
+                     "steps_remaining": {"const": 100}}
+    },
+    {
+      "title": "tool result",
+      "type": "object", "additionalProperties": false, "required": ["result", "steps_remaining"],
+      "properties": {"result": {"type": "object"}, "steps_remaining": {"type": "integer", "minimum": 0, "maximum": 99}}
+    },
+    {
+      "title": "bounded error",
+      "type": "object", "additionalProperties": false, "required": ["error", "steps_remaining"],
+      "properties": {
+        "error": {"type": "object", "additionalProperties": false, "required": ["code"],
+                  "properties": {"code": {"enum": ["unknown_tool", "bad_args", "not_found", "invalid_cursor", "calc_error", "episode_over"]}}},
+        "steps_remaining": {"type": "integer", "minimum": 0, "maximum": 99}
+      }
+    }
+  ]
+}
