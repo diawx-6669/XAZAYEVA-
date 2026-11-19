@@ -5,7 +5,7 @@
   "n_foreign": [2, 3],
   "foreign_share": 0.4,
   "timezones": ["Asia/Almaty", "Asia/Tashkent", "Asia/Dubai", "Asia/Kolkata", "Asia/Tokyo", "America/Bogota", "America/Lima"],
-  "n_invoices": [45, 60],
+  "n_invoices": [26, 36],
   "distractors": {
     "recurring_rent": 0.5, "repeat_amount": 0.5, "split_payment": 0.5, "multi_invoice_payment": 0.5,
     "partial_open": 0.5, "refund": 0.5, "bank_fee": 0.5, "rounding_residual": 0.5, "boundary_time": 0.7,

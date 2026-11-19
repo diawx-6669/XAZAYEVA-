@@ -98,6 +98,21 @@ class Row:
     owner: tuple
 
 
+def split_by_lines(total: int, weights: list) -> list:
+    """Split an integer base amount across line items proportionally (largest remainder,
+    ties -> lower index). Exact: sum(parts) == total. Equal to the line amounts when the
+    document is already in base currency (total == sum(weights))."""
+    w = sum(weights)
+    if w == 0:
+        return [total] + [0] * (len(weights) - 1)
+    base = [total * x // w for x in weights]
+    rem = total - sum(base)
+    order = sorted(range(len(weights)), key=lambda i: (-(total * weights[i] % w), i))
+    for i in order[:rem]:
+        base[i] += 1
+    return base
+
+
 class Book:
     def __init__(self, story, ids: IdFactory, episode_id: str):
         self.story = story
@@ -152,12 +167,16 @@ class Book:
         return self.to_base(abs(inv.total), inv.currency, rate or self.correct_rate(inv.issued_at, inv.currency))
 
     def post_invoice(self, inv: InvoiceDoc):
+        """Dr 1200 for the document total; Cr 4000 once per line item (credit note: reversed)."""
         amt = inv.posted_base if inv.posted_base is not None else self.invoice_base(inv, inv.posted_rate)
         k = inv.key
+        parts = split_by_lines(amt, [abs(li["amount_minor"]) for li in inv.line_items])
         if inv.kind == "credit_note":
-            specs = [("cn_rev", "4000", amt, 0, k, None), ("cn_ar", "1200", 0, amt, k, None)]
+            specs = [(f"cn_rev:{i}", "4000", p, 0, k, None) for i, p in enumerate(parts)]
+            specs.append(("cn_ar", "1200", 0, amt, k, None))
         else:
-            specs = [("inv_ar", "1200", amt, 0, k, None), ("inv_rev", "4000", 0, amt, k, None)]
+            specs = [("inv_ar", "1200", amt, 0, k, None)]
+            specs += [(f"inv_rev:{i}", "4000", 0, p, k, None) for i, p in enumerate(parts)]
         self.post(("inv", k), inv.issued_at, inv.utc_fmt, inv.entity_id, specs)
 
     def post_payment(self, p: PaymentDoc):
@@ -223,6 +242,10 @@ class Book:
 
     # -------------------------------------------------------------- snapshots
     def inv_public(self, inv: InvoiceDoc) -> dict:
+        lines = copy.deepcopy(inv.line_items)
+        if inv.cancels:  # a credit note names the cancelled invoice inside each of its lines
+            for li in lines:
+                li["cancels_invoice_id"] = self.invoices[inv.cancels].invoice_id
         return {
             "doc_id": inv.doc_id,
             "invoice_id": inv.invoice_id,
@@ -231,8 +254,7 @@ class Book:
             "due_at": fmt_ts(inv.due_at, inv.utc_fmt),
             "currency": inv.currency,
             "total_minor": inv.total,
-            "line_items": copy.deepcopy(inv.line_items),
-            "cancels_invoice_id": self.invoices[inv.cancels].invoice_id if inv.cancels else None,
+            "line_items": lines,
         }
 
     def pay_public(self, p: PaymentDoc) -> dict:

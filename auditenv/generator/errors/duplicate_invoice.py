@@ -6,7 +6,7 @@ from __future__ import annotations
 import copy
 from datetime import timedelta
 
-from .base import MIN_AMOUNT, ErrorType, register, special
+from .base import MIN_AMOUNT, ErrorType, register, special, with_revenue_alternative
 
 
 @register
@@ -52,9 +52,7 @@ class DuplicateInvoice(ErrorType):
     def evidence_sets(self, book, target):
         dup = book.invoices[target]
         orig = book.invoices[target[:-1]]
-        ar = book.row_of(("inv", target), "inv_ar").row_id
-        rev = book.row_of(("inv", target), "inv_rev").row_id
-        return [[orig.doc_id, dup.doc_id, ar], [orig.doc_id, dup.doc_id, rev]]
+        return with_revenue_alternative(book, ("inv", target), [orig.doc_id, dup.doc_id], [])
 
     def expected_amount(self, book, target, **kw):
         return book.row_of(("inv", target), "inv_ar").debit

@@ -45,6 +45,19 @@ def _of(recs, kind):
     return [r for k, r in recs.values() if k == kind]
 
 
+def posting_from_rows(rows, inv):
+    """Invoice posting amount provable from the rows in an evidence set: its Dr/Cr 1200 row, or
+    ALL its revenue rows (policy: one 4000 row per line item)."""
+    own = [x for x in rows if x["invoice_id"] == inv["invoice_id"] and not x["payment_id"]]
+    ar = [x for x in own if x["account"] == "1200"]
+    if ar:
+        return ar[0]["debit_minor"] + ar[0]["credit_minor"]
+    rev = [x for x in own if x["account"] == "4000"]
+    if rev and len({x["row_id"] for x in rev}) == len(inv["line_items"]):
+        return sum(x["debit_minor"] + x["credit_minor"] for x in rev)
+    return None
+
+
 def verify_evidence(pd, issue: dict, ev: list):
     """Recompute the issue amount from the evidence records only. Returns (ok, reason, amount)."""
     if not (1 <= len(ev) <= 6):
@@ -67,11 +80,9 @@ def verify_evidence(pd, issue: dict, ev: list):
                  and (parse_ts(i["issued_at"]), i["invoice_id"]) < (t_dup, aid)]
         if not origs:
             return False, "missing_original", None
-        r = [x for x in rows if x["invoice_id"] == aid and not x["payment_id"]
-             and ((x["account"] == "1200" and x["debit_minor"]) or (x["account"] == "4000" and x["credit_minor"]))]
-        if not r:
+        amount = posting_from_rows(rows, dup)
+        if amount is None:
             return False, "missing_ledger_row", None
-        amount = r[0]["debit_minor"] + r[0]["credit_minor"]
     elif typ == "payment_allocation":
         p = [x for x in payments if x["payment_id"] == aid]
         if not p or not p[0]["invoice_refs"]:
@@ -97,9 +108,7 @@ def verify_evidence(pd, issue: dict, ev: list):
         amt_doc = abs(d["total_minor"]) if is_inv else d["amount_minor"]
         correct = pd.to_base(amt_doc, d["currency"], fx[0]["rate"])
         if is_inv:
-            r = [x for x in rows if x["invoice_id"] == aid and not x["payment_id"]
-                 and ((x["account"] == "1200" and x["debit_minor"]) or (x["account"] == "4000" and x["credit_minor"]))]
-            posted = (r[0]["debit_minor"] + r[0]["credit_minor"]) if r else None
+            posted = posting_from_rows(rows, d)
         else:
             r = [x for x in rows if x["payment_id"] == aid and x["account"] == "1000" and x["debit_minor"]]
             posted = r[0]["debit_minor"] if r else None
@@ -114,11 +123,9 @@ def verify_evidence(pd, issue: dict, ev: list):
         t = parse_ts(d[0]["issued_at"])
         if parse_ts(pb["start"]) <= t < parse_ts(pb["end"]):
             return False, "not_outside_period", None
-        r = [x for x in rows if x["invoice_id"] == aid and not x["payment_id"]
-             and ((x["account"] == "1200" and x["debit_minor"]) or (x["account"] == "4000" and x["credit_minor"]))]
-        if not r:
+        amount = posting_from_rows(rows, d[0])
+        if amount is None:
             return False, "missing_ledger_row", None
-        amount = r[0]["debit_minor"] + r[0]["credit_minor"]
     else:
         return False, "unknown_type", None
     if abs(amount - issue["expected_amount_minor"]) > 1:

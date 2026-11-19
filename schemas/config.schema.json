@@ -5,7 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["name", "version", "base_currencies", "foreign_currencies", "n_foreign", "foreign_share", "timezones",
-               "period_starts", "period_months", "n_entities", "n_invoices", "utc_share", "distractors",
+               "period_starts", "period_months", "n_entities", "n_invoices", "line_items", "utc_share", "distractors",
                "clean_probability", "n_errors", "errors", "interactions", "min_interactions", "fx_variants",
                "allocation_variants", "max_steps", "tolerance_minor", "max_attempts"],
   "$defs": {
@@ -25,6 +25,7 @@
     "period_months": {"type": "integer", "minimum": 1, "maximum": 6},
     "n_entities": {"$ref": "#/$defs/range"},
     "n_invoices": {"$ref": "#/$defs/range"},
+    "line_items": {"type": "array", "items": {"type": "integer", "minimum": 1, "maximum": 10}, "minItems": 2, "maxItems": 2},
     "utc_share": {"$ref": "#/$defs/range"},
     "distractors": {
       "type": "object", "additionalProperties": false,

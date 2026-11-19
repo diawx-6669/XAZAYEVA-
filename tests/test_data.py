@@ -163,3 +163,54 @@ def test_null_references_are_explicit(episodes):
     assert all("invoice_refs" in p for p in pd.payments)
     raw = pd.files["payments.jsonl"].decode()
     assert '"invoice_refs":null' in raw or all(p["invoice_refs"] for p in pd.payments)
+
+
+CASE_INVOICE_FIELDS = {"doc_id", "invoice_id", "entity_id", "issued_at", "due_at", "currency", "total_minor", "line_items"}
+
+
+@pytest.mark.parametrize("seed", range(10))
+def test_invoice_fields_exactly_as_in_case(seed):
+    pd = generate_episode(seed, "clean-only").public()
+    assert all(set(i) == CASE_INVOICE_FIELDS for i in pd.invoices)
+    cns = [i for i in pd.invoices if any("cancels_invoice_id" in li for li in i["line_items"])]
+    for cn in cns:  # the credit-note reference lives inside line_items and resolves
+        assert cn["total_minor"] < 0
+        assert {li["cancels_invoice_id"] for li in cn["line_items"]} <= set(pd.invoice_by_id)
+
+
+def test_credit_notes_exist_and_solver_handles_them():
+    seen = 0
+    for seed in range(20):
+        ep = generate_episode(seed, "clean-only")
+        pd = ep.public()
+        seen += sum(1 for i in pd.invoices if any("cancels_invoice_id" in li for li in i["line_items"]))
+        assert solve(pd)["issues"] == []  # re-issued invoice is not a duplicate
+    assert seen >= 5
+
+
+def test_revenue_split_is_exact():
+    from auditenv.generator.books import split_by_lines
+
+    assert split_by_lines(100, [1, 1, 1]) == [34, 33, 33]
+    assert split_by_lines(500, [100, 200, 200]) == [100, 200, 200]
+    for total, w in ((12345, [3, 7, 11]), (1, [5, 5]), (999, [1])):
+        assert sum(split_by_lines(total, w)) == total
+
+
+@pytest.mark.parametrize("cfg", ["train-easy", "dev-mixed", "clean-only", "interaction-heavy"])
+def test_episode_sizes_in_target_range(cfg):
+    for seed in range(15):
+        pd = generate_episode(seed, cfg).public()
+        assert 200 <= len(pd.ledger) <= 450, len(pd.ledger)
+        assert 30 <= len(pd.invoices) + len(pd.payments) <= 80
+
+
+@pytest.mark.parametrize("cfg", ["dev-mixed", "interaction-heavy", "clean-only"])
+def test_oracle_and_simple_reconcile_fit_in_100_steps(cfg):
+    from auditenv.runner import run_episode
+
+    for seed in range(8):
+        ep = generate_episode(seed, cfg)
+        for pol in ("oracle", "simple_reconcile"):
+            g = run_episode(pol, episode=ep, isolate=False)["grade"]
+            assert g["steps"] <= 100 and not g["truncated"]

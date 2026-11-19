@@ -86,6 +86,20 @@ class ErrorType:
         )
 
 
+def revenue_rows(book, owner) -> list:
+    return [r.row_id for r in book.rows_of(owner) if r.role.startswith(("inv_rev:", "cn_rev:"))]
+
+
+def with_revenue_alternative(book, owner, head: list, tail: list) -> list:
+    """Primary set uses the 1200 row; the alternative uses ALL revenue rows when it fits in 6 IDs."""
+    ar = book.row_of(owner, "inv_ar").row_id
+    sets = [head + [ar] + tail]
+    rev = revenue_rows(book, owner)
+    if len(head) + len(rev) + len(tail) <= 6:
+        sets.append(head + rev + tail)
+    return sets
+
+
 def special(doc) -> bool:
     """Documents that belong to distractors/carriers are never independent targets."""
     return bool(set(doc.tags) - {"split_payment", "partial_open", "multi_invoice_payment"})

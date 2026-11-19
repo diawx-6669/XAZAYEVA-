@@ -45,8 +45,14 @@ def invoice_posted_amount(rows) -> int:
     return sum(r["debit_minor"] + r["credit_minor"] for r in rows if r["account"] == "1200")
 
 
+def cancelled_by(inv):
+    """invoice_id cancelled by this credit note (the reference lives inside line_items), else None."""
+    refs = {li.get("cancels_invoice_id") for li in inv["line_items"]} - {None}
+    return sorted(refs)[0] if refs else None
+
+
 def is_credit_note(inv) -> bool:
-    return inv.get("cancels_invoice_id") is not None
+    return cancelled_by(inv) is not None
 
 
 def check_double_entry(pd) -> list:
@@ -79,9 +85,14 @@ def check_completeness(pd) -> list:
     prow = payment_rows(pd)
     for inv in pd.invoices:
         rows = irows.get(inv["invoice_id"], [])
-        if len(rows) != 2 or sorted(r["account"] for r in rows) != ["1200", "4000"]:
+        ar = [r for r in rows if r["account"] == "1200"]
+        rev = [r for r in rows if r["account"] == "4000"]
+        if len(ar) != 1 or len(rev) != len(inv["line_items"]):
             out.append(_v("completeness", inv["invoice_id"], 0, detail="invoice must be posted exactly once"))
-        if inv.get("cancels_invoice_id") and inv["cancels_invoice_id"] not in pd.invoice_by_id:
+        elif sum(r["debit_minor"] + r["credit_minor"] for r in rev) != ar[0]["debit_minor"] + ar[0]["credit_minor"]:
+            out.append(_v("completeness", inv["invoice_id"], 0, detail="revenue lines do not sum to receivable"))
+        refs = {li.get("cancels_invoice_id") for li in inv["line_items"]} - {None}
+        if len(refs) > 1 or (refs and next(iter(refs)) not in pd.invoice_by_id):
             out.append(_v("completeness", inv["invoice_id"], 0, detail="credit note cancels unknown invoice"))
         if sum(li["amount_minor"] for li in inv["line_items"]) != inv["total_minor"]:
             out.append(_v("completeness", inv["invoice_id"], 0, detail="line items do not sum to total"))
@@ -203,7 +214,7 @@ def billing_signature(inv) -> str:
 
 def duplicate_invoices(pd) -> list:
     """[(duplicate invoice, original invoice)]; the later issued_at is the duplicate."""
-    cancelled = {i["cancels_invoice_id"] for i in pd.invoices if is_credit_note(i)}
+    cancelled = {cancelled_by(i) for i in pd.invoices if is_credit_note(i)}
     groups = {}
     for inv in pd.invoices:
         if is_credit_note(inv) or inv["invoice_id"] in cancelled:

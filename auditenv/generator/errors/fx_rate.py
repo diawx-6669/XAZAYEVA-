@@ -8,7 +8,7 @@ from datetime import timezone
 
 from ...money import invert_rate
 from ...timeutil import next_business_day, policy_rate_date, prev_business_day
-from .base import MIN_AMOUNT, ErrorType, register, special, weighted_choice
+from .base import MIN_AMOUNT, ErrorType, register, special, weighted_choice, with_revenue_alternative
 
 
 @register
@@ -86,11 +86,9 @@ class FxRate(ErrorType):
     def evidence_sets(self, book, target):
         kind, key, doc, ts, cur, _ = self._doc(book, target)
         fxid = f"fx:{book.rate_date(ts).isoformat()}:{cur}:{book.base}"
-        primary = book.row_of((kind, key), self._primary_role(kind)).row_id
-        sets = [[doc.doc_id, primary, fxid, "policy"]]
         if kind == "inv":
-            sets.append([doc.doc_id, book.row_of((kind, key), "inv_rev").row_id, fxid, "policy"])
-        return sets
+            return with_revenue_alternative(book, (kind, key), [doc.doc_id], [fxid, "policy"])
+        return [[doc.doc_id, book.row_of((kind, key), "pay_cash").row_id, fxid, "policy"]]
 
     def expected_amount(self, book, target, **kw):
         kind, key, doc, ts, cur, amount = self._doc(book, target)

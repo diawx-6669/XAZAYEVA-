@@ -41,7 +41,9 @@ def make_policy(book) -> dict:
         "ar_relief_rate": "rate of the invoice transaction date",
         "fx_difference_account": "7900",
         "unapplied_cash": "account 2400 is used only for receipts with invoice_refs = null",
-        "credit_notes": "an invoice with cancels_invoice_id cancels that invoice; both stay in the books",
+        "credit_notes": "an invoice whose line_items carry cancels_invoice_id cancels that invoice; both stay in the books",
+        "revenue_posting": "Dr 1200 = document base amount; one Cr 4000 row per line item, the base amount split by "
+                           "line amounts with largest remainder (ties to the earlier line)",
         "accounts": dict(ACCOUNTS),
     }
 

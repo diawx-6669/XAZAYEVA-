@@ -5,7 +5,7 @@
   "additionalProperties": false,
   "required": ["policy_id", "fx_rate_date", "fx_rate_date_basis", "fx_missing_rate", "fx_rate_meaning", "fx_conversion",
                "period_boundary", "rounding", "recognition", "payment_allocation", "ar_relief_rate",
-               "fx_difference_account", "unapplied_cash", "credit_notes", "accounts"],
+               "fx_difference_account", "unapplied_cash", "credit_notes", "revenue_posting", "accounts"],
   "properties": {
     "policy_id": {"const": "policy"},
     "fx_rate_date": {"const": "transaction_date"},
@@ -26,6 +26,7 @@
     "fx_difference_account": {"const": "7900"},
     "unapplied_cash": {"type": "string"},
     "credit_notes": {"type": "string"},
+    "revenue_posting": {"type": "string"},
     "accounts": {"type": "object", "additionalProperties": {"type": "string"}}
   }
 }

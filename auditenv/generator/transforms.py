@@ -49,8 +49,11 @@ def transform_tables(t: dict, mapping: dict, seed) -> dict:
         for k in ("row_id", "entity_id", "invoice_id", "payment_id"):
             r[k] = m(r[k])
     for i in t["invoices"]:
-        for k in ("doc_id", "invoice_id", "entity_id", "cancels_invoice_id"):
+        for k in ("doc_id", "invoice_id", "entity_id"):
             i[k] = m(i[k])
+        for li in i["line_items"]:
+            if "cancels_invoice_id" in li:
+                li["cancels_invoice_id"] = m(li["cancels_invoice_id"])
     for p in t["payments"]:
         p["doc_id"], p["payment_id"] = m(p["doc_id"]), m(p["payment_id"])
         if p["invoice_refs"] is not None:

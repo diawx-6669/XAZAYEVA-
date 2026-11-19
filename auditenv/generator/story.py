@@ -154,7 +154,7 @@ class StoryBuilder:
         return minor
 
     def lines(self, cur: str, period: str, n: int | None = None) -> list:
-        descs = self.r.sample(CATALOG, n or self.r.randint(1, 3))
+        descs = self.r.sample(CATALOG, n or self.r.randint(*self.cfg["line_items"]))
         out = []
         for desc in descs:
             q = self.r.randint(1, 6)

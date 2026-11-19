@@ -7,7 +7,7 @@ from __future__ import annotations
 from datetime import timedelta
 
 from ...timeutil import offset_minutes
-from .base import MIN_AMOUNT, ErrorType, register, special
+from .base import MIN_AMOUNT, ErrorType, register, special, with_revenue_alternative
 
 
 @register
@@ -46,9 +46,7 @@ class PeriodCutoff(ErrorType):
 
     def evidence_sets(self, book, target):
         inv = book.invoices[target]
-        o = ("inv", target)
-        return [[inv.doc_id, book.row_of(o, "inv_ar").row_id, "policy"],
-                [inv.doc_id, book.row_of(o, "inv_rev").row_id, "policy"]]
+        return with_revenue_alternative(book, ("inv", target), [inv.doc_id], ["policy"])
 
     def expected_amount(self, book, target, **kw):
         return book.row_of(("inv", target), "inv_ar").debit
