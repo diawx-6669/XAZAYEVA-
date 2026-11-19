@@ -1,8 +1,8 @@
 """Run a policy against the env.
 
 Agent policies run in a SEPARATE PROCESS and talk JSON lines over stdin/stdout; the env and
-the grader stay in this (parent) process. The child gets an empty temp dir as cwd, no
-episode paths and no seed. Oracle and attacks are grader-side and run in-process.
+the grader stay in this (parent) process. The child gets an empty temp dir as cwd, a
+cleared environment (no salt, no seed, no data paths) and a code-only copy of the package. Oracle and attacks are grader-side and run in-process.
 
 Protocol: parent -> child  {"observation": ..., "reward": r, "terminated": b, "truncated": b}
           child  -> parent {"action": {...}}
@@ -12,26 +12,67 @@ Protocol: parent -> child  {"observation": ..., "reward": r, "terminated": b, "t
 from __future__ import annotations
 
 import argparse
+import atexit
 import json
 import os
+import shutil
 import selectors
 import subprocess
 import sys
 import tempfile
 import time
+from pathlib import Path
 
 from .canon import dumps
 from .env.env import AuditEnv
 from .paths import ROOT
 
 
+_CODE_DIR = None
+
+
+def agent_code_dir() -> str:
+    """A private copy of the auditenv package (code only: no schemas, configs, episodes or
+    grader data), made once per evaluator process. The agent imports policies from here."""
+    global _CODE_DIR
+    if _CODE_DIR is None:
+        d = tempfile.mkdtemp(prefix="auditenv-code-")
+        shutil.copytree(ROOT / "auditenv", Path(d) / "auditenv",
+                        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        atexit.register(shutil.rmtree, d, True)
+        _CODE_DIR = d
+    return _CODE_DIR
+
+
+def harden_evaluator() -> bool:
+    """Mark the evaluator process non-dumpable (Linux prctl PR_SET_DUMPABLE=0): its
+    /proc/<pid>/environ, mem, fd and maps become unreadable for other non-root processes,
+    so the agent cannot read the seed salt or open file handles of its parent."""
+    try:
+        import ctypes
+
+        libc = ctypes.CDLL(None, use_errno=True)
+        return libc.prctl(4, 0, 0, 0, 0) == 0  # PR_SET_DUMPABLE = 4
+    except (OSError, AttributeError):
+        return False
+
+
+AGENT_ENV = {"PATH": "/usr/local/bin:/usr/bin:/bin", "TZ": "UTC", "LANG": "C.UTF-8"}
+
+
 class ChildPolicy:
+    """Agent process: `python -I -S` (ignores every PYTHON* variable, no site-packages, no cwd
+    on sys.path), cwd = a fresh EMPTY temp dir, environment = AGENT_ENV only (no salt, no seed,
+    no paths to episodes or grader files)."""
+
     def __init__(self, name: str, seed: int = 0):
+        harden_evaluator()
         self.tmp = tempfile.TemporaryDirectory(prefix="auditenv-agent-")
-        env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": str(ROOT), "PYTHONHASHSEED": "0", "TZ": "UTC"}
-        self.proc = subprocess.Popen([sys.executable, "-m", "auditenv.runner", "--child", "--policy", name,
-                                      "--seed", str(seed)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                     stderr=subprocess.DEVNULL, cwd=self.tmp.name, env=env, text=True, bufsize=1)
+        boot = (f"import sys; sys.path.insert(0, {agent_code_dir()!r}); "
+                f"from auditenv.runner import _child_main; _child_main({name!r}, {int(seed)})")
+        self.proc = subprocess.Popen([sys.executable, "-I", "-S", "-c", boot], stdin=subprocess.PIPE,
+                                     stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, cwd=self.tmp.name,
+                                     env=dict(AGENT_ENV), text=True, bufsize=1, close_fds=True)
         self.sel = selectors.DefaultSelector()
         self.sel.register(self.proc.stdout, selectors.EVENT_READ)
 

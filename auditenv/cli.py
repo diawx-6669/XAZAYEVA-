@@ -206,7 +206,7 @@ def main(argv=None) -> int:
     g.add_argument("--out", required=True)
     sub.add_parser("export")
     r = sub.add_parser("run")
-    r.add_argument("--policy", required=True, choices=["random_explorer", "simple_reconcile", "flag_all", "oracle"])
+    r.add_argument("--policy", required=True, choices=["random_explorer", "simple_reconcile", "flag_all", "oracle", "truth_hunter"])
     r.add_argument("--episode-dir")
     r.add_argument("--seed", type=int)
     r.add_argument("--config", default="dev-mixed")

@@ -1,0 +1,92 @@
+"""Closed-run isolation: the episode lives only in the evaluator's memory, nothing of grader/ is
+written to disk, and an adversarial policy that hunts for truth on disk / in /proc finds nothing."""
+
+import json
+import os
+import secrets
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def evaluator(args, cwd, salt=None):
+    env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": str(ROOT), "PYTHONHASHSEED": "0", "TZ": "UTC"}
+    if salt:
+        env["AUDITENV_SEED_SALT"] = salt
+    return subprocess.run([sys.executable, "-m", "auditenv", "run", *args], cwd=cwd, env=env,
+                          capture_output=True, text=True, timeout=120)
+
+
+def submitted(traj_path):
+    lines = [json.loads(x) for x in Path(traj_path).read_text().splitlines()]
+    sub = [x["action"] for x in lines if x["action"] and x["action"].get("tool") == "submit"]
+    return sub[0]["args"]["findings"]["findings"] if sub else []
+
+
+def all_files(d):
+    return sorted(str(p.relative_to(d)) for p in Path(d).rglob("*") if p.is_file())
+
+
+def test_closed_run_hunter_finds_nothing(tmp_path):
+    before = set(all_files("/tmp")) if os.access("/tmp", os.R_OK) else set()
+    r = evaluator(["--policy", "truth_hunter", "--seed", "424242", "--config", "dev-mixed", "--mode", "eval",
+                   "--log", str(tmp_path / "grader_log.jsonl"), "--trajectory-out", str(tmp_path / "traj.jsonl")],
+                  cwd=tmp_path, salt="jury-" + secrets.token_hex(16))  # fresh salt: never-seen episode
+    assert r.returncode == 0, r.stderr
+    found = submitted(tmp_path / "traj.jsonl")
+    markers = {tuple(f["affected_ids"]) for f in found}
+    assert ("LEAK-TRUTH",) not in markers and ("LEAK-PATH",) not in markers
+    if os.geteuid() != 0:  # root can read any /proc/*/environ; the jury runs as non-root user
+        assert ("LEAK-SALT",) not in markers
+        assert found == []
+    # nothing of grader/ was written: only our log and trajectory appear in the work dir
+    assert all_files(tmp_path) == ["grader_log.jsonl", "traj.jsonl"]
+    new_tmp = set(all_files("/tmp")) - before
+    assert not [f for f in new_tmp if f.endswith(("truth.json", "provenance.json"))]
+    log = json.loads((tmp_path / "grader_log.jsonl").read_text())
+    assert log["valid"] and log["tp"] == 0
+
+
+def test_hunter_positive_control_finds_truth_written_to_disk(tmp_path):
+    """Sanity check of the hunter itself: if an episode WITH grader/ is on disk, it is found."""
+    from auditenv.generator.episode import generate_episode
+    from auditenv.generator.export import write_episode
+
+    ep = generate_episode(4242, "interaction-heavy")
+    d = write_episode(ep, tmp_path / "leaky_episode")
+    r = evaluator(["--policy", "truth_hunter", "--episode-dir", str(d), "--mode", "eval", "--log",
+                   str(tmp_path / "log.jsonl"), "--trajectory-out", str(tmp_path / "traj.jsonl")], cwd=tmp_path)
+    assert r.returncode == 0, r.stderr
+    markers = {tuple(f["affected_ids"]) for f in submitted(tmp_path / "traj.jsonl")}
+    assert ("LEAK-TRUTH",) in markers
+    assert json.loads((tmp_path / "log.jsonl").read_text())["tp"] == len(ep.truth["issues"])
+
+
+def test_agent_process_environment_is_clean(monkeypatch):
+    from auditenv.runner import AGENT_ENV, ChildPolicy
+
+    monkeypatch.setenv("AUDITENV_SEED_SALT", "secret")
+    c = ChildPolicy("random_explorer")
+    try:
+        env = Path(f"/proc/{c.proc.pid}/environ").read_bytes().split(b"\0")
+        env = dict(x.decode().split("=", 1) for x in env if b"=" in x)
+        assert env == AGENT_ENV
+        assert os.listdir(Path(f"/proc/{c.proc.pid}/cwd")) == []
+        assert "-I" in c.proc.args and "-S" in c.proc.args
+        assert str(ROOT) not in " ".join(c.proc.args[1:])  # code is a private copy, not the repo
+    finally:
+        c.close()
+
+
+@pytest.mark.skipif(sys.platform != "linux", reason="prctl is Linux-only")
+def test_evaluator_is_not_dumpable():
+    code = ("from auditenv.runner import harden_evaluator; import os; assert harden_evaluator(); "
+            "st = os.stat(f'/proc/{os.getpid()}/environ'); print(st.st_uid)")
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, cwd=ROOT,
+                       env={"PYTHONPATH": str(ROOT), "PATH": os.environ.get("PATH", "")})
+    assert r.returncode == 0, r.stderr
+    assert r.stdout.strip() == "0"  # /proc/<pid>/environ now belongs to root -> unreadable for the agent user
