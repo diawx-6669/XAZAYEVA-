@@ -10,7 +10,7 @@
 
 ## 1. Жёсткие правила разработки
 
-- Python 3.11. Только stdlib плюс `pytest`, `hypothesis`, `jsonschema`. Версии закреплены точно (`==`) в `requirements.txt`. Никаких numpy/pandas/ML, сети, платных API или GPU.
+- Python 3.11. Только stdlib плюс `pytest`, `hypothesis` (и их чисто-питоновские зависимости). Версии закреплены точно (`==`) в `requirements.txt`, колёса `*-none-any.whl` лежат в `vendor/wheels/`. JSON Schema проверяет свой валидатор `auditenv/jsonschema_lite.py` (пакет `jsonschema` не используется: он тянет скомпилированный `rpds-py`). Никаких numpy/pandas/ML, сети, платных API или GPU.
 - **Деньги — только `int` в минимальных единицах.** FX-курсы — строки, считаются через `decimal.Decimal`. `float` для денег и курсов запрещён: это ломает воспроизводимость. Режим округления берётся из `policy.json`.
 - **Детерминизм.** Используй только `random.Random(derived_seed)`, никакого глобального `random`, `time.time()`, `uuid4()`, `hash()` строк или итерации по `set` в выходных данных. Под-seed выводится через `hashlib.sha256(f"{seed}:{stream_name}")`. Потоки разделены: `story` (события и ошибки), `naming` (имена, ID, форматы), `order` (порядок строк).
 - **Канонический JSON:** `json.dumps(obj, sort_keys=True, ensure_ascii=False, separators=(",", ":"))`, переводы строк `\n`. В контейнере `TZ=UTC`.
@@ -75,7 +75,7 @@ Makefile, Dockerfile, requirements.txt, LICENSE (MIT), README.md
 ### Открытые файлы эпизода (`public/`)
 - `manifest.json`: `schema_version, episode_id, base_currency, currencies, period_start, period_end (ISO-8601 со смещением), timezone (IANA, например Asia/Almaty), counts {ledger, invoices, payments, fx}, rounding {mode: "ROUND_HALF_EVEN", fx_conversion: "per_document"}, config_hash, generator_version`.
 - `ledger.csv`: `row_id, timestamp, account, debit_minor, credit_minor, currency, entity_id, invoice_id, payment_id`. Ровно эти колонки. **Все суммы ledger — в base_currency** (иностранные документы проведены с конвертацией). Пустые ссылки — пустая ячейка, которая читается как `null`.
-- `invoices.jsonl`: `doc_id, invoice_id, entity_id, issued_at, due_at, currency, total_minor, line_items[{description, service_period, quantity, unit_price_minor, amount_minor}]`. Сумма `line_items` равна `total_minor`.
+- `invoices.jsonl`: `doc_id, invoice_id, entity_id, issued_at, due_at, currency, total_minor, line_items[{description, service_period, quantity, unit_price_minor, amount_minor}]` — ровно эти поля верхнего уровня. Сумма `line_items` равна `total_minor`. У credit note суммы отрицательные, а ссылка на отменяемый счёт — ключ `cancels_invoice_id` внутри каждой строки `line_items`.
 - `payments.jsonl`: `doc_id, payment_id, timestamp, currency, amount_minor, invoice_refs` (список ID или `null`).
 - `fx.csv`: `date, source_currency, target_currency, rate`, где rate — десятичная строка. Курсы есть только на рабочие дни. Через инструменты у каждой строки появляется ID `fx:{date}:{src}:{tgt}`.
 - `policy.json`: `fx_rate_date: "transaction_date"` (для счёта это issued_at, для платежа timestamp, дата берётся в локальном timezone компании), `fx_missing_rate: "previous_business_day"`, `period_boundary: {start, end, timezone, inclusive_start: true, inclusive_end: false}`, `rounding: "ROUND_HALF_EVEN"`, `recognition: "invoice_issue_date"`. Через инструменты доступен как запись с ID `policy`.
@@ -194,4 +194,4 @@ obs, reward, terminated, truncated, info = env.step(action)   # action: dict, JS
 3. Взаимодействующие ошибки, transforms, runner в отдельном процессе, 4 политики и атаки, leakscan, траектории, эпизоды train/dev, selfcheck.
 4. Docker, README с картой «пункт ТЗ → файл → тест», DESIGN.md, LIMITATIONS.md с измеренными числами, разбор сбоев simple_reconcile по типам, сценарий демо.
 
-Размеры по умолчанию (чтобы oracle и simple_reconcile укладывались в 100 шагов): 150–400 проводок, 20–60 документов, 0–6 ошибок. Пресет `stress` (до 2000 проводок) нужен только для проверки производительности.
+Размеры train/dev/закрытых конфигов (чтобы oracle и simple_reconcile укладывались в 100 шагов): 200–450 проводок, 30–80 документов, 0–6 ошибок. Пресет `stress` (до 2000 проводок) нужен только для проверки производительности.

@@ -26,14 +26,20 @@ make venv
 make check
 ```
 
-`make check` = весь pytest (268 тестов, включая hypothesis и 4×50 seed для решателя) + табло self‑check на 20
+`make check` = весь pytest (317 тестов, включая hypothesis и 4×50 seed для решателя) + табло self‑check на 20
 эпизодах и 20 парных преобразованиях + leakscan + replay траекторий. Результат печатается и
 пишется в `reports/selfcheck.md` / `reports/selfcheck.json`, журнал оценщика —
 `reports/grader_log.jsonl`. Код возврата ≠ 0, если хоть одна проверка упала.
 
-Измерено (контейнер, `--cpus 2 --memory 4g --network none`): `make check` — 36 с целиком,
-пик памяти ≈ 70 МиБ. Эпизод `stress` (1 354–1 522 проводки, ~640 документов): генерация
-0,3–0,5 с, прогон simple_reconcile 56 шагов ≈ 0,1 с — с запасом под лимит 60 с.
+Зависимости — только `pytest` и `hypothesis` (+ их чисто-питоновские зависимости), все
+закреплены в `requirements.txt` и лежат колёсами `*-none-any.whl` в `vendor/wheels/`: образ
+собирается без интернета (`pip install --no-index`), одинаково на x86_64 и arm64. JSON Schema
+проверяет собственный валидатор `auditenv/jsonschema_lite.py`.
+
+Размеры эпизодов (замер на 1 000 эпизодах): 204–376 проводок, 42–78 документов, 0–6 ошибок;
+oracle тратит 1 шаг, simple_reconcile — 11–16 из 100. Эпизод `stress` (1 753–1 993 проводки,
+~400 документов): генерация 0,4–0,5 с, simple_reconcile 55–62 шага ≈ 0,1 с — с запасом под
+лимит 60 с. `make check` локально — 29 с; в контейнере (`--network none --cpus 2 --memory 4g`, пользователь `auditor`) — 50 с, пик памяти ≈ 250 МиБ.
 
 **Закрытый прогон (жюри).** Генератор открыт, поэтому для скрытых seed задайте секретную соль —
 без неё агент мог бы перебором seed восстановить эпизод и эталон:
@@ -43,8 +49,24 @@ docker run --rm --network none --cpus 2 --memory 4g -e AUDITENV_SEED_SALT=<се�
   python -m auditenv run --policy simple_reconcile --seed 123456 --config dev-mixed --mode eval --log /tmp/grader_log.jsonl
 ```
 
-Соль меняет все эпизоды, но не передаётся в процесс агента (`runner.py` собирает его окружение
-явно). Открытые train/dev‑эпизоды сгенерированы без соли и воспроизводятся по seed из
+Что гарантирует закрытый прогон (`run --seed ...`):
+
+* эпизод генерируется **в памяти процесса оценщика**; `grader/` (truth, provenance) на диск не
+  пишется вообще — на диске появляется только журнал оценщика после конца эпизода;
+* политика — отдельный процесс `python -I -S` с cwd в новой **пустой** временной папке и
+  окружением из трёх переменных (`PATH`, `TZ`, `LANG`): нет соли, seed, путей к эпизодам и
+  репозиторию; код политики импортируется из отдельной копии пакета (только `.py`);
+* процесс оценщика помечается non-dumpable (`prctl(PR_SET_DUMPABLE, 0)`), поэтому
+  непривилегированный процесс агента не может прочитать его `/proc/<pid>/environ` (там соль)
+  и `/proc/<pid>/mem`;
+* это проверяет враждебная политика `truth_hunter` (`tests/test_isolation.py`): она обходит
+  диск в поисках `truth.json`/`provenance.json` своего эпизода и читает `/proc/*/environ`;
+  в закрытом прогоне она ничего не находит, а в контрольном тесте, где эпизод с `grader/`
+  специально записан на диск, — находит и получает TP (то есть сама проверка работает).
+  Проверку `/proc` нельзя выполнить от root (root читает всё) — в контейнере тесты идут от
+  пользователя `auditor`.
+
+Открытые train/dev‑эпизоды сгенерированы без соли и воспроизводятся по seed из
 `episodes/*/index.json`.
 
 Другие команды:
@@ -112,17 +134,19 @@ obs, reward, terminated, truncated, info = env.step(
 
 ```
 auditenv/
-  money.py ids.py timeutil.py config.py canon.py schemas.py paths.py
+  money.py ids.py timeutil.py config.py canon.py schemas.py jsonschema_lite.py paths.py
   generator/  story.py books.py invariants.py errors/{base,duplicate_invoice,payment_allocation,fx_rate,period_cutoff}.py
               interactions.py transforms.py episode.py export.py
   env/        env.py tools.py calculator.py cursors.py errors.py data.py
   grader/     schema.py normalize.py matcher.py reward.py validate_truth.py log.py core.py
   policies/   random_explorer.py simple_reconcile.py flag_all.py oracle.py attacks.py base.py
+              truth_hunter.py (враждебная политика только для тестов изоляции)
   runner.py   selfcheck.py leakscan.py cli.py
 configs/      train-easy, dev-mixed, clean-only, interaction-heavy, stress (+ splits.json с seed'ами)
 schemas/      manifest, ledger_row, invoice, payment, fx, policy, action, observation, findings, truth, config
 episodes/     train/ (10) и dev/ (10): <episode_id>/public/*, <episode_id>/grader/*, index.json
-trajectories/ trajectories.jsonl (976 шагов: random_explorer, simple_reconcile, flag_all на 20 эпизодах)
+trajectories/ trajectories.jsonl (990 шагов: random_explorer, simple_reconcile, flag_all на 20 эпизодах)
+vendor/wheels/ колёса закреплённых зависимостей (только pure Python) для офлайн-сборки
 reports/      selfcheck.md, selfcheck.json (генерируются make check)
 tests/        pytest + hypothesis
 docs/         CASE.md, DESIGN.md, LIMITATIONS.md, FAILURES.md
@@ -141,6 +165,8 @@ docs/         CASE.md, DESIGN.md, LIMITATIONS.md, FAILURES.md
 | 03 manifest.json и форматы значений | `generator/export.py`, `schemas/*.schema.json` | `selfcheck` блок «Данные» (`validate_public`), `test_data.py::test_clean_book_invariants` |
 | 03 Явные null | `export.py` (пустая ячейка ↔ `None`) | `test_data.py::test_null_references_are_explicit` |
 | 03 Закрытые truth/provenance, не утекают | `export.py::write_episode`, `leakscan.py` | `test_leaks.py`, `selfcheck` «leakscan clean» |
+| 03 Оценщик вне процесса агента; закрытый прогон без grader/ на диске | `runner.py::ChildPolicy`, `harden_evaluator`, `policies/truth_hunter.py` | `test_isolation.py` |
+| 03 Поля invoices ровно как в кейсе | `generator/books.py::inv_public`, `schemas/invoice.schema.json` | `test_data.py::test_invoice_fields_exactly_as_in_case` |
 | 04 reset/step, Gymnasium‑контракт | `env/env.py::AuditEnv` | `test_contract.py::test_reset_shape`, `test_step_shape_and_zero_reward` |
 | 04 Воспроизводимость, изоляция reset | `ids.py::derive_seed`, `env.reset` | `test_repro.py`, `test_contract.py::test_reset_isolates_state`, `test_two_envs_isolated` |
 | 04 Пять действий, страница ≤ 50, стабильные курсоры | `env/tools.py`, `env/cursors.py` (HMAC) | `test_contract.py::test_page_limit_50`, `test_cursors_stable_and_complete`, `test_cursor_from_other_episode_or_table` |
@@ -161,6 +187,7 @@ docs/         CASE.md, DESIGN.md, LIMITATIONS.md, FAILURES.md
 | 07 Без сети, платных API, GPU; контейнер; единая команда | `Dockerfile`, `scripts/check.sh`, `Makefile` | `make docker-check` |
 | 09 10 train + 10 dev эпизодов | `configs/splits.json`, `episodes/` | `test_repro.py::test_exported_episodes_match_generator` |
 | 09 Golden‑хеши | `tests/golden_hashes.json` (`make golden`) | `test_repro.py::test_golden_hashes` |
+| 09 Зафиксированные зависимости, офлайн‑сборка | `requirements.txt`, `vendor/wheels/`, `jsonschema_lite.py` | `test_jsonschema_lite.py` |
 
 ## Как читать табло (`reports/selfcheck.md`)
 
@@ -178,7 +205,34 @@ docs/         CASE.md, DESIGN.md, LIMITATIONS.md, FAILURES.md
 * «Инженерия и объяснение» (10 баллов) табло не считает — это оценка жюри.
 * Таблица диагностики: средние P, R, F1, возврат, возврат по экспериментальной награде,
   шаги, время на 20 эпизодах в режиме `eval`; колонка «агент видел награду» должна быть «нет».
-  У oracle экспериментальная награда низкая намеренно: он не открывал доказательства.
+
+### Почему строки диагностики выглядят именно так
+
+Среди 20 эпизодов табло **6 чистых** (5 из `clean-only` и 1 из `dev-mixed`) и **14 с ошибками**.
+Все колонки — средние по 20 эпизодам, поэтому чистые эпизоды заметно сдвигают средние.
+
+* **oracle: P = R = 0.700 при F1 = 1.000.** На чистом эпизоде эталон пуст и ответ пуст: по
+  правилу кейса F1 = 1, но P = TP/(TP+FP) и R = TP/(TP+FN) имеют нулевой знаменатель и
+  поэтому равны 0. Значит, oracle получает P = R = 1 на 14 эпизодах и 0 на 6: 14/20 = 0.700.
+  F1 = 1 на всех 20, отсюда 1.000. Это не ошибка oracle, а следствие формулы.
+* **oracle: экспериментальная награда −0.400.** Oracle отправляет ответ на первом шаге и не
+  открывает ни одной записи. Экспериментальная награда засчитывает TP только за доказательства,
+  которые агент реально получил в наблюдениях, поэтому на 14 ошибочных эпизодах у oracle 0 TP
+  и награда −1, а на 6 чистых его пустой ответ верен и даёт +1:
+  (14·(−1) + 6·(+1)) / 20 = −0.400. Так экспериментальная награда и задумана: знание ответа
+  без чтения доказательств она не вознаграждает. Общая награда oracle = 1.000.
+* **attack:type_bruteforce (+0.160) лучше пустого ответа (−0.400), но хуже oracle (1.000).**
+  Это сильнейший атакующий: он читает truth и для каждой ошибки шлёт все 4 типа. Верный тип
+  совпадает (TP = n), три других дают FP (3n). F1 = 2n/(2n+3n) = 0.4, награда
+  2·0.4 − 1 = −0.2 на каждом из 14 ошибочных эпизодов; на чистых ему нечего перебирать, ответ
+  пуст, +1. Итого (14·(−0.2) + 6·1)/20 = +0.160. Пустой ответ получает −1 на ошибочных и
+  +1 на чистых: −0.400. Перебор выше молчания, потому что в нём есть все верные ответы, а кейс
+  требует, чтобы верный ответ был лучше молчания. Но на **каждом** ошибочном эпизоде перебор
+  отрицателен (−0.2) и строго хуже oracle (+1): лишние типы штрафуются, выгоды нет. Без
+  доступа к truth атакующий не знает ни ID, ни сумм, и такой перебор даёт 0 TP
+  (см. `attack:guess_ids`, −1.000).
+* **attack:junk_explanation = oracle**: текст `explanation` на награду не влияет.
+* **attack:empty и random_explorer F1 = 0.300**: F1 = 1 на 6 чистых и 0 на 14 ошибочных.
 
 ## Важно
 

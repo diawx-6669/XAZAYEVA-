@@ -76,7 +76,7 @@ episode/
     provenance.json       история генерации и мутаций «до/после»
 ```
 
-Размер по умолчанию: 150–400 проводок, 20–60 документов, 0–6 ошибок.
+Размер train/dev/закрытых эпизодов: 200–450 проводок, 30–80 документов, 0–6 ошибок (замер: 204–376 и 42–78).
 
 ## 7. Инструменты агента
 
@@ -168,6 +168,12 @@ docker run --rm --network none --cpus 2 --memory 4g auditenv
 | 4 | Docker, README, DESIGN.md, LIMITATIONS.md, разбор сбоев, демо | Docker и ATTACKS.md готовы (19.11); Docker: офлайн-сборка, запись только в `reports/` и `trajectories/` |
 
 ## 15. Вопросы к ядру
+
+> **Статус (ядро, 19.11): все пункты ниже закрыты.** `limit>50 → bad_args` записан в
+> DESIGN.md, есть тесты на 51, 1000 и 0. `jsonschema` заменён на `auditenv/jsonschema_lite.py`.
+> `requirements.txt` пересобран (pytest 9.1.1, hypothesis 6.155.7 — последняя с pure-wheel).
+> `vendor/wheels/` содержит только `*-none-any.whl` (у sortedcontainers тег
+> `py2.py3-none-any`), это проверяет `test_jsonschema_lite.py`. CLAUDE.md §1 обновлён.
 
 - **Решено:** `limit > 50` в `list_records` даёт `bad_args`, без обрезки, шаг расходуется. В коде уже так (`auditenv/env/tools.py:57`), но в `docs/DESIGN.md` → «Решения» этого нет. Дописать и проверить, что есть тест на `limit=51` и `limit=1000`.
 - **Блокирует офлайн-сборку:** Dockerfile в ветке `beka` ставит пакеты только из `vendor/wheels/` (`pip install --no-index`). Пока этой папки нет, `docker build` падает. Нужно положить её в репозиторий.
