@@ -47,6 +47,8 @@ def test_page_limit_50(erroneous):
     env, _, _ = make(erroneous)
     assert len(lst(env)[0]["result"]["records"]) == 50
     assert lst(env, limit=51)[0]["error"] == {"code": "bad_args"}
+    over = lst(env, limit=1000)[0]  # no silent truncation to 50: an error, and the step is spent
+    assert over == {"error": {"code": "bad_args"}, "steps_remaining": 97}
     assert lst(env, limit=0)[0]["error"] == {"code": "bad_args"}
     assert len(lst(env, limit=7)[0]["result"]["records"]) == 7
 

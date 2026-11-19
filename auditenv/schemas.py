@@ -12,22 +12,20 @@ NAMES = ["manifest", "ledger_row", "invoice", "payment", "fx", "policy", "action
 
 
 @lru_cache(maxsize=None)
-def _registry():
-    from referencing import Registry, Resource
-
-    reg = Registry()
+def _registry() -> dict:
+    out = {}
     for n in NAMES:
         s = json.loads((SCHEMAS_DIR / f"{n}.schema.json").read_text("utf-8"))
-        reg = reg.with_resource(s["$id"], Resource.from_contents(s))
-    return reg
+        out[s["$id"]] = s
+    return out
 
 
 @lru_cache(maxsize=None)
 def validator(name: str):
-    import jsonschema
+    from .jsonschema_lite import Validator
 
     s = json.loads((SCHEMAS_DIR / f"{name}.schema.json").read_text("utf-8"))
-    return jsonschema.Draft202012Validator(s, registry=_registry())
+    return Validator(s, registry=_registry())
 
 
 def errors(name: str, obj) -> list:

@@ -62,9 +62,9 @@ def _schema():
 
 
 def validate_config(cfg: dict) -> None:
-    import jsonschema
+    from .jsonschema_lite import validate
 
-    jsonschema.validate(cfg, _schema())
+    validate(cfg, _schema())
     for k in ("n_foreign", "n_entities", "n_invoices", "line_items", "utc_share", "n_errors"):
         lo, hi = cfg[k]
         if lo > hi:
