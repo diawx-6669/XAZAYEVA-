@@ -1,5 +1,41 @@
-.venv
+# Что НЕ копировать в образ: мусор, секреты и тяжёлые локальные файлы.
+# Важно: в .dockerignore шаблон без "**/" работает только в корне проекта,
+# поэтому для вложенных папок (auditenv/__pycache__ и т.п.) пишем "**/".
+# episodes/, trajectories/ и vendor/wheels/ НЕ исключаем: это часть сдачи и офлайн-сборки.
+# Dockerfile и .dockerignore тоже не исключаем: жюри видит, из чего собран образ.
+
+# Git и редакторы
 .git
-**/__pycache__
-.pytest_cache
-.hypothesis
+.gitignore
+.idea/
+.vscode/
+**/*.swp
+**/.DS_Store
+
+# Python-кэши (иначе байты в образе зависят от машины разработчика)
+**/__pycache__/
+**/*.py[cod]
+**/*.egg-info/
+**/.pytest_cache/
+**/.hypothesis/
+**/.mypy_cache/
+**/.ruff_cache/
+.coverage
+htmlcov/
+
+# Виртуальные окружения (только в корне: auditenv/env/ — это код среды, его не трогаем)
+.venv/
+venv/
+env/
+
+# Секреты — никогда не кладём в образ
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+
+# Результаты прошлых локальных прогонов: в контейнере make check создаёт их заново
+reports/
+build/
+dist/
+
