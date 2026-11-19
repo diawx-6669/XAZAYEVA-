@@ -1,0 +1,13 @@
+{
+  "name": "stress",
+  "version": "1.0",
+  "foreign_currencies": ["USD", "EUR", "JPY", "KWD"],
+  "n_foreign": [3, 4],
+  "period_months": 6,
+  "period_starts": ["2026-01", "2026-04"],
+  "n_entities": [30, 40],
+  "n_invoices": [380, 420],
+  "clean_probability": 0.0,
+  "n_errors": [6, 12],
+  "interactions": {"partial_fx_cutoff": 1.0, "duplicate_fx": 1.0}
+}

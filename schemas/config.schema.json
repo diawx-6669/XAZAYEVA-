@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "auditenv/config.schema.json",
+  "title": "Episode generation config",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "version", "base_currencies", "foreign_currencies", "n_foreign", "foreign_share", "timezones",
+               "period_starts", "period_months", "n_entities", "n_invoices", "utc_share", "distractors",
+               "clean_probability", "n_errors", "errors", "interactions", "min_interactions", "fx_variants",
+               "allocation_variants", "max_steps", "tolerance_minor", "max_attempts"],
+  "$defs": {
+    "range": {"type": "array", "items": {"type": "integer", "minimum": 0}, "minItems": 2, "maxItems": 2},
+    "prob": {"type": "number", "minimum": 0, "maximum": 1},
+    "cur": {"enum": ["KZT", "USD", "EUR", "JPY", "KWD"]}
+  },
+  "properties": {
+    "name": {"type": "string"},
+    "version": {"type": "string"},
+    "base_currencies": {"type": "array", "items": {"$ref": "#/$defs/cur"}, "minItems": 1},
+    "foreign_currencies": {"type": "array", "items": {"$ref": "#/$defs/cur"}},
+    "n_foreign": {"$ref": "#/$defs/range"},
+    "foreign_share": {"$ref": "#/$defs/prob"},
+    "timezones": {"type": "array", "minItems": 1, "items": {"enum": ["Asia/Almaty", "Asia/Tashkent", "Asia/Dubai", "Asia/Kolkata", "Asia/Tokyo", "America/Bogota", "America/Lima"]}},
+    "period_starts": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^20[0-9]{2}-(0[1-9]|1[0-2])$"}},
+    "period_months": {"type": "integer", "minimum": 1, "maximum": 6},
+    "n_entities": {"$ref": "#/$defs/range"},
+    "n_invoices": {"$ref": "#/$defs/range"},
+    "utc_share": {"$ref": "#/$defs/range"},
+    "distractors": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "recurring_rent": {"$ref": "#/$defs/prob"}, "repeat_amount": {"$ref": "#/$defs/prob"},
+        "split_payment": {"$ref": "#/$defs/prob"}, "multi_invoice_payment": {"$ref": "#/$defs/prob"},
+        "partial_open": {"$ref": "#/$defs/prob"}, "refund": {"$ref": "#/$defs/prob"},
+        "bank_fee": {"$ref": "#/$defs/prob"}, "rounding_residual": {"$ref": "#/$defs/prob"},
+        "boundary_time": {"$ref": "#/$defs/prob"}, "credit_note_reissue": {"$ref": "#/$defs/prob"},
+        "unidentified_receipt": {"$ref": "#/$defs/prob"}
+      }
+    },
+    "clean_probability": {"$ref": "#/$defs/prob"},
+    "n_errors": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 12}, "minItems": 2, "maxItems": 2},
+    "errors": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "duplicate_invoice": {"type": "number", "minimum": 0}, "payment_allocation": {"type": "number", "minimum": 0},
+        "fx_rate": {"type": "number", "minimum": 0}, "period_cutoff": {"type": "number", "minimum": 0}
+      }
+    },
+    "interactions": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"partial_fx_cutoff": {"$ref": "#/$defs/prob"}, "duplicate_fx": {"$ref": "#/$defs/prob"}}
+    },
+    "min_interactions": {"type": "integer", "minimum": 0, "maximum": 2},
+    "fx_variants": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"adjacent_day": {"type": "number", "minimum": 0}, "utc_date": {"type": "number", "minimum": 0}, "inverted": {"type": "number", "minimum": 0}}
+    },
+    "allocation_variants": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"unallocated": {"type": "number", "minimum": 0}, "partial": {"type": "number", "minimum": 0}}
+    },
+    "max_steps": {"const": 100},
+    "tolerance_minor": {"type": "integer", "minimum": 0, "maximum": 100},
+    "max_attempts": {"type": "integer", "minimum": 1, "maximum": 200}
+  }
+}
