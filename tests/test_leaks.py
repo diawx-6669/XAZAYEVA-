@@ -51,3 +51,38 @@ def test_env_never_reads_grader_dir_for_observations(tmp_path, erroneous):
     assert str(tmp_path) not in json.dumps(obs)
     o = env.step({"tool": "get_document", "args": {"doc_id": "../grader/truth.json"}})[0]
     assert o["error"] == {"code": "not_found"}
+
+
+def test_seed_salt_blocks_seed_bruteforce(monkeypatch):
+    """Without a salt the open generator lets anyone map seed -> episode_id. With the evaluator's
+    secret salt the same seed yields a different, unguessable episode."""
+    from auditenv.generator.episode import generate_episode
+
+    plain = generate_episode(5, "dev-mixed")
+    monkeypatch.setenv("AUDITENV_SEED_SALT", "jury-secret-salt")
+    salted = generate_episode(5, "dev-mixed")
+    assert salted.episode_id != plain.episode_id and salted.files != plain.files
+    assert salted.provenance["seed_salted"] is True and "jury-secret-salt" not in str(salted.provenance)
+    # an attacker without the salt cannot reproduce it from small seeds
+    monkeypatch.delenv("AUDITENV_SEED_SALT")
+    from auditenv.ids import IdFactory, make_rng
+
+    assert all(IdFactory(make_rng(s, "naming", 0)).episode_id() != salted.episode_id for s in range(2000))
+
+
+def test_agent_process_gets_no_salt_and_no_paths(monkeypatch):
+    from auditenv.runner import ChildPolicy
+
+    monkeypatch.setenv("AUDITENV_SEED_SALT", "secret")
+    c = ChildPolicy("random_explorer")
+    try:
+        assert "AUDITENV_SEED_SALT" not in c.proc.args and c.proc.pid
+        env = open(f"/proc/{c.proc.pid}/environ", "rb").read().decode(errors="replace")
+        assert "AUDITENV_SEED_SALT" not in env and "secret" not in env
+    finally:
+        c.close()
+
+
+def test_manifest_has_no_config_name(clean):
+    m = clean.public().manifest
+    assert "config_name" not in m and "clean" not in str(m)

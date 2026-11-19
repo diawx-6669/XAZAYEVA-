@@ -156,7 +156,9 @@ def generate_episode(seed, config=None) -> Episode:
             mutations.append({"issue_id": iid, "type": inj.type, "variant": inj.variant, "order": n,
                               "before": inj.before, "after": inj.after})
         truth = {"episode_id": book.episode_id, "issues": issues}
-        provenance = {"seed": seed, "attempt": attempt, "rejections": rejections, "config": cfg,
+        from ..ids import salted
+
+        provenance = {"seed": seed, "seed_salted": salted(), "attempt": attempt, "rejections": rejections, "config": cfg,
                       "config_hash": chash, "generator_version": GENERATOR_VERSION,
                       "schema_version": SCHEMA_VERSION, "plan": plan, "story": _story_summary(book),
                       "mutations": mutations}

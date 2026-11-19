@@ -6,7 +6,10 @@ sequence numbers), so an agent cannot guess IDs or infer creation order.
 """
 
 import hashlib
+import os
 import random
+
+SALT_ENV = "AUDITENV_SEED_SALT"
 
 ALPHABET = "23456789ABCDEFGHJKMNPQRSTVWXYZ"  # no 0/O/1/I/L/U confusion
 
@@ -20,8 +23,18 @@ PREFIX_CHOICES = {
 
 
 def derive_seed(seed, stream: str, attempt: int = 0) -> int:
-    h = hashlib.sha256(f"{seed}:{stream}:{attempt}".encode("utf-8")).digest()
+    """sha256(f"{seed}:{stream}:{attempt}"). For closed runs the evaluator sets the secret
+    AUDITENV_SEED_SALT: the generator is open source, so without a salt an agent could brute-force
+    small seeds from the public episode_id and regenerate truth. The salt is never passed to
+    the agent process (runner.py builds the child environment explicitly)."""
+    salt = os.environ.get(SALT_ENV, "")
+    key = f"{seed}:{stream}:{attempt}" if not salt else f"{salt}|{seed}:{stream}:{attempt}"
+    h = hashlib.sha256(key.encode("utf-8")).digest()
     return int.from_bytes(h[:8], "big")
+
+
+def salted() -> bool:
+    return bool(os.environ.get(SALT_ENV, ""))
 
 
 def make_rng(seed, stream: str, attempt: int = 0) -> random.Random:

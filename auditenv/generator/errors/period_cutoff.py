@@ -31,9 +31,9 @@ class PeriodCutoff(ErrorType):
         off = offset_minutes(s.tz_name)
         before = [book.snapshot(("inv", target))]
         if off > 0:  # just after the period end: UTC date still looks like the last day
-            ts = s.period_end + timedelta(minutes=rng.randint(10, max(11, off - 10)))
+            ts = s.period_end + timedelta(minutes=rng.randint(10, max(11, off - 10)), seconds=rng.randint(0, 59))
         else:  # just before the period start: UTC date already looks like the first day
-            ts = s.period_start - timedelta(minutes=rng.randint(10, max(11, -off - 10)))
+            ts = s.period_start - timedelta(minutes=rng.randint(10, max(11, -off - 10)), seconds=rng.randint(0, 59))
         inv.issued_at = book.uniq(ts)
         if (off > 0 and inv.issued_at < s.period_end) or (off < 0 and inv.issued_at >= s.period_start):
             return None

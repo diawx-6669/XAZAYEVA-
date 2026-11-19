@@ -4,7 +4,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "episode_id", "base_currency", "currencies", "period_start", "period_end", "timezone",
-               "counts", "rounding", "config_name", "config_version", "config_hash", "generator_version"],
+               "counts", "rounding", "config_version", "config_hash", "generator_version"],
   "properties": {
     "schema_version": {"const": "1.0"},
     "episode_id": {"type": "string", "pattern": "^ep-[a-z0-9]{10}$"},
@@ -21,7 +21,6 @@
       "type": "object", "additionalProperties": false, "required": ["mode", "fx_conversion"],
       "properties": {"mode": {"const": "ROUND_HALF_EVEN"}, "fx_conversion": {"const": "per_document"}}
     },
-    "config_name": {"type": "string"},
     "config_version": {"type": "string"},
     "config_hash": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
     "generator_version": {"type": "string"}

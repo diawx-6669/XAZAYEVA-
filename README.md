@@ -35,6 +35,18 @@ make check
 пик памяти ≈ 70 МиБ. Эпизод `stress` (1 354–1 522 проводки, ~640 документов): генерация
 0,3–0,5 с, прогон simple_reconcile 56 шагов ≈ 0,1 с — с запасом под лимит 60 с.
 
+**Закрытый прогон (жюри).** Генератор открыт, поэтому для скрытых seed задайте секретную соль —
+без неё агент мог бы перебором seed восстановить эпизод и эталон:
+
+```bash
+docker run --rm --network none --cpus 2 --memory 4g -e AUDITENV_SEED_SALT=<секрет> auditenv \
+  python -m auditenv run --policy simple_reconcile --seed 123456 --config dev-mixed --mode eval --log /tmp/grader_log.jsonl
+```
+
+Соль меняет все эпизоды, но не передаётся в процесс агента (`runner.py` собирает его окружение
+явно). Открытые train/dev‑эпизоды сгенерированы без соли и воспроизводятся по seed из
+`episodes/*/index.json`.
+
 Другие команды:
 
 | Команда | Что делает |

@@ -70,7 +70,6 @@ def book_tables(book, cfg: dict, cfg_hash: str, order_rng) -> dict:
         "timezone": s.tz_name,
         "counts": {"ledger": len(ledger), "invoices": len(invoices), "payments": len(payments), "fx": len(fx)},
         "rounding": {"mode": "ROUND_HALF_EVEN", "fx_conversion": "per_document"},
-        "config_name": cfg["name"],
         "config_version": cfg["version"],
         "config_hash": cfg_hash,
         "generator_version": GENERATOR_VERSION,

@@ -31,7 +31,7 @@ class DuplicateInvoice(ErrorType):
         from ..books import InvoiceDoc
 
         orig = book.invoices[target]
-        shift = timedelta(days=rng.randint(0, 2), minutes=rng.randint(5, 600))
+        shift = timedelta(days=rng.randint(0, 2), minutes=rng.randint(5, 600), seconds=rng.randint(-29, 29))
         issued = book.uniq(orig.issued_at + shift)
         if issued >= book.story.period_end - timedelta(hours=1):
             return None
