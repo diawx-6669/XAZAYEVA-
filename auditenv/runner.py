@@ -165,6 +165,7 @@ class ChildPolicy:
             argv = [os.path.abspath(x) if os.path.exists(x) and (i > 0 or os.sep in x) else x for i, x in enumerate(argv)]
         else:
             argv = [sys.executable, "-m", "auditenv.runner", "--child", "--policy", name, "--seed", str(seed)]
+        self.env = dict(env)  # kept for audits/tests: exactly what the agent process received
         kw = {}
         if self.drop:
             kw.update(user=NOBODY, group=NOBODY, extra_groups=[])

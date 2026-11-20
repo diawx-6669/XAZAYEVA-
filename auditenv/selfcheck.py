@@ -601,8 +601,14 @@ def header() -> dict:
         raw = json.loads(p.read_text("utf-8"))
         if isinstance(raw, dict) and "name" in raw and "version" in raw:
             hashes[p.stem] = config_hash(load_config(p))
+    try:
+        from importlib.metadata import version as _v
+
+        pip = _v("pip")
+    except Exception:  # noqa: BLE001 - pip is optional at run time
+        pip = "n/a"
     return {"commit": commit, "env_version": __version__, "generator_version": GENERATOR_VERSION,
-            "config_hashes": hashes, "python": platform.python_version(),
+            "config_hashes": hashes, "python": platform.python_version(), "pip": pip,
             "platform": f"{platform.system()} {platform.machine()}"}
 
 
@@ -645,7 +651,7 @@ def render_md(rep) -> str:
     h = rep["header"]
     L = ["# AuditEnv self-check", "",
          f"commit `{h['commit']}` · env {h['env_version']} · {h['generator_version']} · Python {h['python']} · "
-         f"{h['platform']}", "",
+         f"pip {h.get('pip', 'n/a')} · {h['platform']}", "",
          "Хеши конфигов: " + ", ".join(f"`{k}` {v}" for k, v in h["config_hashes"].items()), "",
          f"Эпизоды: {len(rep['episodes'])} (5 clean-only, 5 interaction-heavy, 5 dev-mixed, 5 dev-global). Всё до раздела "
          f"«{TIMING_MARK[3:]}» детерминировано: повторный прогон на том же коммите даёт те же байты.", "",

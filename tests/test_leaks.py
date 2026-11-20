@@ -89,8 +89,12 @@ def test_agent_process_gets_no_salt_and_no_paths(monkeypatch):
     c = ChildPolicy("random_explorer")
     try:
         assert "AUDITENV_SEED_SALT" not in c.proc.args and c.proc.pid
-        env = open(f"/proc/{c.proc.pid}/environ", "rb").read().decode(errors="replace")
-        assert "AUDITENV_SEED_SALT" not in env and "secret" not in env
+        assert "AUDITENV_SEED_SALT" not in c.env and "secret" not in str(c.env)
+        try:  # the kernel's view, when readable (root without CAP_SYS_PTRACE cannot read another uid's environ)
+            env = open(f"/proc/{c.proc.pid}/environ", "rb").read().decode(errors="replace")
+            assert "AUDITENV_SEED_SALT" not in env and "secret" not in env
+        except PermissionError:
+            pass
     finally:
         c.close()
 

@@ -1,73 +1,92 @@
-# Разбор сбоев simple_reconcile (измерено)
+# Разбор сбоев и уязвимостей (измерено)
+
+Два раздела: (1) уязвимости **самой среды**, которые мы нашли и закрыли, — с тестом‑сторожем на
+каждую; (2) где и почему ошибается честная скриптовая политика `simple_reconcile` — с числами,
+интервалами и командами, которыми любой пример можно воспроизвести.
+
+## 1. Уязвимости среды, которые мы нашли и закрыли
+
+| # | Уязвимость | Симптом | Как нашли | Влияние | Исправление | Тест‑сторож |
+|---|---|---|---|---|---|---|
+| 1 | Перебор seed без соли | генератор открыт: перебрав seed 0…N и сравнив `episode_id`, агент восстанавливает эпизод и `truth.json` | думали как атакующий (раунд 1, коммит `70fcd0e`) | полная утечка эталона в закрытом прогоне | секретная соль `AUDITENV_SEED_SALT` в под‑seed; соль не попадает ни в процесс агента, ни в provenance | `test_leaks.py::test_seed_salt_blocks_seed_bruteforce` (2000 seed перебором не находят эпизод) |
+| 2 | Подсказка `config_name` | в `manifest.json` было `"config_name": "clean-only"` | ревью наблюдения (раунд 1, `70fcd0e`) | «книга чистая» читалась из имени | имени конфига в manifest нет, только `config_hash`/`config_version` | `test_leaks.py::test_manifest_has_no_config_name` |
+| 3 | Чтение `/proc/<ppid>/environ` | агент с тем же uid, что и оценщик, читает окружение родителя — в том числе соль из п. 1 | атака‑шпион `tests/agents/environ_spy.py` (раунд 2) — на старом раннере **сработала** | обход п. 1 | агент запускается от `nobody`, окружение root‑процесса ему недоступно | `test_guards.py::test_agent_cannot_read_parent_environ_salt` (с контролем: при `AUDITENV_KEEP_UID=1` утечка воспроизводится) |
+| 4 | Агент пишет в оценщика | процесс агента мог дописать журнал оценщика, переписать `truth.json`, поменять код, оставить файлы в `/tmp` для следующего эпизода, запустить демона | атака‑«писатель» `tests/agents/writer_agent.py` (раунд 2, C7) | подмена итога, канал между эпизодами | `nobody` + `RLIMIT_FSIZE=0` + копия кода только для чтения + своя сессия и `killpg` + зачистка процессов и файлов `nobody` после прогона | `test_batch_c.py::test_writer_attack_changes_nothing` (sha256 всех файлов до/после) |
+| 5 | Подмена эталона и журнала | правка `truth.json` или строки `grader_log.jsonl` проходила незаметно | ревью (раунд 2, C8) | нечестный итог без следов | `grader_digest` в `index.json` проверяется при загрузке; журнал — цепочка хешей, голова публикуется в `reports/selfcheck.json` | `test_batch_c.py::test_grader_digest_detects_tampered_truth`, `test_log_chain_detects_edits`, шаг `verify-log` в `make check` |
+| 6 | Поле счёта не по кейсу | в `invoices.jsonl` было поле `cancels_invoice_id`, которого нет в разделе 03 кейса | сверка схем с кейсом (раунд 2) | расхождение с контрактом данных | ссылка на отменяемый счёт — в тексте строки credit note; схема = ровно поля кейса | `test_guards.py::test_manifest_and_invoice_have_only_case_fields` |
+| 7 | Цепочка зависимостей jsonschema → referencing → **rpds‑py** (Rust‑расширение) | «плавающая» версия могла бы потребовать сборку из исходников или дать другой код при офлайн‑проверке | ревью сборки (риск, а не инцидент) | невоспроизводимая сборка | все 13 зависимостей закреплены `==`, `pip install --no-deps`, базовый образ по дайджесту | `test_guards.py::test_every_dependency_is_pinned_and_installed_as_pinned` |
+| 8 | Неверный `submit` не завершал эпизод | `submit` без/с пустыми args давал `bad_args`, и агент мог зондировать формат бесплатно | ревью контракта (пакет A1) | расхождение с кейсом («неверная структура завершает эпизод с −1») | любой `submit` завершает эпизод; кривой — награда −1, причина в журнале оценщика | `test_batch_a.py::test_malformed_submit_terminates_minus_one` (10 форм) |
+| 9 | `tolerance_minor` из конфига игнорировался | среда читала допуск из несуществующего поля manifest — всегда 1 | ревью (A3) | конфиг врал о допуске | допуск идёт config → `truth.json` → оценщик и печатается в тексте задачи | `test_batch_a.py::test_tolerance_from_config_travels_to_grader_and_task` (±3 да, ±4 нет) |
+| 10 | Суммы сценария `partial_fx_cutoff` зависели друг от друга | 2400 конвертировалась по **неверному** курсу кассы, т. е. сумма payment_allocation менялась от fx‑ошибки | ревью (A5) | «каждая мутация ломает ровно своё» нарушалось | нераспределённая часть всегда по курсу политики; вариант `inverted` запрещён в сценарии | `test_batch_a.py::test_partial_fx_cutoff_amounts_independent_and_never_inverted`, `test_duplicate_fx_amounts_independent` |
+| 11 | Падение генератора на одном клиенте | конфиг `n_entities=[1,1]` → `IndexError` (отвлекалка «повтор суммы у другого клиента») | hypothesis‑fuzz по пространству конфигов (A6) | неработающее ядро на допустимом конфиге | отвлекалка пропускается, если другого клиента нет; невыполнимые конфиги отклоняются `load_config` с понятной ошибкой | `test_config_fuzz.py::test_config_space_fuzz`, `test_batch_a.py::test_infeasible_configs_fail_clearly` |
+| 12 | «Чистый или нет» зависел от попытки | при перегенерации (сканер совпадений) эпизод мог сменить чистый ↔ ошибочный | ревью (A7) | доля чистых уплывала от `clean_probability` | решение из отдельного потока без `attempt` | `test_batch_a.py::test_clean_decision_does_not_depend_on_attempt`, `test_clean_share_matches_probability` |
+| 13 | Противоречия в данных | cutoff оставлял `service_period` старого месяца; «повтор суммы» копировал чужой месяц; возврат мог превысить оплату после мутации распределения | линтер правдоподобия `auditenv/lint.py` (C3) на 600 эпизодах | «противоречивые данные не считаются сложностью» (кейс, раздел 10) | `service_period` следует локальной дате; платёж с возвратами не портится | `test_batch_a.py::test_cutoff_service_period_follows_local_month`, `test_batch_c.py::test_lint_only_truth_explains_implausibility`, шаг `lint` в `make check` |
+| 14 | Устаревшие доказательства | альтернативный набор fx по платежу считался до второй мутации того же платежа | независимый проверяльщик (C4) | набор доказательств не пересчитывал сумму | наборы собираются по итоговой книге | `test_batch_c.py::test_evidence_sets_are_minimal_and_alternatives_exist`, `verify-independent` (540 эпизодов) |
+
+## 2. Где ошибается simple_reconcile
 
 `simple_reconcile` — честный скриптовый аудитор: видит только то, что вернули инструменты.
-Ниже — замер на 250 эпизодах (100 `dev-mixed`, 100 `interaction-heavy`, 50 `clean-only`,
-seed 5000–5099 / 5000–5049), режим `train`, коды причин из журнала оценщика
-(`grader/matcher.py::miss_reason`). Воспроизвести: табло `make check` содержит тот же разбор
-на 20 эпизодах self‑check (`reports/selfcheck.md`, раздел «Разбор сбоев»).
+Три намеренных упрощения объясняют **все** его промахи и ложные выводы:
 
-## Полнота по типам и вариантам (раунд 2, все открытые конфиги)
+* **Нет правила `previous_business_day`.** Если на дату документа нет курса (выходной), документ
+  пропускается. Это все без исключения промахи fx_rate (замер: 79 из 79 непойманных fx‑ошибок
+  датированы субботой или воскресеньем).
+* **Не читает ссылку credit note.** Перевыставленный после credit note счёт выглядит как дубль →
+  ложный `duplicate_invoice` (`unmatched`, а если в книге есть настоящий дубль — `ids_mismatch`).
+* **Считает любую 2400 по платежу со ссылками ошибкой.** Законная переплата (отвлекалка
+  `overpayment`) → ложный `payment_allocation`. И наоборот, `wrong_invoice` (Cr 1200 на чужой
+  счёт без 2400) он не видит вовсе.
+* Плюс: не исключает дубли из проверки курса → дубль, скопированный по неверному курсу
+  (`duplicate_fx`), даёт `wrong_type` по fx_rate.
 
 <!--generated:variants-->
-Замер: 300 эпизодов (`python -m auditenv analyze --n 300 --docs`), режим train.
+Замер: 300 эпизодов по всем открытым конфигам (`python -m auditenv analyze --n 300 --docs`), режим train. Recall — доля найденных simple_reconcile, в скобках 95 % интервал Уилсона. Пример промаха можно посмотреть шаг за шагом командой `python -m auditenv demo --config <конфиг> --seed <seed>`. Столбцы «oracle» и «незав.» показывают, что те же случаи решаемы: oracle находит их по эталону, а `tools/verify_independent.py` (без импорта auditenv) выводит их из открытых данных и пересчитывает суммы по доказательствам.
 
-| Тип / вариант | Встречается | Найдено simple_reconcile | Recall |
-|---|---|---|---|
-| duplicate_invoice / copy | 84 | 84 | 100% |
-| duplicate_invoice / copy_as_posted | 57 | 57 | 100% |
-| duplicate_invoice / paid_twice | 13 | 13 | 100% |
-| fx_rate / adjacent_day | 119 | 63 | 53% |
-| fx_rate / due_date | 11 | 8 | 73% |
-| fx_rate / historical_rate | 12 | 4 | 33% |
-| fx_rate / inverted | 11 | 11 | 100% |
-| fx_rate / utc_date | 32 | 31 | 97% |
-| fx_rate / wrong_pair | 23 | 13 | 57% |
-| payment_allocation / partial | 115 | 115 | 100% |
-| payment_allocation / unallocated | 43 | 43 | 100% |
-| payment_allocation / wrong_invoice | 5 | 0 | 0% |
-| period_cutoff / backdated_posting | 8 | 8 | 100% |
-| period_cutoff / prior_period | 40 | 40 | 100% |
-| period_cutoff / utc_trap | 31 | 31 | 100% |
-| **итого** | **604** | **521** | **86%** |
+| Тип / вариант | n | simple_reconcile | Recall (95 % ДИ) | Пример промаха | oracle | незав. |
+|---|---|---|---|---|---|---|
+| duplicate_invoice / copy | 84 | 84 | 100% (96%–100%) | — | 84/84 | 84/84 |
+| duplicate_invoice / copy_as_posted | 57 | 57 | 100% (94%–100%) | — | 57/57 | 57/57 |
+| duplicate_invoice / paid_twice | 13 | 13 | 100% (77%–100%) | — | 13/13 | 13/13 |
+| fx_rate / adjacent_day | 120 | 63 | 52% (44%–61%) | `interaction-heavy 70001` | 120/120 | 120/120 |
+| fx_rate / due_date | 10 | 7 | 70% (40%–89%) | `dev-mixed 70066` | 10/10 | 10/10 |
+| fx_rate / historical_rate | 13 | 5 | 38% (18%–64%) | `interaction-heavy 70019` | 13/13 | 13/13 |
+| fx_rate / inverted | 11 | 11 | 100% (74%–100%) | — | 11/11 | 11/11 |
+| fx_rate / utc_date | 32 | 31 | 97% (84%–99%) | `dev-global 70086` | 32/32 | 32/32 |
+| fx_rate / wrong_pair | 22 | 12 | 55% (35%–73%) | `dev-global 70014` | 22/22 | 22/22 |
+| payment_allocation / partial | 116 | 116 | 100% (97%–100%) | — | 116/116 | 116/116 |
+| payment_allocation / unallocated | 43 | 43 | 100% (92%–100%) | — | 43/43 | 43/43 |
+| payment_allocation / wrong_invoice | 4 | 0 | 0% (0%–49%) | `dev-mixed 70066` | 4/4 | 4/4 |
+| period_cutoff / backdated_posting | 9 | 9 | 100% (70%–100%) | — | 9/9 | 9/9 |
+| period_cutoff / prior_period | 41 | 41 | 100% (91%–100%) | — | 41/41 | 41/41 |
+| period_cutoff / utc_trap | 29 | 29 | 100% (88%–100%) | — | 29/29 | 29/29 |
+| **итого** | **604** | **521** | **86% (83%–89%)** | | **604/604** | **604/604** |
+
+Ложные выводы simple_reconcile по кодам причин оценщика (`grader/matcher.py::miss_reason`):
+
+| Код причины | Сколько | Пример |
+|---|---|---|
+| `unmatched` | 153 | `dev-mixed 70000` |
+| `ids_mismatch` | 101 | `dev-mixed 70006` |
+| `wrong_type` | 32 | `interaction-heavy 70019` |
+
+Средняя награда simple_reconcile по конфигам:
+
+| Конфиг | Награда |
+|---|---|
+| clean-only | -0.803 |
+| dev-global | +0.399 |
+| dev-mixed | +0.342 |
+| interaction-heavy | +0.487 |
+| train-easy | +0.325 |
+| train-global | +0.416 |
 <!--/generated-->
 
-## Полнота по типам и вариантам (раунд 1, архив)
+### Что это говорит о среде
 
-| Тип / вариант | Найдено | Почему |
-|---|---|---|
-| duplicate_invoice / copy | 60 / 60 (100 %) | |
-| duplicate_invoice / copy_as_posted (сценарий duplicate_fx) | 100 / 100 (100 %) | |
-| payment_allocation / partial | 103 / 103 (100 %) | |
-| payment_allocation / unallocated | 28 / 28 (100 %) | |
-| period_cutoff (UTC‑ловушка) | 70 / 70 (100 %) | переводит время в местный пояс |
-| fx_rate / adjacent_day, рабочий день | 110 / 110 (100 %) | |
-| fx_rate / utc_date, рабочий день | 40 / 40 (100 %) | |
-| fx_rate / inverted, рабочий день | 15 / 15 (100 %) | |
-| **fx_rate / любой вариант, документ в выходной** | **0 / 71 (0 %)** | нет правила `previous_business_day`: нет курса на дату — документ пропускается |
-
-## Ложные выводы (217 на 250 эпизодов)
-
-| Код причины | Кол‑во | Источник |
-|---|---|---|
-| `unmatched` (duplicate_invoice) | 83 | перевыставленный после credit note счёт принят за дубль: политика игнорирует ссылку `Credit note for <invoice_id>` в строках credit note |
-| `ids_mismatch` (duplicate_invoice) | 62 | то же, но в эпизоде есть настоящий дубль с другим ID |
-| `wrong_type` (fx_rate) | 72 | в `duplicate_fx` дубль скопирован по неверному курсу; политика не исключает дубли из проверки курса и докладывает fx_rate по ID дубля |
-
-## Итоговая награда simple_reconcile
-
-| Набор | Средняя награда |
-|---|---|
-| dev-mixed (100) | 0.497 |
-| interaction-heavy (100) | 0.566 |
-| clean-only (50) | −0.881 (почти всегда 1 FP из‑за credit note) |
-
-## Что это говорит о среде
-
-* Все четыре типа решаемы по открытым данным (oracle 1.0, независимый решатель сходится с
-  truth на 1 000 эпизодах), но **не тривиальны**: три простые эвристики (без previous business
-  day, без credit note, без исключения дублей) стоят 30–100 % награды.
-* Чистые книги действительно штрафуют самоуверенную политику: одна ложная находка на чистой
-  книге даёт −1.
-* Отвлекающие случаи «аренда с одинаковой суммой», «оплата частями», «платёж на несколько
-  счетов», «остаток округления 1 ед.», «операции в 23:50/00:05», «неопознанный платёж на 2400»
-  simple_reconcile не обманули — ложных выводов от них 0.
+* Все типы и варианты решаемы по открытым данным: oracle и независимый проверяльщик
+  (`tools/verify_independent.py`, без единого импорта из `auditenv`) сходятся с эталоном на каждом случае.
+* Но задача **не тривиальна**: три простые эвристики стоят simple_reconcile от 30 до 100 %
+  полноты на отдельных вариантах, а на чистых книгах он почти всегда получает −1 — потому что в
+  каждом эпизоде есть корректные «двойники» каждого типа ошибки (`min_lookalikes_per_type`).
+* Ни один поверхностный признак не отделяет ошибки от корректных документов (таблица и тест — в
+  `docs/LIMITATIONS.md`, `tests/test_surface.py`).

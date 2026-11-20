@@ -140,21 +140,71 @@ def shortcuts(table, threshold=THRESHOLD) -> list:
     return sorted(k for k, (_, _, _, p, r) in table.items() if p > threshold and r > threshold)
 
 
+def wilson(k: int, n: int, z: float = 1.96):
+    """95 % Wilson score interval for a proportion k/n (no scipy)."""
+    if n == 0:
+        return (0.0, 1.0)
+    import math
+
+    p = k / n
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return (max(0.0, c - h), min(1.0, c + h))
+
+
+def _independent_ok(results) -> dict:
+    """episode_id -> bool from tools/verify_independent.py (separate isolated interpreter)."""
+    import json
+    import subprocess
+    import sys
+    import tempfile
+    from pathlib import Path
+
+    from .generator.export import write_episode
+    from .generator.episode import Episode
+    from .paths import ROOT
+
+    with tempfile.TemporaryDirectory(prefix="auditenv-an-") as tmp:
+        dirs = []
+        for cfg, seed, files, truth, _ in results:
+            dirs.append(str(write_episode(Episode(truth["episode_id"], files, truth, {}), Path(tmp) / f"{cfg}-{seed}")))
+        out = subprocess.run([sys.executable, "-I", str(ROOT / "tools" / "verify_independent.py"), "--json", *dirs],
+                             capture_output=True, text=True)
+    failed = {r["episode_id"] for r in json.loads(out.stdout)["failed"]}
+    return {truth["episode_id"]: truth["episode_id"] not in failed for _, _, _, truth, _ in results}
+
+
 def variant_table(results) -> dict:
-    """{(type, variant): [count, found_by_simple_reconcile]}"""
+    """{(type, variant): {n, sr, oracle, indep, miss_example, hit_example}} and FP reasons of simple_reconcile."""
     from .generator.episode import Episode
     from .runner import run_episode
 
-    out = {}
+    indep = _independent_ok(results)
+    out, fps, by_cfg = {}, {}, {}
     for cfg, seed, files, truth, muts in results:
         ep = Episode(truth["episode_id"], files, truth, {})
         g = run_episode("simple_reconcile", episode=ep, isolate=False, record=False)["grade"]
+        o = run_episode("oracle", episode=ep, isolate=False, record=False)["grade"]
+        by_cfg.setdefault(cfg, []).append(g["reward"])
         found = {f["matched"] for f in g["findings"] if f["matched"]}
+        ofound = {f["matched"] for f in o["findings"] if f["matched"]}
         for m in muts:
-            c = out.setdefault((m["type"], m["variant"]), [0, 0])
-            c[0] += 1
-            c[1] += m["issue_id"] in found
-    return out
+            c = out.setdefault((m["type"], m["variant"]), {"n": 0, "sr": 0, "oracle": 0, "indep": 0,
+                                                            "miss_example": None, "hit_example": None})
+            c["n"] += 1
+            hit = m["issue_id"] in found
+            c["sr"] += hit
+            c["oracle"] += m["issue_id"] in ofound
+            c["indep"] += indep[truth["episode_id"]]
+            key = "hit_example" if hit else "miss_example"
+            if c[key] is None:
+                c[key] = (cfg, seed)
+        for f in g["findings"]:
+            if f["reason"]:
+                d = fps.setdefault(f["reason"], {"n": 0, "example": (cfg, seed)})
+                d["n"] += 1
+    return {"variants": out, "fp": fps, "reward_by_config": {k: sum(v) / len(v) for k, v in by_cfg.items()}}
 
 
 def render_surface(n, surface) -> str:
@@ -171,14 +221,34 @@ def render_surface(n, surface) -> str:
     return "\n".join(L)
 
 
-def render_variants(n, variants) -> str:
-    L = [f"Замер: {n} эпизодов (`python -m auditenv analyze --n {n} --docs`), режим train.", "",
-         "| Тип / вариант | Встречается | Найдено simple_reconcile | Recall |", "|---|---|---|---|"]
-    for (t, v), (c, f) in sorted(variants.items()):
-        L.append(f"| {t} / {v} | {c} | {f} | {f / c:.0%} |")
-    tot = sum(c for c, _ in variants.values())
-    fnd = sum(f for _, f in variants.values())
-    L += [f"| **итого** | **{tot}** | **{fnd}** | **{fnd / tot:.0%}** |" if tot else ""]
+def render_variants(n, vt) -> str:
+    variants = vt["variants"]
+    L = [f"Замер: {n} эпизодов по всем открытым конфигам (`python -m auditenv analyze --n {n} --docs`), режим train. "
+         "Recall — доля найденных simple_reconcile, в скобках 95 % интервал Уилсона. Пример промаха можно посмотреть "
+         "шаг за шагом командой `python -m auditenv demo --config <конфиг> --seed <seed>`. Столбцы «oracle» и «незав.» "
+         "показывают, что те же случаи решаемы: oracle находит их по эталону, а `tools/verify_independent.py` "
+         "(без импорта auditenv) выводит их из открытых данных и пересчитывает суммы по доказательствам.", "",
+         "| Тип / вариант | n | simple_reconcile | Recall (95 % ДИ) | Пример промаха | oracle | незав. |",
+         "|---|---|---|---|---|---|---|"]
+    tot = {"n": 0, "sr": 0, "oracle": 0, "indep": 0}
+    for (t, v), c in sorted(variants.items()):
+        lo, hi = wilson(c["sr"], c["n"])
+        ex = f"`{c['miss_example'][0]} {c['miss_example'][1]}`" if c["miss_example"] else "—"
+        L.append(f"| {t} / {v} | {c['n']} | {c['sr']} | {c['sr'] / c['n']:.0%} ({lo:.0%}–{hi:.0%}) | {ex} | "
+                 f"{c['oracle']}/{c['n']} | {c['indep']}/{c['n']} |")
+        for k in tot:
+            tot[k] += c[k]
+    if tot["n"]:
+        lo, hi = wilson(tot["sr"], tot["n"])
+        L.append(f"| **итого** | **{tot['n']}** | **{tot['sr']}** | **{tot['sr'] / tot['n']:.0%} ({lo:.0%}–{hi:.0%})** | | "
+                 f"**{tot['oracle']}/{tot['n']}** | **{tot['indep']}/{tot['n']}** |")
+    L += ["", "Ложные выводы simple_reconcile по кодам причин оценщика (`grader/matcher.py::miss_reason`):", "",
+          "| Код причины | Сколько | Пример |", "|---|---|---|"]
+    for r, d in sorted(vt["fp"].items(), key=lambda kv: -kv[1]["n"]):
+        L.append(f"| `{r}` | {d['n']} | `{d['example'][0]} {d['example'][1]}` |")
+    L += ["", "Средняя награда simple_reconcile по конфигам:", "", "| Конфиг | Награда |", "|---|---|"]
+    for cfg, r in sorted(vt["reward_by_config"].items()):
+        L.append(f"| {cfg} | {r:+.3f} |")
     return "\n".join(L)
 
 

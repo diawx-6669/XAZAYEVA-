@@ -1,0 +1,51 @@
+[
+ {
+  "name": "clean-only",
+  "file": "clean-only.json",
+  "version": "2.0",
+  "config_hash": "b3ea7789592542fd",
+  "content_hash": "16397d7fd70687f5"
+ },
+ {
+  "name": "dev-global",
+  "file": "dev-global.json",
+  "version": "2.0",
+  "config_hash": "901a6f99473a48ad",
+  "content_hash": "ce582946d6805f92"
+ },
+ {
+  "name": "dev-mixed",
+  "file": "dev-mixed.json",
+  "version": "2.0",
+  "config_hash": "2435d9d9eff18731",
+  "content_hash": "ff12a0332466cae7"
+ },
+ {
+  "name": "interaction-heavy",
+  "file": "interaction-heavy.json",
+  "version": "2.0",
+  "config_hash": "69494e59920a9b92",
+  "content_hash": "1918e27955e57959"
+ },
+ {
+  "name": "stress",
+  "file": "stress.json",
+  "version": "2.0",
+  "config_hash": "7dd64db6b1aeac85",
+  "content_hash": "9f3df648da4cca6f"
+ },
+ {
+  "name": "train-easy",
+  "file": "train-easy.json",
+  "version": "2.0",
+  "config_hash": "58e3dda93da800ba",
+  "content_hash": "622b4fe75142a2a1"
+ },
+ {
+  "name": "train-global",
+  "file": "train-global.json",
+  "version": "2.0",
+  "config_hash": "700ad883b68e9fbf",
+  "content_hash": "f29e983e07f627b3"
+ }
+]

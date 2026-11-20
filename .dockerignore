@@ -3,3 +3,4 @@
 **/__pycache__
 .pytest_cache
 .hypothesis
+reports/grader_log.jsonl

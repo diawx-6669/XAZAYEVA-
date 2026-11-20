@@ -1,0 +1,29 @@
+name: check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  docker-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record the commit for the report header
+        run: git rev-parse --short=12 HEAD > VERSION
+      - name: Build the image (base pinned by digest)
+        run: docker build -t auditenv .
+      - name: Official check - offline, 2 CPUs, 4 GB, exactly as the jury runs it
+        run: |
+          mkdir -p out
+          docker run --rm --network none --cpus 2 --memory 4g \
+            -v "$PWD/out:/out" auditenv \
+            sh -c 'sh scripts/check.sh; rc=$?; cp -r reports /out/; exit $rc'
+      - name: Upload reports/
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: out/reports/

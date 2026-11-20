@@ -133,3 +133,41 @@ def load_config(cfg=None) -> dict:
 
 def config_hash(cfg: dict) -> str:
     return sha256_hex(dumps(cfg).encode("utf-8"))[:16]
+
+
+# ------------------------------------------------------------------ lock file
+def content_hash(cfg: dict) -> str:
+    """Hash of the EFFECTIVE config (defaults merged) without its version: changes whenever the generated
+    episodes can change - also when a generator default moves under an unchanged config file."""
+    body = {k: v for k, v in cfg.items() if k != "version"}
+    return sha256_hex(dumps(body).encode("utf-8"))[:16]
+
+
+def lock_entries() -> list:
+    out = []
+    for p in sorted(CONFIGS_DIR.glob("*.json")):
+        raw = json.loads(p.read_text("utf-8"))
+        if not (isinstance(raw, dict) and "name" in raw and "version" in raw):
+            continue
+        cfg = load_config(p)
+        out.append({"name": cfg["name"], "file": p.name, "version": cfg["version"], "config_hash": config_hash(cfg),
+                    "content_hash": content_hash(cfg)})
+    return out
+
+
+def check_lock(lock: list) -> list:
+    """Problems: content changed but version did not (must bump), or LOCK is stale (must regenerate)."""
+    have = {e["name"]: e for e in lock}
+    problems = []
+    for e in lock_entries():
+        old = have.get(e["name"])
+        if old is None:
+            problems.append(f"{e['name']}: not in configs/LOCK.json (run: python -m auditenv lock-configs)")
+        elif old["content_hash"] != e["content_hash"] and old["version"] == e["version"]:
+            problems.append(f"{e['name']}: content changed but version is still {e['version']} - bump 'version' "
+                            "and add a line to configs/CHANGELOG.md")
+        elif old != e:
+            problems.append(f"{e['name']}: configs/LOCK.json is stale (run: python -m auditenv lock-configs)")
+    gone = set(have) - {e["name"] for e in lock_entries()}
+    problems += [f"{n}: in LOCK.json but the config file is gone" for n in sorted(gone)]
+    return problems

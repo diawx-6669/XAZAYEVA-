@@ -330,6 +330,15 @@ def cmd_verify_provenance(a):
     return 1 if bad else 0
 
 
+def cmd_lock_configs(a):
+    from .config import lock_entries
+
+    p = ROOT / "configs" / "LOCK.json"
+    entries = lock_entries()
+    p.write_text(json.dumps(entries, indent=1) + "\n", "utf-8")
+    print(f"lock-configs: {len(entries)} configs -> {p}")
+
+
 def cmd_verify_log(a):
     from .grader.log import verify_chain
 
@@ -402,6 +411,7 @@ def main(argv=None) -> int:
     vi = sub.add_parser("verify-independent")
     vi.add_argument("--seeds", type=int, default=500)
     sub.add_parser("verify-provenance")
+    sub.add_parser("lock-configs")
     cs = sub.add_parser("check-schemas")
     cs.add_argument("--no-log", action="store_true")
     sub.add_parser("lint")

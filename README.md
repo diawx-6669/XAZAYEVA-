@@ -1,5 +1,19 @@
 # AuditEnv — RL‑среда для ИИ‑аудитора (Genesis Hackathon, FinTech)
 
+[![check](https://github.com/diawx-6669/XAZAYEVA-/actions/workflows/check.yml/badge.svg)](https://github.com/diawx-6669/XAZAYEVA-/actions/workflows/check.yml)
+
+## Критерии «Инженерия и объяснение» — где смотреть
+
+| Критерий | Где смотреть | Команда на 1 минуту | Ожидаемый вывод |
+|---|---|---|---|
+| Запуск одной командой | `Makefile`, `scripts/check.sh`, `Dockerfile` (образ по дайджесту), `.github/workflows/check.yml` | `make quick` (полная: `make check` / `make docker-check`) | `quick smoke: …s`; у полной — табло `<!--fact:selfcheck_total-->90/90<!--/fact-->` и `check: ALL GREEN` |
+| Версии конфигураций | `configs/*.json` (`version`), `configs/LOCK.json`, `configs/CHANGELOG.md`, `config_version` + `config_hash` в каждом `manifest.json` | `python -m pytest -q tests/test_configs_lock.py` | `5 passed`: содержимое без смены версии не пройдёт |
+| Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1193<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
+| Измеренный разбор сбоев | [`docs/FAILURES.md`](docs/FAILURES.md): 14 закрытых уязвимостей с тестами‑сторожами, полнота по вариантам с интервалами Уилсона, seed каждого примера | `python -m auditenv analyze --n 60` | таблицы признаков и вариантов; oracle и независимый проверяльщик решают 100 % |
+| Честные ограничения | [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) | `python -m auditenv docs-check` | `0 mismatches`: числа в документах совпадают с реальностью |
+
+---
+
 Воспроизводимый симулятор для дообучения модели финансового аудита. По `seed` и `config`
 генерируется **вымышленная** компания за один отчётный период: скрытая история событий →
 документы и проводки → внесённые ошибки с записанной причиной → закрытый эталон. Агент через
@@ -15,8 +29,9 @@
 make docker-check
 ```
 
-Собирает образ `python:3.11-slim` и запускает полную проверку **без сети** с лимитами жюри:
-`docker run --rm --network none --cpus 2 --memory 4g auditenv`. Без Docker:
+Собирает образ (`python:3.11-slim`, закреплён по sha256‑дайджесту) и запускает полную проверку
+**без сети** с лимитами жюри: `docker run --rm --network none --cpus 2 --memory 4g auditenv`.
+Без Docker:
 
 ```bash
 make venv
@@ -26,14 +41,22 @@ make venv
 make check
 ```
 
-`make check` = весь pytest (<!--fact:n_tests-->376<!--/fact--> тестов, включая hypothesis и 4×50 seed для решателя) + табло self‑check на 20
-эпизодах и 20 парных преобразованиях + leakscan + replay траекторий. Результат печатается и
-пишется в `reports/selfcheck.md` / `reports/selfcheck.json`, журнал оценщика —
-`reports/grader_log.jsonl`. Код возврата ≠ 0, если хоть одна проверка упала.
+`make check` — это по порядку:
 
-Измерено (контейнер, `--cpus 2 --memory 4g --network none`): `make check` — 36 с целиком,
-пик памяти ≈ 70 МиБ. Эпизод `stress` (1 354–1 522 проводки, ~640 документов): генерация
-0,3–0,5 с, прогон simple_reconcile 56 шагов ≈ 0,1 с — с запасом под лимит 60 с.
+1. весь pytest (<!--fact:n_tests-->384<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
+   поверхностных признаков, атаки на песочницу агента);
+2. табло self‑check в духе жюри: 4 блока × 20 проверок на 20 эпизодах и 20 парных преобразованиях,
+   диагностика P/R/F1 (макро и микро), возврат на чистых и ошибочных книгах, шаги, время p50/p95;
+3. `leakscan` и побайтовый `replay` всех траекторий; `verify-log` — цепочка хешей журнала оценщика;
+4. `verify-provenance` — откат всех мутаций по `provenance.json` даёт чистую книгу, повтор —
+   ровно объявленные расхождения;
+5. `verify-independent` — независимый проверяльщик (`tools/verify_independent.py`, только stdlib,
+   запускается в `python -I`) на 20 открытых + 20 self‑check + 500 новых эпизодах;
+6. `lint` (правдоподобие данных), `check-schemas` (каждая строка каждого артефакта по схеме),
+   `docs-check` (числа в документах).
+
+Итог печатается и пишется в `reports/selfcheck.md` / `reports/selfcheck.json`; всё до раздела
+«Замеры времени» детерминировано. Код возврата ≠ 0, если хоть одна проверка упала.
 
 **Закрытый прогон (жюри).** Генератор открыт, поэтому для скрытых seed задайте секретную соль —
 без неё агент мог бы перебором seed восстановить эпизод и эталон:
@@ -43,21 +66,37 @@ docker run --rm --network none --cpus 2 --memory 4g -e AUDITENV_SEED_SALT=<се�
   python -m auditenv run --policy simple_reconcile --seed 123456 --config dev-mixed --mode eval --log /tmp/grader_log.jsonl
 ```
 
-Соль меняет все эпизоды, но не передаётся в процесс агента (`runner.py` собирает его окружение
-явно). Открытые train/dev‑эпизоды сгенерированы без соли и воспроизводятся по seed из
-`episodes/*/index.json`.
+Соль меняет все эпизоды, но не передаётся в процесс агента; агент работает от `nobody` и не может
+прочитать окружение оценщика. Открытые train/dev‑эпизоды сгенерированы без соли.
 
-Другие команды:
+## Свой агент
+
+```bash
+python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 7 --config dev-mixed
+```
+
+Протокол JSON‑строк, песочница процесса и Gymnasium‑клиент — [docs/ADAPTER.md](docs/ADAPTER.md).
+Все трактовки контракта (что такое `inspection_steps` при обрыве, формы `submit`, коды ошибок) —
+[docs/CONTRACT.md](docs/CONTRACT.md) и машиночитаемо в `contract.json` (`env.spec`).
+
+## Команды
 
 | Команда | Что делает |
 |---|---|
-| `make quick` | быстрые тесты + 3 эпизода × 4 политики (≈17 с) |
-| `make episodes` | перегенерирует 10 train + 10 dev эпизодов в `episodes/` из `configs/splits.json` |
-| `make trajectories` | пишет `trajectories/trajectories.jsonl` (все политики, кроме oracle) и прогоняет leakscan |
-| `make demo` | `scripts/demo.sh`: check → эпизод с взаимодействующими ошибками шаг за шагом → атака flag_all → двойник после transforms |
+| `make quick` | быстрые тесты + 3 эпизода × 4 политики |
+| `make check` / `make docker-check` | полная проверка (см. выше) |
+| `make episodes` / `make trajectories` / `make golden` | перегенерировать эпизоды, траектории, golden‑хеши |
+| `make demo` | сценарий демо: табло → эпизод с взаимодействующими ошибками шаг за шагом → атака → двойник |
+| `make docs-check` | числа в README/docs совпадают с реальностью |
 | `python -m auditenv generate --seed 7 --config dev-mixed --out /tmp/ep` | один эпизод на диск (`public/` и `grader/` раздельно) |
 | `python -m auditenv run --policy simple_reconcile --episode-dir episodes/dev/<id> --mode eval --log log.jsonl` | прогон политики в отдельном процессе |
-| `python -m auditenv replay` | повтор действий из траекторий и побайтовое сравнение наблюдений и наград |
+| `python -m auditenv serve` | среда как JSON‑lines сервер (клиент: `auditenv.serve.AuditEnvClient`) |
+| `python -m auditenv transform --episode-dir D --out D2 --seed 5 --opaque-ids` | безвредное преобразование: перестановка строк и новые ID (без префиксов, длина 12–64) + `grader/id_map.json` |
+| `python -m auditenv verify-independent --seeds 500` | независимая проверка эталона и доказательств |
+| `python -m auditenv verify-provenance` | откат/повтор мутаций по provenance |
+| `python -m auditenv verify-log` | проверка цепочки хешей журнала оценщика |
+| `python -m auditenv analyze --n 300 --docs` | замеры: поверхностные признаки, полнота по вариантам → таблицы в docs |
+| `python -m auditenv lock-configs` | обновить `configs/LOCK.json` после смены версии конфига |
 
 ## Как устроен эпизод
 
@@ -76,29 +115,40 @@ seed, config ──► story (скрытые события, курсы) ──�
 
 * Деньги — только `int` в минимальных единицах; курсы — десятичные строки, `Decimal`,
   `ROUND_HALF_EVEN`. Все суммы в `ledger.csv` — в базовой валюте.
-* Время — ISO‑8601 со смещением; документы пишутся то в локальном смещении, то в UTC
-  (доля задаётся конфигом), поэтому «UTC‑ловушка» на границе периода реальна.
-* Валюты KZT/USD/EUR (экспонента 2), JPY (0), KWD (3). Часовые пояса без перехода на летнее
-  время: Asia/Almaty, Tashkent, Dubai, Kolkata (+05:30), Tokyo, America/Bogota, Lima (−05:00).
-* Отсутствующая ссылка — пустая ячейка CSV / `null` в JSON, не угаданная связь.
+* Базовая валюта KZT, USD, JPY (экспонента 0) или KWD (экспонента 3); иностранные — из тех же пяти.
+* Время — ISO‑8601 со смещением; документы пишутся то в локальном смещении, то в UTC, поэтому
+  «UTC‑ловушка» на границе периода реальна. <!--fact:n_timezones-->10<!--/fact--> поясов без летнего времени, включая
+  Asia/Kathmandu (+05:45), Pacific/Kiritimati (+14), Pacific/Pago_Pago (−11); смещение явно указано в
+  `policy.json`. Периоды 1–3 месяца, в том числе через Новый год.
+* Отсутствующая ссылка — пустая ячейка CSV / `null` в JSON, не угаданная связь. Поля файлов —
+  ровно поля раздела 03 кейса.
 
-Четыре типа ошибок (каждый — один модуль в `auditenv/generator/errors/`, включаются
-независимо в конфиге): `duplicate_invoice`, `payment_allocation` (не распределён / частично),
-`fx_rate` (соседний рабочий день / дата UTC вместо локальной / перевёрнутый курс),
-`period_cutoff` (счёт вне периода по местному времени, записанный в UTC). Два сценария
-взаимодействия: `partial_fx_cutoff`, `duplicate_fx`. <!--fact:n_distractors-->14<!--/fact--> корректных отвлекающих
-случаев (аренда с одинаковой суммой, оплата частями, платёж на 2–3 счёта, законная частичная
-оплата, возврат, банковская комиссия, остаток округления 1 ед., операции в 23:50 и 00:05,
-credit note с перевыставлением, неопознанный платёж на 2400, повтор суммы у другого клиента).
+Четыре типа ошибок (каждый — один модуль в `auditenv/generator/errors/`, включаются независимо):
+
+| Тип | Варианты |
+|---|---|
+| `duplicate_invoice` | `copy`, `paid_twice` (клиент оплатил и дубль), `copy_as_posted` (сценарий); косметика: другой порядок строк, другой срок оплаты, другой формат смещения; дубль всегда в рабочие часы |
+| `payment_allocation` | `unallocated`, `partial`, `wrong_invoice` (Cr 1200 на другой счёт того же клиента) |
+| `fx_rate` | `adjacent_day`, `utc_date`, `inverted`, `historical_rate`, `wrong_pair`, `due_date`; в том числе на оплаченных счетах |
+| `period_cutoff` | `utc_trap`, `backdated_posting` (проводки в периоде, документ — нет), `prior_period` (в том числе счёт, оплаченный в периоде) |
+
+Два сценария взаимодействия: `partial_fx_cutoff`, `duplicate_fx` (суммы независимы — тест).
+<!--fact:n_distractors-->14<!--/fact--> корректных отвлекающих случаев (аренда с одинаковой суммой, оплата частями, платёж на
+2–3 счёта, законная частичная оплата, переплата на 2400, возврат, комиссия банка, остаток округления,
+операции в 23:50/00:05, credit note с перевыставлением, неопознанный платёж, повтор суммы у
+другого клиента, ночные и выходные валютные документы); в **каждом** эпизоде есть хотя бы один
+корректный «двойник» каждого типа ошибки, поэтому ни один поверхностный признак не отделяет
+ошибки (тест на 300 эпизодах).
 
 ## Контракт среды
 
 ```python
-from auditenv.env.env import AuditEnv
-env = AuditEnv(mode="train")                     # "eval": reward=0, info={}, итог только в журнал оценщика
-obs, info = env.reset(seed=7, config="dev-mixed") # или env.reset(episode_dir="episodes/dev/<id>")
+import auditenv
+env = auditenv.make("dev-mixed", mode="train")     # "eval": reward=0, info={}, итог только в журнал оценщика
+obs, info = env.reset(seed=7)                       # или env.reset(episode_dir="episodes/dev/<id>")
 obs, reward, terminated, truncated, info = env.step(
     {"tool": "list_records", "args": {"table": "ledger", "limit": 50}})
+env.close()
 ```
 
 Инструменты: `list_records(table, cursor, limit≤50)`, `get_record(table, id)`,
@@ -106,26 +156,29 @@ obs, reward, terminated, truncated, info = env.step(
 `unknown_tool | bad_args | not_found | invalid_cursor | calc_error | episode_over`, каждая
 тратит шаг. Терминальная награда: `clip(2·F1 − 1 − 0.002·inspection_steps, −1, 1)`;
 экспериментальная (TP только при реально увиденных доказательствах) показывается отдельно.
-Схемы всех файлов, действий, наблюдений, findings и truth — в [`schemas/`](schemas/).
+Схемы всех файлов, действий, наблюдений, findings, truth, траекторий, журнала оценщика, `info` и
+`index.json` — в [`schemas/`](schemas/).
 
 ## Структура
 
 ```
 auditenv/
-  money.py ids.py timeutil.py config.py canon.py schemas.py paths.py
+  money.py ids.py timeutil.py config.py canon.py schemas.py paths.py contract.py
   generator/  story.py books.py invariants.py errors/{base,duplicate_invoice,payment_allocation,fx_rate,period_cutoff}.py
               interactions.py transforms.py episode.py export.py
   env/        env.py tools.py calculator.py cursors.py errors.py data.py
   grader/     schema.py normalize.py matcher.py reward.py validate_truth.py log.py core.py
-  policies/   random_explorer.py simple_reconcile.py flag_all.py oracle.py attacks.py base.py
-  runner.py   selfcheck.py leakscan.py cli.py
-configs/      train-easy, dev-mixed, clean-only, interaction-heavy, stress (+ splits.json с seed'ами)
-schemas/      manifest, ledger_row, invoice, payment, fx, policy, action, observation, findings, truth, config
-episodes/     train/ (10) и dev/ (10): <episode_id>/public/*, <episode_id>/grader/*, index.json
-trajectories/ trajectories.jsonl (<!--fact:traj_lines-->1193<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов: <!--fact:traj_policies-->flag_all, hung, random_explorer, simple_reconcile, step_burner<!--/fact-->)
-reports/      selfcheck.md, selfcheck.json (генерируются make check)
-tests/        pytest + hypothesis
-docs/         CASE.md, DESIGN.md, LIMITATIONS.md, FAILURES.md
+  policies/   random_explorer.py simple_reconcile.py flag_all.py oracle.py attacks.py stress.py base.py
+  runner.py serve.py selfcheck.py leakscan.py lint.py analysis.py verify_provenance.py docs_check.py cli.py
+tools/        verify_independent.py   (независимый проверяльщик: только stdlib)
+examples/     minimal_agent.py        (агент на ~35 строк)
+configs/      7 конфигов + splits.json + LOCK.json + CHANGELOG.md
+schemas/      15 JSON Schema
+episodes/     train/ (10) и dev/ (10): <episode_id>/public/*, <episode_id>/grader/*, index.json (+ дайджесты)
+trajectories/ trajectories.jsonl
+reports/      selfcheck.md, selfcheck.json, grader_log.jsonl (генерируются make check)
+tests/        pytest + hypothesis; tests/agents/ — атакующие агенты
+docs/         CASE.md DESIGN.md CONTRACT.md ADAPTER.md LIMITATIONS.md FAILURES.md
 ```
 
 ## Карта соответствия «пункт ТЗ → файл/функция → тест»
@@ -161,12 +214,20 @@ docs/         CASE.md, DESIGN.md, LIMITATIONS.md, FAILURES.md
 | 07 Без сети, платных API, GPU; контейнер; единая команда | `Dockerfile`, `scripts/check.sh`, `Makefile` | `make docker-check` |
 | 09 10 train + 10 dev эпизодов | `configs/splits.json`, `episodes/` | `test_repro.py::test_exported_episodes_match_generator` |
 | 09 Golden‑хеши | `tests/golden_hashes.json` (`make golden`) | `test_repro.py::test_golden_hashes` |
+| 06 Эталон и доказательства проверяются независимо | `tools/verify_independent.py` (только stdlib, без `auditenv`) | шаг `verify-independent` в `make check` (540 эпизодов), `test_batch_c.py::test_independent_verifier_*` |
+| 02 Записанное причинное изменение | `grader/provenance.json` (до/после), `auditenv/verify_provenance.py` | шаг `verify-provenance`, `test_batch_c.py::test_verify_provenance*` |
+| 10 «Противоречивые данные не сложность» | `auditenv/lint.py` (правдоподобие) | шаг `lint`, `test_batch_c.py::test_lint_only_truth_explains_implausibility` |
+| 02 Сложность против простых трюков | `auditenv/analysis.py` (поверхностные признаки) | `tests/test_surface.py` (300 эпизодов) |
+| 03 Оценщик вне процесса агента, только чтение | `runner.py::ChildPolicy` (nobody, rlimits, read‑only код) | `test_batch_c.py::test_writer_attack_changes_nothing`, `test_guards.py` |
+| 10 «Запись в оценщик блокирует оценивание» | `grader/log.py` (цепочка хешей), `grader_digest` | `test_batch_c.py::test_log_chain_detects_edits`, `test_grader_digest_detects_tampered_truth` |
+| 04 Контракт в стиле Gymnasium | `env/env.py` (`close/render/metadata/spaces/spec`), `auditenv.make`, `serve.py::AuditEnvClient` | `test_batch_a.py::test_gymnasium_surface`, `test_batch_c.py::test_client_replays_trajectories_byte_identical` |
+| 04/05 Трактовки контракта | `contract.json`, `docs/CONTRACT.md` | `tests/test_contract_json.py` |
 
 ## Как читать табло (`reports/selfcheck.md`)
 
 * **Контракт и изоляция** — 20 фиксированных проверок reset/step, схем, лимитов, завершения,
   неверного ввода, утечек; баллы = 25 × пройдено / 20.
-* **Данные и эталон** — 20 эпизодов (5 clean‑only, 5 interaction‑heavy, 10 dev‑mixed):
+* **Данные и эталон** — 20 эпизодов (5 clean‑only, 5 interaction‑heavy, 5 dev‑mixed, 5 dev‑global):
   инварианты чистой книги до мутаций; расхождения после мутаций совпадают с объявленными
   ровно по сумме; независимый решатель по открытым данным находит то же, что truth; каждый
   набор доказательств сам по себе позволяет пересчитать сумму.
@@ -176,9 +237,13 @@ docs/         CASE.md, DESIGN.md, LIMITATIONS.md, FAILURES.md
   же наблюдения и награды; двойник после перестановки строк и переименования всех ID даёт ту
   же награду и F1 у oracle и simple_reconcile.
 * «Инженерия и объяснение» (10 баллов) табло не считает — это оценка жюри.
-* Таблица диагностики: средние P, R, F1, возврат, возврат по экспериментальной награде,
-  шаги, время на 20 эпизодах в режиме `eval`; колонка «агент видел награду» должна быть «нет».
-  У oracle экспериментальная награда низкая намеренно: он не открывал доказательства.
+* Таблица диагностики (режим `eval`, 20 эпизодов): макро P/R (где определены, иначе `n/a`), F1,
+  микро P/R/F1 (ΣTP/ΣFP/ΣFN), возврат — всего, на чистых и на ошибочных книгах, экспериментальный
+  возврат, шаги; колонка «агент видел награду» должна быть «нет». У `oracle` экспериментальная
+  награда низкая намеренно: он не открывал доказательства; `oracle_observing` открывает все ID
+  доказательств инструментами и получает ту же награду по обеим формулам.
+* Время (среднее, p50, p95, максимум) вынесено в отдельный последний раздел — это единственная
+  недетерминированная часть отчёта.
 
 ## Важно
 
