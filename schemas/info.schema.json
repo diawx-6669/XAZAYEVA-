@@ -5,7 +5,7 @@
   "oneOf": [
     {
       "type": "object",
-      "maxProperties": 0
+      "additionalProperties": false
     },
     {
       "type": "object",

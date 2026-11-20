@@ -4,7 +4,7 @@
 Среда и оценщик остаются в родительском процессе; агент не видит ни путей, ни seed, ни эталона.
 
 ```bash
-python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 7 --config dev-mixed
+python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12 --config dev-mixed
 ```
 
 ```bash
@@ -31,8 +31,10 @@ python -m auditenv run --policy-cmd "python my_agent.py" --episode-dir episodes/
 
 | Ограничение | Значение |
 |---|---|
+| оценщик | помечает себя non-dumpable (`prctl(PR_SET_DUMPABLE, 0)`): агент не читает его `/proc/<pid>/environ` (соль), `mem`, `fd` |
+| интерпретатор | `python -I -S` для встроенных политик: без `PYTHON*`‑переменных, без site‑packages, без cwd в `sys.path` |
 | процесс | отдельная сессия (`start_new_session`), при закрытии убивается вся группа |
-| пользователь | если оценщик запущен от root — `nobody` (65534): репозиторий, `truth.json`, журнал оценщика недоступны для записи |
+| пользователь | если оценщик запущен от root — `nobody` (65534): репозиторий, `truth.json`, журнал оценщика недоступны для записи. В нашем образе оценщик — непривилегированный `auditor`, и агент работает им же (см. `docs/LIMITATIONS.md`, п. 7) |
 | `RLIMIT_AS` | 1.5 ГиБ |
 | `RLIMIT_CPU` | 65 с |
 | `RLIMIT_NOFILE` | 64 |
@@ -41,13 +43,15 @@ python -m auditenv run --policy-cmd "python my_agent.py" --episode-dir episodes/
 | `RLIMIT_NPROC` | 64 (вместе с `nobody`) |
 | код политики | импортируется из копии пакета только для чтения (`chmod -R a-w`) |
 | cwd, `HOME`, `TMPDIR` | пустой временный каталог, удаляется после прогона |
-| окружение | собирается явно: без `AUDITENV_SEED_SALT`, без путей к эпизоду |
-| после прогона | все процессы `nobody` убиваются, его файлы в `/tmp`, `/var/tmp`, `/dev/shm` удаляются |
+| окружение | ровно `AGENT_ENV` = `PATH`, `TZ`, `LANG`: без `AUDITENV_SEED_SALT`, seed и путей к эпизоду |
+| после прогона | (под root) все процессы `nobody` убиваются, его файлы в `/tmp`, `/var/tmp`, `/dev/shm` удаляются |
 
 Проверено тестами: `tests/test_batch_c.py::test_child_limits_are_applied_and_python_still_starts`
 (значения из `/proc/<pid>/limits`), `test_writer_attack_changes_nothing` (агент‑«писатель»
 пытается дописать журнал оценщика, переписать `truth.json`, изменить код, оставить файлы в `/tmp`,
-запустить демона — sha256 всех файлов до и после совпадают), `test_overlong_line_ends_the_run`.
+запустить демона — sha256 всех файлов до и после совпадают), `test_overlong_line_ends_the_run`;
+`tests/test_isolation.py` — враждебная политика `truth_hunter` ищет эталон на диске и соль в `/proc` и в
+закрытом прогоне ничего не находит (с позитивными контролями); `docs/ATTACKS.md` — каталог атак.
 
 Без root изоляция слабее (нет смены пользователя) — см. `docs/LIMITATIONS.md`.
 

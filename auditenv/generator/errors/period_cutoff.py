@@ -18,7 +18,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 
 from ...timeutil import is_business_day, month_str, offset_minutes
-from .base import MIN_AMOUNT, ErrorType, register, special, weighted_choice
+from .base import MIN_AMOUNT, ErrorType, register, special, weighted_choice, with_revenue_alternative
 
 ALLOW = ("repeat_amount", "reissue", "weekend_fx")
 
@@ -98,9 +98,7 @@ class PeriodCutoff(ErrorType):
 
     def evidence_sets(self, book, target):
         inv = book.invoices[target]
-        o = ("inv", target)
-        return [[inv.doc_id, book.row_of(o, "inv_ar").row_id, "policy"],
-                [inv.doc_id, book.row_of(o, "inv_rev").row_id, "policy"]]
+        return with_revenue_alternative(book, ("inv", target), [inv.doc_id], ["policy"])
 
     def expected_amount(self, book, target, **kw):
         return book.row_of(("inv", target), "inv_ar").debit

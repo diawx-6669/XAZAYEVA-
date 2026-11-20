@@ -19,7 +19,6 @@ from datetime import date, datetime, timedelta, timezone
 from decimal import ROUND_HALF_EVEN, ROUND_HALF_UP, Decimal, localcontext
 
 ROUNDING = {"ROUND_HALF_EVEN": ROUND_HALF_EVEN, "ROUND_HALF_UP": ROUND_HALF_UP}
-CN_PREFIX = "Credit note for "
 
 
 def _read_json(path):
@@ -99,14 +98,22 @@ class Episode:
 
     @staticmethod
     def cancelled_ref(inv):
-        if inv["total_minor"] >= 0:
-            return None
-        refs = set()
-        for li in inv["line_items"]:
-            if not li["description"].startswith(CN_PREFIX):
-                return None
-            refs.add(li["description"][len(CN_PREFIX):].split(": ", 1)[0])
+        """Case 03 keeps invoices to the listed fields; a credit note names the cancelled invoice in
+        cancels_invoice_id inside each of its line items (policy.json, 'credit_notes')."""
+        refs = {li.get("cancels_invoice_id") for li in inv["line_items"]} - {None}
         return refs.pop() if len(refs) == 1 else None
+
+    def posting_in(self, rows, inv):
+        """Invoice posting provable from rows: its 1200 row, or ALL its 4000 rows (policy 'revenue_posting':
+        one revenue row per line item)."""
+        own = [x for x in rows if x["inv"] == inv["invoice_id"] and not x["pay"]]
+        ar = [x for x in own if x["account"] == "1200"]
+        if ar:
+            return ar[0]["dr"] + ar[0]["cr"]
+        rev = {x["row_id"]: x for x in own if x["account"] == "4000"}
+        if rev and len(rev) == len(inv["line_items"]):
+            return sum(x["dr"] + x["cr"] for x in rev.values())
+        return None
 
     @staticmethod
     def bill_key(inv):
@@ -214,8 +221,8 @@ class Episode:
             if not any(self.bill_key(i) == self.bill_key(dup[0]) and (datetime.fromisoformat(i["issued_at"]), i["invoice_id"]) < t
                        for i in invs if i["invoice_id"] != aid):
                 return None, "no_original_doc"
-            r = [x for x in rows if x["inv"] == aid and not x["pay"] and x["account"] in ("1200", "4000")]
-            return (r[0]["dr"] + r[0]["cr"], "ok") if r else (None, "no_posting_row")
+            amt = self.posting_in(rows, dup[0])
+            return (amt, "ok") if amt is not None else (None, "no_posting_row")
         if typ == "payment_allocation":
             p = [x for x in pays if x["payment_id"] == aid]
             if not p or not p[0]["invoice_refs"]:
@@ -257,8 +264,7 @@ class Episode:
             amount = abs(d["total_minor"]) if "invoice_id" in d else d["amount_minor"]
             want = self.conv(amount, d["currency"], fx[0]["rate"])
             if "invoice_id" in d:
-                r = [x for x in rows if x["inv"] == aid and not x["pay"] and x["account"] in ("1200", "4000")]
-                got = r[0]["dr"] + r[0]["cr"] if r else None
+                got = self.posting_in(rows, d)
             else:
                 r = [x for x in rows if x["pay"] == aid and x["account"] == "1000" and x["dr"]]
                 got = r[0]["dr"] if r else None
@@ -272,8 +278,8 @@ class Episode:
                 return None, "no_document_or_policy"
             if self.in_period(d[0]["issued_at"]):
                 return None, "document_inside_period"
-            r = [x for x in rows if x["inv"] == aid and not x["pay"] and x["account"] in ("1200", "4000")]
-            return (r[0]["dr"] + r[0]["cr"], "ok") if r else (None, "no_posting_row")
+            amt = self.posting_in(rows, d[0])
+            return (amt, "ok") if amt is not None else (None, "no_posting_row")
         return None, "unknown_type"
 
 

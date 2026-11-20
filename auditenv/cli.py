@@ -402,7 +402,8 @@ def main(argv=None) -> int:
     g.add_argument("--out", required=True)
     sub.add_parser("export")
     r = sub.add_parser("run")
-    r.add_argument("--policy", choices=["random_explorer", "simple_reconcile", "flag_all", "oracle", "step_burner"])
+    r.add_argument("--policy", choices=["random_explorer", "simple_reconcile", "flag_all", "oracle", "step_burner",
+                                        "truth_hunter"])
     r.add_argument("--policy-cmd", help="your agent as a command speaking JSON lines (docs/ADAPTER.md)")
     r.add_argument("--time-limit", type=float, default=60.0)
     r.add_argument("--episode-dir")

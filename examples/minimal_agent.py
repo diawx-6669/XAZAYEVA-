@@ -1,6 +1,6 @@
 """Minimal AuditEnv agent (~35 lines, stdlib only). Protocol: docs/ADAPTER.md.
 
-Run:  python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 7 --config dev-mixed
+Run:  python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12 --config dev-mixed
 It pages through the ledger and payments, reports receipts that reference invoices but sit on
 Unapplied Cash (2400), and submits. Every line it reads is {"observation", "reward", "terminated",
 "truncated"} or {"close": true}; every line it writes is {"action": {...}}.

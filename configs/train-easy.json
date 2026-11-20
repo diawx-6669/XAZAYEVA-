@@ -1,11 +1,11 @@
 {
   "name": "train-easy",
-  "version": "2.0",
+  "version": "2.1",
   "foreign_currencies": ["USD"],
   "n_foreign": [1, 1],
   "foreign_share": 0.25,
   "timezones": ["Asia/Almaty"],
-  "n_invoices": [40, 50],
+  "n_invoices": [30, 36],
   "distractors": {"recurring_rent": 0.3, "repeat_amount": 0.2, "split_payment": 0.3, "multi_invoice_payment": 0.3, "partial_open": 0.3, "refund": 0.2, "bank_fee": 0.3, "rounding_residual": 0.0, "boundary_time": 0.2, "credit_note_reissue": 0.0, "unidentified_receipt": 0.0},
   "clean_probability": 0.2,
   "n_errors": [1, 3],

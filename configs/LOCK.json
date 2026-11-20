@@ -2,50 +2,50 @@
  {
   "name": "clean-only",
   "file": "clean-only.json",
-  "version": "2.0",
-  "config_hash": "b3ea7789592542fd",
-  "content_hash": "16397d7fd70687f5"
+  "version": "2.1",
+  "config_hash": "888d9b2efe8dabab",
+  "content_hash": "6cb1659204a07b23"
  },
  {
   "name": "dev-global",
   "file": "dev-global.json",
-  "version": "2.0",
-  "config_hash": "901a6f99473a48ad",
-  "content_hash": "ce582946d6805f92"
+  "version": "2.1",
+  "config_hash": "3e5719530ff397f6",
+  "content_hash": "e51fadd72ace13c5"
  },
  {
   "name": "dev-mixed",
   "file": "dev-mixed.json",
-  "version": "2.0",
-  "config_hash": "2435d9d9eff18731",
-  "content_hash": "ff12a0332466cae7"
+  "version": "2.1",
+  "config_hash": "58d390229a2b5ad5",
+  "content_hash": "258918937fdf1d3e"
  },
  {
   "name": "interaction-heavy",
   "file": "interaction-heavy.json",
-  "version": "2.0",
-  "config_hash": "69494e59920a9b92",
-  "content_hash": "1918e27955e57959"
+  "version": "2.1",
+  "config_hash": "11d80441ae5df73a",
+  "content_hash": "89a129019639bd92"
  },
  {
   "name": "stress",
   "file": "stress.json",
-  "version": "2.0",
-  "config_hash": "7dd64db6b1aeac85",
-  "content_hash": "9f3df648da4cca6f"
+  "version": "2.1",
+  "config_hash": "60b0fe2dbb0fcdfe",
+  "content_hash": "b67dd765e360c544"
  },
  {
   "name": "train-easy",
   "file": "train-easy.json",
-  "version": "2.0",
-  "config_hash": "58e3dda93da800ba",
-  "content_hash": "622b4fe75142a2a1"
+  "version": "2.1",
+  "config_hash": "8946748a75222c01",
+  "content_hash": "90e5a35901886a58"
  },
  {
   "name": "train-global",
   "file": "train-global.json",
-  "version": "2.0",
-  "config_hash": "700ad883b68e9fbf",
-  "content_hash": "f29e983e07f627b3"
+  "version": "2.1",
+  "config_hash": "54ed4c6d541dc3f9",
+  "content_hash": "83f0b214efda3b69"
  }
 ]

@@ -1,6 +1,6 @@
 {
   "name": "dev-global",
-  "version": "2.0",
+  "version": "2.1",
   "base_currencies": ["USD", "JPY", "KWD"],
   "foreign_currencies": ["KZT", "USD", "EUR", "JPY", "KWD"],
   "n_foreign": [2, 3],
@@ -8,7 +8,7 @@
   "timezones": ["Asia/Kathmandu", "Pacific/Kiritimati", "Pacific/Pago_Pago", "Asia/Tokyo", "America/Bogota"],
   "period_starts": ["2026-11", "2026-12", "2026-02"],
   "period_months": [1, 3],
-  "n_invoices": [45, 60],
+  "n_invoices": [26, 36],
   "clean_probability": 0.25,
   "n_errors": [1, 5],
   "interactions": {"partial_fx_cutoff": 0.25, "duplicate_fx": 0.25}

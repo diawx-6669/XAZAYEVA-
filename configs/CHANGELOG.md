@@ -8,6 +8,7 @@
 
 | Версия | Конфиги | Что изменилось |
 |---|---|---|
+| 2.1 | все | Слияние с `main`: размеры эпизодов из `main` (`n_invoices` ≈ 26–36, новый ключ `line_items` = 3–7 строк на счёт, выручка проводится построчно), `stress` уменьшен до 230–260 счетов; ссылка credit note — ключ `cancels_invoice_id` внутри строк. |
 | 2.0 | все | Раунд 2: новые варианты ошибок (`paid_twice`, `wrong_invoice`, `historical_rate`, `wrong_pair`, `due_date`, `backdated_posting`, `prior_period`), отвлекалки `night_fx` / `weekend_fx` / `overpayment`, `min_lookalikes_per_type = 1`, пояса Asia/Kathmandu, Pacific/Kiritimati, Pacific/Pago_Pago (в `dev-mixed`, `interaction-heavy`), `period_months` может быть диапазоном. В `train-easy` новые варианты выключены. |
 | 2.0 | `train-global`, `dev-global` (новые) | База USD/JPY/KWD, старт в ноябре (через Новый год), декабре и феврале, периоды 1–3 месяца, экстремальные пояса. |
 | 1.0 | `train-easy`, `dev-mixed`, `clean-only`, `interaction-heavy`, `stress` | Раунд 1: исходные конфиги. |

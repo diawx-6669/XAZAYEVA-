@@ -300,7 +300,9 @@ def test_docs_check_detects_stale_and_unknown_facts(tmp_path, monkeypatch):
 def test_committed_docs_facts_are_current():
     import auditenv.docs_check as dc
 
-    found = [f for f in dc.scan() if f[1] != "n_tests"]  # n_tests needs a nested pytest run: make docs-check
+    # n_tests needs a nested pytest run, selfcheck_total the report that make check writes AFTER pytest
+    # (reports/ is not even copied into the image): both are checked by `make docs-check` at the end
+    found = [f for f in dc.scan() if f[1] not in ("n_tests", "selfcheck_total")]
     facts = dc.compute_facts({n for _, n, _ in found})
     assert found and all(facts[n] == shown for _, n, shown in found), [(r, n, s, facts[n]) for r, n, s in found
                                                                          if facts[n] != s]

@@ -96,7 +96,7 @@
         },
         "time_limit_s": {
           "type": "number",
-          "exclusiveMinimum": 0
+          "minimum": 0.001
         }
       }
     }

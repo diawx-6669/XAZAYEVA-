@@ -16,13 +16,6 @@ from ..ids import IdFactory, make_rng
 from ..money import convert_minor
 from ..timeutil import fmt_ts, policy_rate_date
 
-CREDIT_NOTE_PREFIX = "Credit note for "
-
-
-def credit_note_text(invoice_id: str, description: str) -> str:
-    return f"{CREDIT_NOTE_PREFIX}{invoice_id}: {description}"
-
-
 ACCOUNTS = {
     "1000": "Cash",
     "1200": "Accounts Receivable",
@@ -106,6 +99,21 @@ class Row:
     owner: tuple
 
 
+def split_by_lines(total: int, weights: list) -> list:
+    """Split an integer base amount across line items proportionally (largest remainder,
+    ties -> lower index). Exact: sum(parts) == total. Equal to the line amounts when the
+    document is already in base currency (total == sum(weights))."""
+    w = sum(weights)
+    if w == 0:
+        return [total] + [0] * (len(weights) - 1)
+    base = [total * x // w for x in weights]
+    rem = total - sum(base)
+    order = sorted(range(len(weights)), key=lambda i: (-(total * weights[i] % w), i))
+    for i in order[:rem]:
+        base[i] += 1
+    return base
+
+
 class Book:
     def __init__(self, story, ids: IdFactory, episode_id: str):
         self.story = story
@@ -160,13 +168,17 @@ class Book:
         return self.to_base(abs(inv.total), inv.currency, rate or self.correct_rate(inv.issued_at, inv.currency))
 
     def post_invoice(self, inv: InvoiceDoc):
+        """Dr 1200 for the document total; Cr 4000 once per line item (credit note: reversed)."""
         amt = inv.posted_base if inv.posted_base is not None else self.invoice_base(inv, inv.posted_rate)
         k = inv.key
+        parts = split_by_lines(amt, [abs(li["amount_minor"]) for li in inv.line_items])
         if inv.kind == "credit_note":
-            specs = [("cn_rev", "4000", amt, 0, k, None), ("cn_ar", "1200", 0, amt, k, None)]
+            specs = [(f"cn_rev:{i}", "4000", p, 0, k, None) for i, p in enumerate(parts)]
+            specs.append(("cn_ar", "1200", 0, amt, k, None))
         else:
-            specs = [("inv_ar", "1200", amt, 0, k, None), ("inv_rev", "4000", 0, amt, k, None)]
-        ts = inv.posted_at or inv.issued_at
+            specs = [("inv_ar", "1200", amt, 0, k, None)]
+            specs += [(f"inv_rev:{i}", "4000", 0, p, k, None) for i, p in enumerate(parts)]
+        ts = inv.posted_at or inv.issued_at  # posted_at: only period_cutoff/backdated_posting
         self.post(("inv", k), ts, inv.utc_fmt, inv.entity_id, specs)
 
     def post_payment(self, p: PaymentDoc):
@@ -236,10 +248,9 @@ class Book:
     # -------------------------------------------------------------- snapshots
     def inv_public(self, inv: InvoiceDoc) -> dict:
         lines = copy.deepcopy(inv.line_items)
-        if inv.cancels:  # credit note: the cancelled invoice is referenced in the line text (case 03 has no field for it)
-            ref = self.invoices[inv.cancels].invoice_id
+        if inv.cancels:  # a credit note names the cancelled invoice inside each of its lines
             for li in lines:
-                li["description"] = credit_note_text(ref, li["description"])
+                li["cancels_invoice_id"] = self.invoices[inv.cancels].invoice_id
         return {
             "doc_id": inv.doc_id,
             "invoice_id": inv.invoice_id,

@@ -18,7 +18,8 @@ DEFAULT_CONFIG = {
     "period_starts": ["2026-07", "2026-08"],
     "period_months": 3,
     "n_entities": [8, 14],
-    "n_invoices": [45, 60],
+    "n_invoices": [26, 36],
+    "line_items": [3, 7],
     "utc_share": [30, 70],
     "distractors": {
         "recurring_rent": 0.5,
@@ -72,13 +73,12 @@ class ConfigError(ValueError):
 
 
 def validate_config(cfg: dict) -> None:
-    import jsonschema
+    from .jsonschema_lite import validate
 
     try:
-        jsonschema.validate(cfg, _schema())
-    except jsonschema.ValidationError as e:
-        where = "/".join(str(x) for x in e.absolute_path) or "<root>"
-        raise ConfigError(f"config {cfg.get('name', '?')!r}: {where}: {e.message}") from None
+        validate(cfg, _schema())
+    except ValueError as e:
+        raise ConfigError(f"config {cfg.get('name', '?')!r}: {e}") from None
     name = cfg["name"]
 
     def bad(msg):
@@ -86,7 +86,7 @@ def validate_config(cfg: dict) -> None:
 
     if isinstance(cfg["period_months"], list) and cfg["period_months"][0] > cfg["period_months"][1]:
         bad("period_months: min > max")
-    for k in ("n_foreign", "n_entities", "n_invoices", "utc_share", "n_errors"):
+    for k in ("n_foreign", "n_entities", "n_invoices", "line_items", "utc_share", "n_errors"):
         lo, hi = cfg[k]
         if lo > hi:
             bad(f"{k}: min > max")

@@ -8,7 +8,7 @@
 |---|---|---|---|
 | Запуск одной командой | `Makefile`, `scripts/check.sh`, `Dockerfile` (образ по дайджесту), `.github/workflows/check.yml` | `make quick` (полная: `make check` / `make docker-check`) | `quick smoke: …s`; у полной — табло `<!--fact:selfcheck_total-->90/90<!--/fact-->` и `check: ALL GREEN` |
 | Версии конфигураций | `configs/*.json` (`version`), `configs/LOCK.json`, `configs/CHANGELOG.md`, `config_version` + `config_hash` в каждом `manifest.json` | `python -m pytest -q tests/test_configs_lock.py` | `5 passed`: содержимое без смены версии не пройдёт |
-| Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1193<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
+| Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1195<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
 | Измеренный разбор сбоев | [`docs/FAILURES.md`](docs/FAILURES.md): 14 закрытых уязвимостей с тестами‑сторожами, полнота по вариантам с интервалами Уилсона, seed каждого примера | `python -m auditenv analyze --n 60` | таблицы признаков и вариантов; oracle и независимый проверяльщик решают 100 % |
 | Честные ограничения | [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) | `python -m auditenv docs-check` | `0 mismatches`: числа в документах совпадают с реальностью |
 
@@ -43,7 +43,7 @@ make check
 
 `make check` — это по порядку:
 
-1. весь pytest (<!--fact:n_tests-->390<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
+1. весь pytest (<!--fact:n_tests-->437<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
    поверхностных признаков, атаки на песочницу агента);
 2. табло self‑check в духе жюри: 4 блока × 20 проверок на 20 эпизодах и 20 парных преобразованиях,
    диагностика P/R/F1 (макро и микро), возврат на чистых и ошибочных книгах, шаги, время p50/p95;
@@ -58,6 +58,15 @@ make check
 Итог печатается и пишется в `reports/selfcheck.md` / `reports/selfcheck.json`; всё до раздела
 «Замеры времени» детерминировано. Код возврата ≠ 0, если хоть одна проверка упала.
 
+Зависимости — только `pytest` и `hypothesis` (+ их чисто‑питоновские зависимости), все
+закреплены в `requirements.txt` (`pip freeze`) и лежат колёсами `*-none-any.whl` в `vendor/wheels/`:
+образ собирается без интернета (`pip install --no-index`), одинаково на x86_64 и arm64. JSON Schema
+проверяет собственный валидатор `auditenv/jsonschema_lite.py`. В контейнере проверка идёт от
+пользователя `auditor`, писать можно только в `reports/` и `trajectories/`.
+
+Размеры открытых эпизодов: <!--fact:ep_ledger_range-->235–335<!--/fact--> проводок, <!--fact:ep_docs_range-->54–72<!--/fact--> документов,
+<!--fact:ep_issues_range-->0–4<!--/fact--> ошибок; oracle тратит 1 шаг, simple_reconcile — 11–16 из 100.
+
 **Закрытый прогон (жюри).** Генератор открыт, поэтому для скрытых seed задайте секретную соль —
 без неё агент мог бы перебором seed восстановить эпизод и эталон:
 
@@ -66,13 +75,34 @@ docker run --rm --network none --cpus 2 --memory 4g -e AUDITENV_SEED_SALT=<се�
   python -m auditenv run --policy simple_reconcile --seed 123456 --config dev-mixed --mode eval --log /tmp/grader_log.jsonl
 ```
 
-Соль меняет все эпизоды, но не передаётся в процесс агента; агент работает от `nobody` и не может
-прочитать окружение оценщика. Открытые train/dev‑эпизоды сгенерированы без соли.
+Что гарантирует закрытый прогон (`run --seed ...`):
+
+* эпизод генерируется **в памяти процесса оценщика**; `grader/` (truth, provenance) на диск не
+  пишется вообще — на диске появляется только журнал оценщика после конца эпизода;
+* политика — отдельный процесс `python -I -S` с cwd в новой **пустой** временной папке и
+  окружением из трёх переменных (`PATH`, `TZ`, `LANG`): нет соли, seed, путей к эпизодам и
+  репозиторию; код политики импортируется из отдельной копии пакета (только `.py`);
+* процесс оценщика помечается non-dumpable (`prctl(PR_SET_DUMPABLE, 0)`), поэтому
+  непривилегированный процесс агента не может прочитать его `/proc/<pid>/environ` (там соль)
+  и `/proc/<pid>/mem`;
+* процесс агента — в своей сессии с rlimits (память 1.5 ГиБ, CPU 65 с, 64 файла,
+  `RLIMIT_FSIZE=0`: писать содержимое файлов нельзя); если оценщик запущен от root, агент ещё и
+  работает от `nobody` (не может писать в репозиторий, эталон и журнал), а после прогона его
+  процессы и файлы в `/tmp` вычищаются — это проверяет атака‑«писатель» (`docs/ADAPTER.md`);
+* это проверяет враждебная политика `truth_hunter` (`tests/test_isolation.py`): она обходит
+  диск в поисках `truth.json`/`provenance.json` своего эпизода и читает `/proc/*/environ`;
+  в закрытом прогоне она ничего не находит, а в контрольном тесте, где эпизод с `grader/`
+  специально записан на диск, — находит и получает TP (то есть сама проверка работает).
+  Проверку `/proc` нельзя выполнить от root (root читает всё) — в контейнере тесты идут от
+  пользователя `auditor`.
+
+Открытые train/dev‑эпизоды сгенерированы без соли и воспроизводятся по seed из
+`episodes/*/index.json`.
 
 ## Свой агент
 
 ```bash
-python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 7 --config dev-mixed
+python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12 --config dev-mixed
 ```
 
 Протокол JSON‑строк, песочница процесса и Gymnasium‑клиент — [docs/ADAPTER.md](docs/ADAPTER.md).
@@ -90,7 +120,7 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 7 
 | `make episodes` / `make trajectories` / `make golden` | перегенерировать эпизоды, траектории, golden‑хеши |
 | `make demo` | сценарий демо: табло → эпизод с взаимодействующими ошибками шаг за шагом → атака → двойник |
 | `make docs-check` | числа в README/docs совпадают с реальностью |
-| `python -m auditenv generate --seed 7 --config dev-mixed --out /tmp/ep` | один эпизод на диск (`public/` и `grader/` раздельно) |
+| `python -m auditenv generate --seed 12 --config dev-mixed --out /tmp/ep` | один эпизод на диск (`public/` и `grader/` раздельно) |
 | `python -m auditenv run --policy simple_reconcile --episode-dir episodes/dev/<id> --mode eval --log log.jsonl` | прогон политики в отдельном процессе |
 | `python -m auditenv serve` | среда как JSON‑lines сервер (клиент: `auditenv.serve.AuditEnvClient`) |
 | `python -m auditenv transform --episode-dir D --out D2 --seed 5 --opaque-ids` | безвредное преобразование: перестановка строк и новые ID (без префиксов, длина 12–64) + `grader/id_map.json` |
@@ -170,12 +200,13 @@ env.close()
 
 ```
 auditenv/
-  money.py ids.py timeutil.py config.py canon.py schemas.py paths.py contract.py
+  money.py ids.py timeutil.py config.py canon.py schemas.py jsonschema_lite.py paths.py contract.py
   generator/  story.py books.py invariants.py errors/{base,duplicate_invoice,payment_allocation,fx_rate,period_cutoff}.py
               interactions.py transforms.py episode.py export.py
   env/        env.py tools.py calculator.py cursors.py errors.py data.py
   grader/     schema.py normalize.py matcher.py reward.py validate_truth.py log.py core.py
   policies/   random_explorer.py simple_reconcile.py flag_all.py oracle.py attacks.py stress.py base.py
+              truth_hunter.py (враждебная политика только для тестов изоляции)
   runner.py serve.py selfcheck.py leakscan.py lint.py analysis.py verify_provenance.py docs_check.py cli.py
 tools/        verify_independent.py   (независимый проверяльщик: только stdlib)
 examples/     minimal_agent.py        (агент на ~35 строк)
@@ -183,9 +214,10 @@ configs/      7 конфигов + splits.json + LOCK.json + CHANGELOG.md
 schemas/      15 JSON Schema
 episodes/     train/ (10) и dev/ (10): <episode_id>/public/*, <episode_id>/grader/*, index.json (+ дайджесты)
 trajectories/ trajectories.jsonl
+vendor/wheels/ колёса закреплённых зависимостей (только pure Python) для офлайн-сборки
 reports/      selfcheck.md, selfcheck.json, grader_log.jsonl (генерируются make check)
 tests/        pytest + hypothesis; tests/agents/ — атакующие агенты
-docs/         CASE.md DESIGN.md CONTRACT.md ADAPTER.md LIMITATIONS.md FAILURES.md SUBMISSION.md
+docs/         CASE.md PROJECT.md DESIGN.md CONTRACT.md ADAPTER.md ATTACKS.md LIMITATIONS.md FAILURES.md SUBMISSION.md
               MANUAL_AUDIT.md HOWTO_EXTEND.md EXPERIMENT.md rehearsal/vat_error.patch
 audit/        3 dev-эпизода в CSV для ручного аудита (Google Таблицы)
 ```
@@ -203,6 +235,8 @@ audit/        3 dev-эпизода в CSV для ручного аудита (Go
 | 03 manifest.json и форматы значений | `generator/export.py`, `schemas/*.schema.json` | `selfcheck` блок «Данные» (`validate_public`), `test_data.py::test_clean_book_invariants` |
 | 03 Явные null | `export.py` (пустая ячейка ↔ `None`) | `test_data.py::test_null_references_are_explicit` |
 | 03 Закрытые truth/provenance, не утекают | `export.py::write_episode`, `leakscan.py` | `test_leaks.py`, `selfcheck` «leakscan clean» |
+| 03 Оценщик вне процесса агента; закрытый прогон без grader/ на диске | `runner.py::ChildPolicy`, `harden_evaluator`, `policies/truth_hunter.py` | `test_isolation.py` |
+| 03 Поля invoices ровно как в кейсе | `generator/books.py::inv_public`, `schemas/invoice.schema.json` | `test_data.py::test_invoice_fields_exactly_as_in_case` |
 | 04 reset/step, Gymnasium‑контракт | `env/env.py::AuditEnv` | `test_contract.py::test_reset_shape`, `test_step_shape_and_zero_reward` |
 | 04 Воспроизводимость, изоляция reset | `ids.py::derive_seed`, `env.reset` | `test_repro.py`, `test_contract.py::test_reset_isolates_state`, `test_two_envs_isolated` |
 | 04 Пять действий, страница ≤ 50, стабильные курсоры | `env/tools.py`, `env/cursors.py` (HMAC) | `test_contract.py::test_page_limit_50`, `test_cursors_stable_and_complete`, `test_cursor_from_other_episode_or_table` |
@@ -231,6 +265,7 @@ audit/        3 dev-эпизода в CSV для ручного аудита (Go
 | 10 «Запись в оценщик блокирует оценивание» | `grader/log.py` (цепочка хешей), `grader_digest` | `test_batch_c.py::test_log_chain_detects_edits`, `test_grader_digest_detects_tampered_truth` |
 | 04 Контракт в стиле Gymnasium | `env/env.py` (`close/render/metadata/spaces/spec`), `auditenv.make`, `serve.py::AuditEnvClient` | `test_batch_a.py::test_gymnasium_surface`, `test_batch_c.py::test_client_replays_trajectories_byte_identical` |
 | 04/05 Трактовки контракта | `contract.json`, `docs/CONTRACT.md` | `tests/test_contract_json.py` |
+| 09 Зафиксированные зависимости, офлайн‑сборка | `requirements.txt`, `vendor/wheels/`, `jsonschema_lite.py` | `test_jsonschema_lite.py` |
 
 ## Как читать табло (`reports/selfcheck.md`)
 
@@ -253,6 +288,29 @@ audit/        3 dev-эпизода в CSV для ручного аудита (Go
   доказательств инструментами и получает ту же награду по обеим формулам.
 * Время (среднее, p50, p95, максимум) вынесено в отдельный последний раздел — это единственная
   недетерминированная часть отчёта.
+
+### Почему строки диагностики выглядят именно так
+
+Часть из 20 эпизодов табло чистые (5 из `clean-only` и те, что выпали чистыми в смешанных
+конфигах). Возврат показан отдельно на чистых и на ошибочных книгах, потому что средние по всем
+20 эпизодам сильно сдвигаются чистыми.
+
+* **P и R на чистом эпизоде не определены** (нулевой знаменатель): по правилу кейса они равны 0,
+  а F1 = 1, если и эталон, и ответ пусты. Чтобы оракул не выглядел «на 70 % точным», макро‑P/R в
+  табло усредняются только по эпизодам, где величина определена, а микро‑P/R/F1 считаются по
+  суммам ΣTP/ΣFP/ΣFN; где не определено ничего — `n/a`.
+* **oracle: экспериментальная награда низкая.** Oracle отвечает на первом шаге и не открывает ни
+  одной записи; экспериментальная награда засчитывает TP только за доказательства, реально
+  полученные в наблюдениях, поэтому на ошибочных книгах у него −1, а на чистых пустой ответ верен
+  (+1). Так она и задумана: знание ответа без чтения доказательств не вознаграждается.
+  `oracle_observing` открывает все ID доказательств и получает одинаковую награду по обеим формулам.
+* **attack:type_bruteforce выше пустого ответа, но ниже oracle.** Это сильнейший атакующий: он
+  читает truth и шлёт каждую ошибку со всеми 4 типами. TP = n, FP = 3n, F1 = 0.4, награда −0.2 на
+  каждом ошибочном эпизоде (молчание даёт −1, oracle +1); на чистых ему нечего перебирать (+1).
+  Выгоды нет: на каждом ошибочном эпизоде перебор строго хуже oracle, а без доступа к truth он
+  не знает ни ID, ни сумм (`attack:guess_ids`: 0 TP; автопоиск эксплойтов — `reports/exploit_search.md`).
+* **attack:junk_explanation = oracle**: текст `explanation` на награду не влияет.
+* **attack:empty и random_explorer**: F1 = 1 на чистых и 0 на ошибочных.
 
 ## Важно
 

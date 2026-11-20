@@ -1,1 +1,1 @@
-{"episode_id":"ep-p2ndc2nyey","issues":[{"affected_ids":["SF-HKNKSYHG"],"currency":"KZT","evidence_sets":[["FD-ZFDBNPCT","JE-ZDT7GN8","policy"],["FD-ZFDBNPCT","JE-AWQPSZW","policy"]],"expected_amount_minor":359525192,"issue_id":"ISS-001","type":"period_cutoff"}],"tolerance_minor":1}
+{"episode_id":"ep-p2ndc2nyey","issues":[{"affected_ids":["SF-BXQARK5D"],"currency":"KZT","evidence_sets":[["FD-FEPFXQ39","JE-8BRDWBT","policy"]],"expected_amount_minor":394778079,"issue_id":"ISS-001","type":"period_cutoff"}],"tolerance_minor":1}

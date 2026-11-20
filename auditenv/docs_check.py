@@ -20,7 +20,8 @@ import sys
 from .paths import CONFIGS_DIR, EPISODES_DIR, ROOT
 
 DOCS = ["README.md", "docs/DESIGN.md", "docs/LIMITATIONS.md", "docs/FAILURES.md", "docs/CONTRACT.md",
-        "docs/ADAPTER.md", "docs/SUBMISSION.md", "docs/HOWTO_EXTEND.md", "docs/MANUAL_AUDIT.md"]
+        "docs/ADAPTER.md", "docs/SUBMISSION.md", "docs/HOWTO_EXTEND.md", "docs/MANUAL_AUDIT.md",
+        "docs/PROJECT.md", "docs/ATTACKS.md", "docs/EXPERIMENT.md"]
 FACT_RE = re.compile(r"<!--fact:([a-z0-9_]+)-->(.*?)<!--/fact-->", re.S)
 
 

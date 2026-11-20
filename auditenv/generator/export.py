@@ -44,7 +44,9 @@ def make_policy(book) -> dict:
         "unapplied_cash": ("account 2400 holds only cash that cannot be applied: a whole receipt with invoice_refs = null, "
                            "or the part of a receipt exceeding the open balance of the invoices it references "
                            "(overpayment), converted at the payment's policy rate"),
-        "credit_notes": "an invoice with a negative total whose lines read 'Credit note for <invoice_id>: ...' cancels that invoice; both stay in the books",
+        "credit_notes": "an invoice whose line_items carry cancels_invoice_id cancels that invoice; both stay in the books",
+        "revenue_posting": "Dr 1200 = document base amount; one Cr 4000 row per line item, the base amount split by "
+                           "line amounts with largest remainder (ties to the earlier line)",
         "accounts": dict(ACCOUNTS),
     }
 

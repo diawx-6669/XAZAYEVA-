@@ -51,10 +51,11 @@ def export_one(src: Path, out: Path) -> dict:
         for n, li in enumerate(i["line_items"], 1):
             rows.append([i["doc_id"], i["invoice_id"], i["entity_id"], i["issued_at"], pd.local(i["issued_at"]).isoformat(),
                          i["due_at"], i["currency"], i["total_minor"], _major(pd, i["total_minor"], i["currency"]), n,
-                         li["description"], li["service_period"], li["quantity"], li["unit_price_minor"], li["amount_minor"]])
+                         li["description"], li["service_period"], li["quantity"], li["unit_price_minor"], li["amount_minor"],
+                         li.get("cancels_invoice_id")])
     _w(out / "invoices.csv", ["doc_id", "invoice_id", "entity_id", "issued_at", "local_time", "due_at", "currency",
                               "total_minor", "total", "line_no", "description", "service_period", "quantity",
-                              "unit_price_minor", "amount_minor"], rows)
+                              "unit_price_minor", "amount_minor", "cancels_invoice_id"], rows)
     _w(out / "payments.csv", ["doc_id", "payment_id", "timestamp", "local_time", "currency", "amount_minor", "amount",
                               "invoice_refs"],
        [[p["doc_id"], p["payment_id"], p["timestamp"], pd.local(p["timestamp"]).isoformat(), p["currency"],

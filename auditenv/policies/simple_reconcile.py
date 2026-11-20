@@ -93,8 +93,7 @@ class SimpleReconcile(Policy):
         cancelled = set()
         if "credit_note_aware" in R:
             for i in invs:
-                if i["total_minor"] < 0 and i["line_items"] and i["line_items"][0]["description"].startswith("Credit note for "):
-                    cancelled.add(i["line_items"][0]["description"][len("Credit note for "):].split(": ", 1)[0])
+                cancelled.update(li["cancels_invoice_id"] for li in i["line_items"] if li.get("cancels_invoice_id"))
         # duplicates
         groups = {}
         dups = set()

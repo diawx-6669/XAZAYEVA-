@@ -8,7 +8,7 @@ account.6500,Bank Fees
 account.7900,FX Gain/Loss
 ar_relief_rate,rate of the invoice transaction date
 base_currency,KZT
-credit_notes,an invoice with a negative total whose lines read 'Credit note for <invoice_id>: ...' cancels that invoice; both stay in the books
+credit_notes,an invoice whose line_items carry cancels_invoice_id cancels that invoice; both stay in the books
 currency_exponents,"{""EUR"": 2, ""KWD"": 3, ""KZT"": 2, ""USD"": 2}"
 fx_conversion,"base_minor = round(amount_minor * rate * 10^(exp_base - exp_src)), once per document"
 fx_difference_account,7900
@@ -25,5 +25,6 @@ period_boundary.timezone,Asia/Dubai
 period_boundary.utc_offset,+04:00
 policy_id,policy
 recognition,invoice_issue_date
+revenue_posting,"Dr 1200 = document base amount; one Cr 4000 row per line item, the base amount split by line amounts with largest remainder (ties to the earlier line)"
 rounding,ROUND_HALF_EVEN
 unapplied_cash,"account 2400 holds only cash that cannot be applied: a whole receipt with invoice_refs = null, or the part of a receipt exceeding the open balance of the invoices it references (overpayment), converted at the payment's policy rate"

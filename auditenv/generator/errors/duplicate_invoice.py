@@ -14,7 +14,7 @@ from __future__ import annotations
 import copy
 from datetime import datetime, timedelta
 
-from .base import MIN_AMOUNT, ErrorType, register, special, weighted_choice
+from .base import MIN_AMOUNT, ErrorType, register, special, weighted_choice, with_revenue_alternative
 
 ALLOW = ("recurring_rent", "repeat_amount", "reissue", "night_fx", "weekend_fx", "overpayment")
 
@@ -101,9 +101,7 @@ class DuplicateInvoice(ErrorType):
     def evidence_sets(self, book, target):
         dup = book.invoices[target]
         orig = book.invoices[target[:-1]]
-        ar = book.row_of(("inv", target), "inv_ar").row_id
-        rev = book.row_of(("inv", target), "inv_rev").row_id
-        return [[orig.doc_id, dup.doc_id, ar], [orig.doc_id, dup.doc_id, rev]]
+        return with_revenue_alternative(book, ("inv", target), [orig.doc_id, dup.doc_id], [])
 
     def expected_amount(self, book, target, **kw):
         return book.row_of(("inv", target), "inv_ar").debit

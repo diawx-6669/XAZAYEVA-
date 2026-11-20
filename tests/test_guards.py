@@ -30,8 +30,10 @@ def test_agent_cannot_read_parent_environ_salt():
 
 
 def test_every_dependency_is_pinned_and_installed_as_pinned():
-    """jsonschema pulls referencing -> rpds-py (a compiled Rust extension). Every transitive dependency is
-    pinned with == and installed with --no-deps, so no resolver can bring in another build."""
+    """No jsonschema / referencing / rpds-py (a compiled Rust extension): JSON Schema is checked by
+    auditenv/jsonschema_lite.py. Only pytest + hypothesis and their pure-Python dependencies, pinned
+    with == (requirements.txt = pip freeze), each with a pure-Python wheel in vendor/wheels, installed
+    offline with --no-index --no-deps on a digest-pinned base image."""
     pins = {}
     for line in (ROOT / "requirements.txt").read_text().splitlines():
         line = line.split("#")[0].strip()
@@ -39,12 +41,21 @@ def test_every_dependency_is_pinned_and_installed_as_pinned():
             assert "==" in line, line
             name, ver = line.split("==")
             pins[name.lower().replace("_", "-")] = ver
-    for name in ("jsonschema", "referencing", "rpds-py", "jsonschema-specifications", "attrs", "hypothesis", "pytest"):
-        assert name in pins, name
+    assert {"pytest", "hypothesis"} <= set(pins)
+    assert not {"jsonschema", "referencing", "rpds-py", "jsonschema-specifications"} & set(pins)
     for name, ver in pins.items():
         assert version(name) == ver, (name, version(name), ver)
-    assert "--no-deps" in (ROOT / "Dockerfile").read_text()
-    assert "@sha256:" in (ROOT / "Dockerfile").read_text().split("FROM", 1)[1].splitlines()[0]
+    wheels = sorted(p.name for p in (ROOT / "vendor" / "wheels").glob("*.whl"))
+    assert all(w.endswith("-none-any.whl") and "py3" in w.split("-")[-3] for w in wheels), wheels  # pure Python
+    for name, ver in pins.items():
+        assert any(w.lower().replace("_", "-").startswith(f"{name}-{ver}-") for w in wheels), (name, ver)
+    assert len(wheels) == len(pins)
+    df = (ROOT / "Dockerfile").read_text()
+    assert "--no-index" in df and "--no-deps" in df and "vendor/wheels" in df
+    assert "@sha256:" in df.split("\nFROM", 1)[1].splitlines()[0]
+    import importlib.util
+
+    assert importlib.util.find_spec("jsonschema") is None and importlib.util.find_spec("rpds") is None
 
 
 def test_manifest_and_invoice_have_only_case_fields(clean):

@@ -9,7 +9,6 @@ from __future__ import annotations
 import copy
 
 from ..ids import ALPHABET, make_rng
-from .books import CREDIT_NOTE_PREFIX
 from .episode import Episode
 from .export import parse_files, serialize_tables
 
@@ -66,10 +65,9 @@ def transform_tables(t: dict, mapping: dict, seed) -> dict:
     for i in t["invoices"]:
         for k in ("doc_id", "invoice_id", "entity_id"):
             i[k] = m(i[k])
-        for li in i["line_items"]:  # credit notes reference the cancelled invoice in the line text
-            if li["description"].startswith(CREDIT_NOTE_PREFIX):
-                ref, sep, rest = li["description"][len(CREDIT_NOTE_PREFIX):].partition(": ")
-                li["description"] = f"{CREDIT_NOTE_PREFIX}{m(ref)}{sep}{rest}"
+        for li in i["line_items"]:  # a credit note names the cancelled invoice inside its lines
+            if "cancels_invoice_id" in li:
+                li["cancels_invoice_id"] = m(li["cancels_invoice_id"])
     for p in t["payments"]:
         p["doc_id"], p["payment_id"] = m(p["doc_id"]), m(p["payment_id"])
         if p["invoice_refs"] is not None:

@@ -1,8 +1,10 @@
 """Run a policy against the env.
 
 Agent policies run in a SEPARATE PROCESS and talk JSON lines over stdin/stdout; the env and
-the grader stay in this (parent) process. The child gets an empty temp dir as cwd, no
-episode paths and no seed. Oracle and attacks are grader-side and run in-process.
+the grader stay in this (parent) process. The child gets an empty temp dir as cwd, a
+cleared environment (no salt, no seed, no data paths), a read-only code-only copy of the package,
+rlimits and (under root) the `nobody` uid; see ChildPolicy. Oracle and attacks are grader-side
+and run in-process.
 
 Protocol: parent -> child  {"observation": ..., "reward": r, "terminated": b, "truncated": b}
           child  -> parent {"action": {...}}
@@ -12,13 +14,16 @@ Protocol: parent -> child  {"observation": ..., "reward": r, "terminated": b, "t
 from __future__ import annotations
 
 import argparse
+import atexit
 import json
 import os
+import shutil
 import selectors
 import subprocess
 import sys
 import tempfile
 import time
+from pathlib import Path
 
 from .canon import dumps
 from .env.env import AuditEnv
@@ -33,20 +38,17 @@ NPROC_LIMIT = 64  # only enforced together with the unprivileged uid
 MAX_LINE = 2 * 1024 * 1024  # one action line from the agent: at most ~2 MB
 NOBODY = 65534
 
-_CODE_COPY = None
+_CODE_DIR = None
 
 
-def _readonly_code_copy() -> str:
-    """A private, read-only (chmod -R a-w) copy of the auditenv package for agent processes: the agent
-    imports policy code from here, never from the repository the grader runs from."""
-    global _CODE_COPY
-    if _CODE_COPY is None:
-        import atexit
-        import shutil
-
+def agent_code_dir() -> str:
+    """A private copy of the auditenv package (code only: no schemas, configs, episodes or grader data),
+    made once per evaluator process and made READ-ONLY (chmod -R a-w). The agent imports policies from
+    here, never from the repository the grader runs from."""
+    global _CODE_DIR
+    if _CODE_DIR is None:
         d = tempfile.mkdtemp(prefix="auditenv-code-")
-        shutil.copytree(ROOT / "auditenv", os.path.join(d, "auditenv"),
-                        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        shutil.copytree(ROOT / "auditenv", Path(d) / "auditenv", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
         for root, dirs, files in os.walk(d):
             for f in files:
                 os.chmod(os.path.join(root, f), 0o444)
@@ -58,8 +60,29 @@ def _readonly_code_copy() -> str:
             shutil.rmtree(path, ignore_errors=True)
 
         atexit.register(_cleanup)
-        _CODE_COPY = d
-    return _CODE_COPY
+        _CODE_DIR = d
+    return _CODE_DIR
+
+
+_readonly_code_copy = agent_code_dir  # older name used by tests
+
+
+def harden_evaluator() -> bool:
+    """Mark the evaluator process non-dumpable (Linux prctl PR_SET_DUMPABLE=0): its
+    /proc/<pid>/environ, mem, fd and maps become unreadable for other non-root processes,
+    so the agent cannot read the seed salt or open file handles of its parent."""
+    if os.environ.get("AUDITENV_INSECURE_DUMPABLE") == "1":  # only for the isolation test's positive control
+        return False
+    try:
+        import ctypes
+
+        libc = ctypes.CDLL(None, use_errno=True)
+        return libc.prctl(4, 0, 0, 0, 0) == 0  # PR_SET_DUMPABLE = 4
+    except (OSError, AttributeError):
+        return False
+
+
+AGENT_ENV = {"PATH": "/usr/local/bin:/usr/bin:/bin", "TZ": "UTC", "LANG": "C.UTF-8"}
 
 
 def _can_drop_privileges() -> bool:
@@ -141,37 +164,45 @@ def _sweep_uid(uid: int):
 class ChildPolicy:
     """An agent in a separate, constrained process, talking JSON lines over stdin/stdout.
 
-    - own session (start_new_session) -> the whole process group is killed on close;
+    Layers (all active together):
+    - the evaluator marks itself non-dumpable (prctl): its /proc/<pid>/environ, mem, fd are closed to the agent;
+    - `python -I -S` (no PYTHON* variables, no site-packages, no cwd on sys.path), environment = AGENT_ENV only
+      (no salt, no seed, no paths); policy code from a private READ-ONLY copy of the package;
+    - cwd = an empty private temp dir; own session (start_new_session) -> the whole group is killed on close;
     - rlimits: AS 1.5 GiB, CPU 65 s, 64 open files, no core dumps, FSIZE 0 (SIGXFSZ ignored);
-    - as root: runs as `nobody` (+ NPROC limit), so repository, truth, grader log and code are not
-      writable; leftovers in /tmp and stray processes of that uid are swept after the run;
-    - imports policy code from a read-only copy, cwd/HOME/TMPDIR = an empty private temp dir,
-      environment built explicitly (no AUDITENV_SEED_SALT, no paths);
+    - when the evaluator runs as root: the agent runs as `nobody` (+ NPROC limit), so repository, truth,
+      grader log and code are not writable; leftovers in /tmp and stray processes of that uid are swept;
     - an action line longer than ~2 MB ends the run like a dead policy.
+    `cmd` runs an external agent (python -m auditenv run --policy-cmd ...) under the same sandbox.
     """
 
     def __init__(self, name: str | None = None, seed: int = 0, cmd=None, limits: bool = True):
         import shlex
 
+        harden_evaluator()
         self.tmp = tempfile.TemporaryDirectory(prefix="auditenv-agent-")
         self.drop = limits and _can_drop_privileges()
         if self.drop:
             os.chown(self.tmp.name, NOBODY, NOBODY)
-        env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": _readonly_code_copy(), "PYTHONHASHSEED": "0",
-               "TZ": "UTC", "PYTHONDONTWRITEBYTECODE": "1", "HOME": self.tmp.name, "TMPDIR": self.tmp.name,
-               "LANG": "C.UTF-8"}
+        env = dict(AGENT_ENV)
         if cmd:
             argv = shlex.split(cmd) if isinstance(cmd, str) else list(cmd)
             argv = [os.path.abspath(x) if os.path.exists(x) and (i > 0 or os.sep in x) else x for i, x in enumerate(argv)]
         else:
-            argv = [sys.executable, "-m", "auditenv.runner", "--child", "--policy", name, "--seed", str(seed)]
+            boot = (f"import sys; sys.path.insert(0, {agent_code_dir()!r}); "
+                    f"from auditenv.runner import _child_main; _child_main({name!r}, {int(seed)})")
+            argv = [sys.executable, "-I", "-S", "-c", boot]
         self.env = dict(env)  # kept for audits/tests: exactly what the agent process received
         kw = {}
         if self.drop:
             kw.update(user=NOBODY, group=NOBODY, extra_groups=[])
         self.proc = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-                                     cwd=self.tmp.name, env=env, text=True, bufsize=1, start_new_session=True,
+                                     cwd=self.tmp.name, env=env, text=True, bufsize=1, close_fds=True,
+                                     start_new_session=True,
                                      preexec_fn=(lambda: _apply_limits(self.drop)) if limits else None, **kw)
+        self.sel = selectors.DefaultSelector()
+        self.sel.register(self.proc.stdout, selectors.EVENT_READ)
+
         self.sel = selectors.DefaultSelector()
         self.sel.register(self.proc.stdout, selectors.EVENT_READ)
 

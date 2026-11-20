@@ -26,7 +26,7 @@
 ## 2. Где ошибается simple_reconcile
 
 `simple_reconcile` — честный скриптовый аудитор: видит только то, что вернули инструменты.
-Три намеренных упрощения объясняют **все** его промахи и ложные выводы:
+Он тратит 11–16 шагов из 100. Три намеренных упрощения объясняют **все** его промахи и ложные выводы:
 
 * **Нет правила `previous_business_day`.** Если на дату документа нет курса (выходной), документ
   пропускается. Это все без исключения промахи fx_rate (замер: 79 из 79 непойманных fx‑ошибок
@@ -44,41 +44,42 @@
 
 | Тип / вариант | n | simple_reconcile | Recall (95 % ДИ) | Пример промаха | oracle | незав. |
 |---|---|---|---|---|---|---|
-| duplicate_invoice / copy | 84 | 84 | 100% (96%–100%) | — | 84/84 | 84/84 |
+| duplicate_invoice / copy | 74 | 71 | 96% (89%–99%) | `dev-mixed 70198` | 74/74 | 74/74 |
 | duplicate_invoice / copy_as_posted | 57 | 57 | 100% (94%–100%) | — | 57/57 | 57/57 |
-| duplicate_invoice / paid_twice | 13 | 13 | 100% (77%–100%) | — | 13/13 | 13/13 |
-| fx_rate / adjacent_day | 120 | 63 | 52% (44%–61%) | `interaction-heavy 70001` | 120/120 | 120/120 |
-| fx_rate / due_date | 10 | 7 | 70% (40%–89%) | `dev-mixed 70066` | 10/10 | 10/10 |
-| fx_rate / historical_rate | 13 | 5 | 38% (18%–64%) | `interaction-heavy 70019` | 13/13 | 13/13 |
-| fx_rate / inverted | 11 | 11 | 100% (74%–100%) | — | 11/11 | 11/11 |
-| fx_rate / utc_date | 32 | 31 | 97% (84%–99%) | `dev-global 70086` | 32/32 | 32/32 |
-| fx_rate / wrong_pair | 22 | 12 | 55% (35%–73%) | `dev-global 70014` | 22/22 | 22/22 |
-| payment_allocation / partial | 116 | 116 | 100% (97%–100%) | — | 116/116 | 116/116 |
+| duplicate_invoice / paid_twice | 21 | 21 | 100% (85%–100%) | — | 21/21 | 21/21 |
+| fx_rate / adjacent_day | 126 | 79 | 63% (54%–71%) | `interaction-heavy 70013` | 126/126 | 126/126 |
+| fx_rate / due_date | 8 | 5 | 62% (31%–86%) | `interaction-heavy 70037` | 8/8 | 8/8 |
+| fx_rate / historical_rate | 10 | 4 | 40% (17%–69%) | `interaction-heavy 70019` | 10/10 | 10/10 |
+| fx_rate / inverted | 7 | 3 | 43% (16%–75%) | `dev-global 70068` | 7/7 | 7/7 |
+| fx_rate / utc_date | 34 | 32 | 94% (81%–98%) | `interaction-heavy 70019` | 34/34 | 34/34 |
+| fx_rate / wrong_pair | 25 | 17 | 68% (48%–83%) | `dev-mixed 70018` | 25/25 | 25/25 |
+| payment_allocation / partial | 112 | 112 | 100% (97%–100%) | — | 112/112 | 112/112 |
 | payment_allocation / unallocated | 43 | 43 | 100% (92%–100%) | — | 43/43 | 43/43 |
-| payment_allocation / wrong_invoice | 4 | 0 | 0% (0%–49%) | `dev-mixed 70066` | 4/4 | 4/4 |
-| period_cutoff / backdated_posting | 9 | 9 | 100% (70%–100%) | — | 9/9 | 9/9 |
+| payment_allocation / wrong_invoice | 4 | 0 | 0% (0%–49%) | `interaction-heavy 70061` | 4/4 | 4/4 |
+| period_cutoff / backdated_posting | 8 | 8 | 100% (68%–100%) | — | 8/8 | 8/8 |
 | period_cutoff / prior_period | 41 | 41 | 100% (91%–100%) | — | 41/41 | 41/41 |
-| period_cutoff / utc_trap | 29 | 29 | 100% (88%–100%) | — | 29/29 | 29/29 |
-| **итого** | **604** | **521** | **86% (83%–89%)** | | **604/604** | **604/604** |
+| period_cutoff / utc_trap | 34 | 34 | 100% (90%–100%) | — | 34/34 | 34/34 |
+| **итого** | **604** | **527** | **87% (84%–90%)** | | **604/604** | **604/604** |
 
 Ложные выводы simple_reconcile по кодам причин оценщика (`grader/matcher.py::miss_reason`):
 
 | Код причины | Сколько | Пример |
 |---|---|---|
-| `unmatched` | 153 | `dev-mixed 70000` |
-| `ids_mismatch` | 101 | `dev-mixed 70006` |
-| `wrong_type` | 32 | `interaction-heavy 70019` |
+| `unmatched` | 157 | `dev-mixed 70000` |
+| `ids_mismatch` | 98 | `dev-mixed 70006` |
+| `wrong_type` | 40 | `interaction-heavy 70001` |
+| `evidence_incomplete` | 3 | `dev-mixed 70198` |
 
 Средняя награда simple_reconcile по конфигам:
 
 | Конфиг | Награда |
 |---|---|
 | clean-only | -0.803 |
-| dev-global | +0.399 |
-| dev-mixed | +0.342 |
-| interaction-heavy | +0.487 |
-| train-easy | +0.325 |
-| train-global | +0.416 |
+| dev-global | +0.384 |
+| dev-mixed | +0.312 |
+| interaction-heavy | +0.446 |
+| train-easy | +0.266 |
+| train-global | +0.480 |
 <!--/generated-->
 
 ### Что это говорит о среде
@@ -90,3 +91,7 @@
   каждом эпизоде есть корректные «двойники» каждого типа ошибки (`min_lookalikes_per_type`).
 * Ни один поверхностный признак не отделяет ошибки от корректных документов (таблица и тест — в
   `docs/LIMITATIONS.md`, `tests/test_surface.py`).
+* Остальные отвлекающие случаи simple_reconcile не обманывают (ложных выводов от них 0): аренда
+  с одинаковой суммой, оплата частями, платёж на несколько счетов, остаток округления 1 ед.,
+  операции в 23:50/00:05, неопознанный платёж на 2400, повтор суммы у другого клиента, ночные и
+  выходные валютные документы.

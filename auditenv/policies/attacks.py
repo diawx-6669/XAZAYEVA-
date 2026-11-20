@@ -103,7 +103,7 @@ class AttackPolicy(Policy):
 # Best strategy found by the automatic exploit search (python -m auditenv exploit-search, CEM over
 # 240 strategies on train seeds, no truth access). Frozen here as a regression attack: it must stay
 # below silence and below simple_reconcile on held-out episodes (tests/test_exploit_search.py).
-CEM_BEST = {"amount_pick": "ledger_main", "id_pick": "latest", "n_evidence": 10, "n_findings": 2, "pages_invoices": 2, "pages_ledger": 4, "pages_payments": 0, "type": "period_cutoff"}
+CEM_BEST = {"amount_pick": "ledger_main", "id_pick": "has_2400", "n_evidence": 10, "n_findings": 20, "pages_invoices": 1, "pages_ledger": 2, "pages_payments": 0, "type": "mixed"}
 
 
 def cem_best_policy(seed: int = 0):

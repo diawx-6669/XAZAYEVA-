@@ -8,7 +8,9 @@ trajectories` → `python -m auditenv docs-check --fix` → `make check` (дол
 ## 1. Новый тип ошибки (отрепетировано: `vat_error`, 242 секунды)
 
 Репетиция — в локальной ветке `final-rehearsal` (в `main` **не сливается**), полный патч:
-[`docs/rehearsal/vat_error.patch`](rehearsal/vat_error.patch) (`git apply docs/rehearsal/vat_error.patch`).
+[`docs/rehearsal/vat_error.patch`](rehearsal/vat_error.patch). Патч снят **до** слияния с `main`
+(построчная выручка, свой валидатор схем), поэтому применять его — `git apply -3` с ручной правкой;
+список шагов ниже от этого не меняется.
 Время от создания ветки до зелёного pytest — **242 с** (Claude Code; человеку по этому списку —
 порядка 1–2 часов), затем `make check` — 1 мин 43 с, табло 90/90, `ALL GREEN`.
 
@@ -68,15 +70,15 @@ trajectories` → `python -m auditenv docs-check --fix` → `make check` (дол
 Конфиг (например, `configs/big.json`, `"version": "1.0"`):
 
 ```json
-{"name": "big", "version": "1.0", "n_invoices": [520, 580], "n_entities": [40, 60], "period_months": 6,
+{"name": "big", "version": "1.0", "n_invoices": [230, 260], "n_entities": [40, 60], "period_months": 6,
  "period_starts": ["2026-01"], "n_errors": [12, 12], "clean_probability": 0.0,
  "foreign_currencies": ["USD", "EUR", "JPY", "KWD"], "n_foreign": [3, 4],
  "interactions": {"partial_fx_cutoff": 1.0, "duplicate_fx": 1.0}}
 ```
 
-Замер (`n_invoices` 700–760 → 2 403–2 749 проводок, ≈ 3.6 проводки на счёт, поэтому 520–580 дают
-≈ 2 000): генерация 1.0–1.2 с, ровно 12 ошибок, эталон валиден, oracle = 1.0, simple_reconcile
-укладывается в 84–94 шага из 100 за 0.12–0.17 с. Затем `python -m auditenv lock-configs`.
+Замер (после слияния с `main`: 3–7 позиций на счёт, выручка построчно): 1 858–2 046 проводок,
+ровно 12 ошибок, генерация 0.4–0.6 с, эталон валиден, oracle = 1.0, simple_reconcile — 58–65 шагов
+из 100. Затем `python -m auditenv lock-configs`.
 
 ## 6. Подключить чужую политику
 

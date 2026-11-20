@@ -204,7 +204,7 @@ def test_log_chain_detects_edits(tmp_path):
 
 # ------------------------------------------------------- C9 external agents
 def test_minimal_example_agent_runs():
-    out = subprocess.run([PY, "-m", "auditenv", "run", "--policy-cmd", f"{PY} examples/minimal_agent.py", "--seed", "7",
+    out = subprocess.run([PY, "-m", "auditenv", "run", "--policy-cmd", f"{PY} examples/minimal_agent.py", "--seed", "12",
                           "--config", "dev-mixed"], cwd=ROOT, capture_output=True, text=True, timeout=120)
     res = json.loads(out.stdout)
     assert out.returncode == 0 and res["steps"] <= 100 and res["tp"] >= 1
@@ -276,7 +276,7 @@ def _interpreters():
     out = []
     for cand in [PY, "python3.11", "python3.12", "python3.13"]:
         try:
-            ok = subprocess.run([cand, "-c", "import jsonschema, sys; print(sys.version_info[:2])"], capture_output=True,
+            ok = subprocess.run([cand, "-c", "import sys; print(sys.version_info[:2])"], capture_output=True,
                                 text=True, timeout=30)
         except OSError:
             continue
