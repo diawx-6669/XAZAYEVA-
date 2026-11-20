@@ -35,4 +35,40 @@
 
 ## Результаты
 
-(дописываются после прогона)
+Прогон 2026‑11‑20, `make experiment` (≈ 34 с). Сырые числа — `reports/experiment.json`.
+
+**Отклонение от протокола:** первый запуск упал до получения каких‑либо чисел (политика не
+вызывала `reset()` в конструкторе); исправлено в коде политики, протокол не менялся, повторный
+запуск — единственный, давший результаты.
+
+Отбор (successive halving, 6016 оценок «ветвь × эпизод» на 120 train‑эпизодах):
+
+| Ветвей | Эпизодов на ветвь | Лидер | Награда лидера |
+|---|---|---|---|
+| 256 | 8 | `alloc, credit_note_aware, cutoff, dup, fx, fx_prev_business_day, overpayment_aware` | +0.976 |
+| 128 | 16 | `alloc, credit_note_aware, cutoff, dup, fx, fx_prev_business_day, overpayment_aware, skip_dup_in_fx` | +0.852 |
+| 64 | 32 | `alloc, credit_note_aware, cutoff, dup, fx, fx_prev_business_day, overpayment_aware, skip_dup_in_fx` | +0.914 |
+| 32 | 64 | `alloc, credit_note_aware, cutoff, dup, fx, fx_prev_business_day, overpayment_aware, skip_dup_in_fx` | +0.941 |
+| 16 | 120 | `alloc, credit_note_aware, cutoff, dup, fx, fx_prev_business_day, overpayment_aware, skip_dup_in_fx` | +0.957 |
+| 8 | 120 | `alloc, credit_note_aware, cutoff, dup, fx, fx_prev_business_day, overpayment_aware, skip_dup_in_fx` | +0.957 |
+| 4 | 120 | `alloc, credit_note_aware, cutoff, dup, fx, fx_prev_business_day, overpayment_aware, skip_dup_in_fx` | +0.957 |
+| 2 | 120 | `alloc, credit_note_aware, cutoff, dup, fx, fx_prev_business_day, overpayment_aware, skip_dup_in_fx` | +0.957 |
+
+Выбрано: `alloc, credit_note_aware, cutoff, dup, fx, fx_prev_business_day, overpayment_aware, skip_dup_in_fx`.
+
+Отложенные 300 эпизодов (новая соль), один прогон:
+
+| | Средняя награда |
+|---|---|
+| базовая `simple_reconcile` | +0.132 |
+| выбранная по награде | +0.974 |
+| **разность (парная)** | **+0.842, 95 % ДИ [+0.754; +0.930]** |
+| негативный контроль: плацебо − базовая | +0.000, 95 % ДИ [+0.000; +0.000] |
+
+**Вывод (в формулировке протокола):** нижняя граница интервала > 0, значит, **среда даёт
+обучаемый сигнал**: выбор по её награде на train переносится на отложенные эпизоды с новой
+солью. Контроль‑плацебо даёт ровно 0 — конвейер сам различий не создаёт. Это **не** утверждение
+об улучшении модели: веса не обучались, выбирался один из 256 вариантов скриптовой политики, а
+варианты придуманы нами со знанием её слабостей (см. «Угрозы валидности» выше). Выбранная ветвь
+всё ещё не видит `wrong_invoice` — потолок 1.0 не достигнут.
+

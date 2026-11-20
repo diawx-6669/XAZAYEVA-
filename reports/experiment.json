@@ -1,0 +1,157 @@
+{
+ "baseline_rules": [
+  "alloc",
+  "cutoff",
+  "dup",
+  "fx"
+ ],
+ "chosen_rules": [
+  "alloc",
+  "credit_note_aware",
+  "cutoff",
+  "dup",
+  "fx",
+  "fx_prev_business_day",
+  "overpayment_aware",
+  "skip_dup_in_fx"
+ ],
+ "selection_rounds": [
+  {
+   "arms": 256,
+   "episodes": 8,
+   "leader": [
+    "alloc",
+    "credit_note_aware",
+    "cutoff",
+    "dup",
+    "fx",
+    "fx_prev_business_day",
+    "overpayment_aware"
+   ],
+   "leader_reward": 0.9764999999999999
+  },
+  {
+   "arms": 128,
+   "episodes": 16,
+   "leader": [
+    "alloc",
+    "credit_note_aware",
+    "cutoff",
+    "dup",
+    "fx",
+    "fx_prev_business_day",
+    "overpayment_aware",
+    "skip_dup_in_fx"
+   ],
+   "leader_reward": 0.852125
+  },
+  {
+   "arms": 64,
+   "episodes": 32,
+   "leader": [
+    "alloc",
+    "credit_note_aware",
+    "cutoff",
+    "dup",
+    "fx",
+    "fx_prev_business_day",
+    "overpayment_aware",
+    "skip_dup_in_fx"
+   ],
+   "leader_reward": 0.9139375
+  },
+  {
+   "arms": 32,
+   "episodes": 64,
+   "leader": [
+    "alloc",
+    "credit_note_aware",
+    "cutoff",
+    "dup",
+    "fx",
+    "fx_prev_business_day",
+    "overpayment_aware",
+    "skip_dup_in_fx"
+   ],
+   "leader_reward": 0.9409027777777778
+  },
+  {
+   "arms": 16,
+   "episodes": 120,
+   "leader": [
+    "alloc",
+    "credit_note_aware",
+    "cutoff",
+    "dup",
+    "fx",
+    "fx_prev_business_day",
+    "overpayment_aware",
+    "skip_dup_in_fx"
+   ],
+   "leader_reward": 0.9571814814814814
+  },
+  {
+   "arms": 8,
+   "episodes": 120,
+   "leader": [
+    "alloc",
+    "credit_note_aware",
+    "cutoff",
+    "dup",
+    "fx",
+    "fx_prev_business_day",
+    "overpayment_aware",
+    "skip_dup_in_fx"
+   ],
+   "leader_reward": 0.9571814814814814
+  },
+  {
+   "arms": 4,
+   "episodes": 120,
+   "leader": [
+    "alloc",
+    "credit_note_aware",
+    "cutoff",
+    "dup",
+    "fx",
+    "fx_prev_business_day",
+    "overpayment_aware",
+    "skip_dup_in_fx"
+   ],
+   "leader_reward": 0.9571814814814814
+  },
+  {
+   "arms": 2,
+   "episodes": 120,
+   "leader": [
+    "alloc",
+    "credit_note_aware",
+    "cutoff",
+    "dup",
+    "fx",
+    "fx_prev_business_day",
+    "overpayment_aware",
+    "skip_dup_in_fx"
+   ],
+   "leader_reward": 0.9571814814814814
+  }
+ ],
+ "test": {
+  "baseline_mean": 0.13192775964775963,
+  "chosen_mean": 0.9737276190476191,
+  "diff_ci95": [
+   0.7538112117512117,
+   0.9303549346949347
+  ],
+  "diff_mean": 0.8417998593998594,
+  "placebo_ci95": [
+   0.0,
+   0.0
+  ],
+  "placebo_diff_mean": 0.0
+ },
+ "test_episodes": 300,
+ "train_episodes": 120,
+ "train_evaluations": 6016,
+ "verdict": "learnable signal: CI of the paired difference excludes 0"
+}

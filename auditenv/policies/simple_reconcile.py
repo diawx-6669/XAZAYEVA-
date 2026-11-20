@@ -38,6 +38,7 @@ class SimpleReconcile(Policy):
     def __init__(self, seed: int = 0, rules=BASE_RULES):
         self.rules = frozenset(rules)
         super().__init__(seed)
+        self.reset()
 
     def reset(self):
         super().reset()
