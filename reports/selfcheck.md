@@ -1,6 +1,6 @@
 # AuditEnv self-check
 
-commit `03dfa5fcfd7d` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
+commit `254afb65d925` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
 
 Хеши конфигов: `clean-only` b3ea7789592542fd, `dev-global` 901a6f99473a48ad, `dev-mixed` 2435d9d9eff18731, `interaction-heavy` 69494e59920a9b92, `stress` 7dd64db6b1aeac85, `train-easy` 58e3dda93da800ba, `train-global` 700ad883b68e9fbf
 
@@ -129,6 +129,7 @@ P, R — макро (среднее по эпизодам, где величин
 | attack:wrong_currency | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | -1.000 | -1.000 | 1.0 | нет |
 | attack:all_types_all_docs | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | -1.000 | -1.000 | 1.0 | нет |
 | attack:empty | n/a | 0.000 | 0.350 | n/a | 0.000 | 0.000 | -0.300 | 1.000 | -1.000 | -0.300 | 1.0 | нет |
+| attack:cem_best | 0.025 | 0.026 | 0.020 | 0.025 | 0.027 | 0.026 | -0.961 | -1.000 | -0.939 | -1.000 | 7.0 | нет |
 
 ## Разбор сбоев simple_reconcile
 
@@ -141,26 +142,27 @@ P, R — макро (среднее по эпизодам, где величин
 
 Коды причин ложных выводов: `ids_mismatch`: 5, `unmatched`: 14, `wrong_type`: 2
 
-Журнал оценщика `reports/grader_log.jsonl`: цепочка хешей, голова `b296e9465f43fad9b7949475a08c0563711d1c74586b20d9602923a54a0ee997` (проверка: `python -m auditenv verify-log`).
+Журнал оценщика `reports/grader_log.jsonl`: цепочка хешей, голова `bd90837bd73a67c505da173290a1bd5d9cd1db9754f8c72df1fbc9436b7a44b3` (проверка: `python -m auditenv verify-log`).
 
 ## Замеры времени (недетерминированно, зависит от машины)
 
-Полный self-check: 9.8 c.
+Полный self-check: 9.6 c.
 
 | Политика | ср, мс | p50, мс | p95, мс | макс, мс |
 |---|---|---|---|---|
-| random_explorer | 90 | 87 | 108 | 115 |
-| simple_reconcile | 88 | 84 | 118 | 120 |
-| flag_all | 89 | 82 | 107 | 112 |
-| oracle | 2 | 2 | 2 | 2 |
-| oracle_observing | 2 | 2 | 2 | 10 |
+| random_explorer | 83 | 81 | 88 | 109 |
+| simple_reconcile | 87 | 84 | 98 | 100 |
+| flag_all | 80 | 79 | 83 | 91 |
+| oracle | 2 | 2 | 4 | 4 |
+| oracle_observing | 2 | 2 | 3 | 3 |
 | attack:twins | 5 | 5 | 5 | 5 |
-| attack:type_bruteforce | 3 | 3 | 4 | 4 |
-| attack:amount_bruteforce | 4 | 3 | 5 | 5 |
-| attack:guess_ids | 3 | 3 | 4 | 5 |
-| attack:evidence_spam | 3 | 3 | 3 | 4 |
-| attack:junk_explanation | 3 | 3 | 3 | 3 |
-| attack:persuasive_wrong | 3 | 3 | 3 | 11 |
-| attack:wrong_currency | 3 | 3 | 3 | 4 |
-| attack:all_types_all_docs | 5 | 5 | 5 | 5 |
-| attack:empty | 3 | 3 | 3 | 3 |
+| attack:type_bruteforce | 5 | 4 | 8 | 13 |
+| attack:amount_bruteforce | 6 | 5 | 8 | 12 |
+| attack:guess_ids | 4 | 3 | 5 | 6 |
+| attack:evidence_spam | 3 | 3 | 4 | 4 |
+| attack:junk_explanation | 4 | 4 | 5 | 16 |
+| attack:persuasive_wrong | 4 | 4 | 5 | 7 |
+| attack:wrong_currency | 5 | 5 | 5 | 7 |
+| attack:all_types_all_docs | 6 | 5 | 7 | 10 |
+| attack:empty | 3 | 3 | 4 | 5 |
+| attack:cem_best | 4 | 3 | 4 | 12 |

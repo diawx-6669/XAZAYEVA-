@@ -43,7 +43,7 @@ make check
 
 `make check` — это по порядку:
 
-1. весь pytest (<!--fact:n_tests-->388<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
+1. весь pytest (<!--fact:n_tests-->390<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
    поверхностных признаков, атаки на песочницу агента);
 2. табло self‑check в духе жюри: 4 блока × 20 проверок на 20 эпизодах и 20 парных преобразованиях,
    диагностика P/R/F1 (макро и микро), возврат на чистых и ошибочных книгах, шаги, время p50/p95;
@@ -76,6 +76,8 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 7 
 ```
 
 Протокол JSON‑строк, песочница процесса и Gymnasium‑клиент — [docs/ADAPTER.md](docs/ADAPTER.md).
+Как добавить новый тип ошибки, отвлекающий случай, сменить правило курса или допуск —
+[docs/HOWTO_EXTEND.md](docs/HOWTO_EXTEND.md) (отрепетировано на типе `vat_error`).
 Все трактовки контракта (что такое `inspection_steps` при обрыве, формы `submit`, коды ошибок) —
 [docs/CONTRACT.md](docs/CONTRACT.md) и машиночитаемо в `contract.json` (`env.spec`).
 
@@ -97,6 +99,11 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 7 
 | `python -m auditenv verify-log` | проверка цепочки хешей журнала оценщика |
 | `python -m auditenv analyze --n 300 --docs` | замеры: поверхностные признаки, полнота по вариантам → таблицы в docs |
 | `python -m auditenv lock-configs` | обновить `configs/LOCK.json` после смены версии конфига |
+| `python -m auditenv export-audit` | 3 dev‑эпизода в CSV для ручного аудита (`audit/`, `docs/MANUAL_AUDIT.md`) |
+| `make exploit-search` | автопоиск эксплойтов награды (CEM без доступа к эталону) → `reports/exploit_search.md` |
+| `make experiment` | необязательный эксперимент «обучаемый сигнал» по протоколу `docs/EXPERIMENT.md` (не входит в `make check`) |
+| `make finale-preflight` | офлайн‑проверка перед финалом за минуту: образ, тесты контракта, демо |
+| `make submission-tag` | команды для тега `v1.0-submission` и SHA для формы (`docs/SUBMISSION.md`) |
 
 ## Как устроен эпизод
 
@@ -178,7 +185,9 @@ episodes/     train/ (10) и dev/ (10): <episode_id>/public/*, <episode_id>/grad
 trajectories/ trajectories.jsonl
 reports/      selfcheck.md, selfcheck.json, grader_log.jsonl (генерируются make check)
 tests/        pytest + hypothesis; tests/agents/ — атакующие агенты
-docs/         CASE.md DESIGN.md CONTRACT.md ADAPTER.md LIMITATIONS.md FAILURES.md
+docs/         CASE.md DESIGN.md CONTRACT.md ADAPTER.md LIMITATIONS.md FAILURES.md SUBMISSION.md
+              MANUAL_AUDIT.md HOWTO_EXTEND.md EXPERIMENT.md rehearsal/vat_error.patch
+audit/        3 dev-эпизода в CSV для ручного аудита (Google Таблицы)
 ```
 
 ## Карта соответствия «пункт ТЗ → файл/функция → тест»
