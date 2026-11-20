@@ -228,7 +228,13 @@ def main(argv=None) -> int:
     d.add_argument("--seed", type=int, default=9008)
     d.add_argument("--config", default="interaction-heavy")
     sub.add_parser("golden")
+    dc = sub.add_parser("docs-check")
+    dc.add_argument("--fix", action="store_true")
     a = ap.parse_args(argv)
+    if a.cmd == "docs-check":
+        from .docs_check import main as docs_main
+
+        return docs_main(["--fix"] if a.fix else [])
     fn = globals()["cmd_" + a.cmd]
     return fn(a) or 0
 

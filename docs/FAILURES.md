@@ -24,7 +24,7 @@ seed 5000–5099 / 5000–5049), режим `train`, коды причин из 
 
 | Код причины | Кол‑во | Источник |
 |---|---|---|
-| `unmatched` (duplicate_invoice) | 83 | перевыставленный после credit note счёт принят за дубль: политика игнорирует `cancels_invoice_id` |
+| `unmatched` (duplicate_invoice) | 83 | перевыставленный после credit note счёт принят за дубль: политика игнорирует ссылку `Credit note for <invoice_id>` в строках credit note |
 | `ids_mismatch` (duplicate_invoice) | 62 | то же, но в эпизоде есть настоящий дубль с другим ID |
 | `wrong_type` (fx_rate) | 72 | в `duplicate_fx` дубль скопирован по неверному курсу; политика не исключает дубли из проверки курса и докладывает fx_rate по ID дубля |
 

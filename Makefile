@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -12,6 +12,7 @@ help:
 	@echo "make episodes      regenerate 10 train + 10 dev episodes from configs/"
 	@echo "make trajectories  regenerate trajectories/trajectories.jsonl"
 	@echo "make demo          scripted demo (scripts/demo.sh)"
+	@echo "make docs-check    numbers in README/docs match reality (tests, trajectories, episode sizes)"
 	@echo "make docker-check  build image and run 'make check' with --network none --cpus 2 --memory 4g"
 
 venv:
@@ -40,10 +41,16 @@ trajectories:
 golden:
 	$(PYTHON) -m auditenv golden
 
+docs-check:
+	$(PYTHON) -m auditenv docs-check
+
+version:
+	@git rev-parse --short=12 HEAD > VERSION 2>/dev/null || echo unknown > VERSION; cat VERSION
+
 demo:
 	bash scripts/demo.sh
 
-docker-build:
+docker-build: version
 	docker build -t auditenv .
 
 docker-check: docker-build

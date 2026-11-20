@@ -12,3 +12,4 @@ if [ -n "${AUDITENV_SEED_SALT:-}" ]; then
 fi
 "$PY" -m pytest -q
 "$PY" -m auditenv check
+"$PY" -m auditenv docs-check

@@ -26,7 +26,7 @@ make venv
 make check
 ```
 
-`make check` = весь pytest (268 тестов, включая hypothesis и 4×50 seed для решателя) + табло self‑check на 20
+`make check` = весь pytest (<!--fact:n_tests-->313<!--/fact--> тестов, включая hypothesis и 4×50 seed для решателя) + табло self‑check на 20
 эпизодах и 20 парных преобразованиях + leakscan + replay траекторий. Результат печатается и
 пишется в `reports/selfcheck.md` / `reports/selfcheck.json`, журнал оценщика —
 `reports/grader_log.jsonl`. Код возврата ≠ 0, если хоть одна проверка упала.
@@ -86,7 +86,7 @@ seed, config ──► story (скрытые события, курсы) ──�
 независимо в конфиге): `duplicate_invoice`, `payment_allocation` (не распределён / частично),
 `fx_rate` (соседний рабочий день / дата UTC вместо локальной / перевёрнутый курс),
 `period_cutoff` (счёт вне периода по местному времени, записанный в UTC). Два сценария
-взаимодействия: `partial_fx_cutoff`, `duplicate_fx`. Одиннадцать корректных отвлекающих
+взаимодействия: `partial_fx_cutoff`, `duplicate_fx`. <!--fact:n_distractors-->11<!--/fact--> корректных отвлекающих
 случаев (аренда с одинаковой суммой, оплата частями, платёж на 2–3 счёта, законная частичная
 оплата, возврат, банковская комиссия, остаток округления 1 ед., операции в 23:50 и 00:05,
 credit note с перевыставлением, неопознанный платёж на 2400, повтор суммы у другого клиента).
@@ -122,7 +122,7 @@ auditenv/
 configs/      train-easy, dev-mixed, clean-only, interaction-heavy, stress (+ splits.json с seed'ами)
 schemas/      manifest, ledger_row, invoice, payment, fx, policy, action, observation, findings, truth, config
 episodes/     train/ (10) и dev/ (10): <episode_id>/public/*, <episode_id>/grader/*, index.json
-trajectories/ trajectories.jsonl (976 шагов: random_explorer, simple_reconcile, flag_all на 20 эпизодах)
+trajectories/ trajectories.jsonl (<!--fact:traj_lines-->976<!--/fact--> строк, <!--fact:traj_runs-->60<!--/fact--> прогонов: <!--fact:traj_policies-->flag_all, random_explorer, simple_reconcile<!--/fact-->)
 reports/      selfcheck.md, selfcheck.json (генерируются make check)
 tests/        pytest + hypothesis
 docs/         CASE.md, DESIGN.md, LIMITATIONS.md, FAILURES.md

@@ -280,3 +280,26 @@ def test_report_deterministic_part_excludes_timing():
     a, b = render_md(rep), render_md(rep2)
     assert a != b and deterministic_part(a) == deterministic_part(b)
     assert "commit `abc`" in a and "Python 3.11" in a
+
+
+# ------------------------------------------------------------ A9 docs-check
+def test_docs_check_detects_stale_and_unknown_facts(tmp_path, monkeypatch):
+    import auditenv.docs_check as dc
+
+    (tmp_path / "README.md").write_text("x <!--fact:n_timezones-->999<!--/fact--> y <!--fact:nope-->1<!--/fact-->")
+    monkeypatch.setattr(dc, "ROOT", tmp_path)
+    monkeypatch.setattr(dc, "DOCS", ["README.md"])
+    assert dc.main([]) == 1
+    dc.main(["--fix"])
+    from auditenv.timeutil import TIMEZONES
+
+    assert f"<!--fact:n_timezones-->{len(TIMEZONES)}<!--/fact-->" in (tmp_path / "README.md").read_text()
+
+
+def test_committed_docs_facts_are_current():
+    import auditenv.docs_check as dc
+
+    found = [f for f in dc.scan() if f[1] != "n_tests"]  # n_tests needs a nested pytest run: make docs-check
+    facts = dc.compute_facts({n for _, n, _ in found})
+    assert found and all(facts[n] == shown for _, n, shown in found), [(r, n, s, facts[n]) for r, n, s in found
+                                                                         if facts[n] != s]
