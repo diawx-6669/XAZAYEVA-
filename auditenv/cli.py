@@ -189,6 +189,12 @@ def cmd_demo(a):
     print(f"result: reward={r:+.3f} info={info}")
 
 
+def cmd_analyze(a):
+    from .analysis import main as analysis_main
+
+    print(analysis_main(a.n, a.out, a.docs))
+
+
 def cmd_golden(a):
     from .generator.episode import generate_episode
 
@@ -228,6 +234,10 @@ def main(argv=None) -> int:
     d.add_argument("--seed", type=int, default=9008)
     d.add_argument("--config", default="interaction-heavy")
     sub.add_parser("golden")
+    an = sub.add_parser("analyze")
+    an.add_argument("--n", type=int, default=300)
+    an.add_argument("--out")
+    an.add_argument("--docs", action="store_true", help="update the generated tables in docs/")
     dc = sub.add_parser("docs-check")
     dc.add_argument("--fix", action="store_true")
     a = ap.parse_args(argv)

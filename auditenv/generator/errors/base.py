@@ -36,6 +36,8 @@ class Injected:
     owners: list = field(default_factory=list)
     before: list = field(default_factory=list)
     after: list = field(default_factory=list)
+    touched: list = field(default_factory=list)  # internal keys no later mutation may reuse
+    detail: dict = field(default_factory=dict)  # cosmetic / sub-variant facts for provenance
 
 
 def weighted_choice(rng, weights: dict, allowed=None):
@@ -71,8 +73,10 @@ class ErrorType:
         raise NotImplementedError
 
     # helper used by every type
-    def finish(self, book, target, variant, owners, before, **kw) -> Injected:
+    def finish(self, book, target, variant, owners, before, touched=(), detail=None, **kw) -> Injected:
         return Injected(
+            touched=list(touched),
+            detail=dict(detail or {}),
             type=self.name,
             affected_ids=self.canonical_ids(book, target),
             expected_amount_minor=self.expected_amount(book, target, **kw),
@@ -86,6 +90,8 @@ class ErrorType:
         )
 
 
-def special(doc) -> bool:
-    """Documents that belong to distractors/carriers are never independent targets."""
-    return bool(set(doc.tags) - {"split_payment", "partial_open", "multi_invoice_payment"})
+def special(doc, allow=()) -> bool:
+    """Documents of distractors/carriers are protected from independent errors, EXCEPT the tags an error
+    type explicitly allows (where the error stays solvable from the documents): otherwise "this document
+    is a distractor" would itself prove "this document is clean"."""
+    return bool(set(doc.tags) - {"split_payment", "partial_open", "multi_invoice_payment"} - set(allow))

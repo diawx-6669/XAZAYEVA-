@@ -1,1 +1,1 @@
-{"episode_id":"ep-8htn7y36fp","issues":[{"affected_ids":["RCV-6DGZ56PC"],"currency":"KZT","evidence_sets":[["FD-CJ9AQ5ST","GL-AV9EGGX","fx:2026-09-25:USD:KZT","policy"]],"expected_amount_minor":332389,"issue_id":"ISS-001","type":"fx_rate"}],"tolerance_minor":1}
+{"episode_id":"ep-8htn7y36fp","issues":[{"affected_ids":["SF-9P5DKP"],"currency":"USD","evidence_sets":[["FD-5CN4SQCY","GL-2KYQRFC","fx:2026-02-06:KWD:USD","policy"],["FD-5CN4SQCY","GL-YGWFXTP","fx:2026-02-06:KWD:USD","policy"]],"expected_amount_minor":5187,"issue_id":"ISS-001","type":"fx_rate"}],"tolerance_minor":1}

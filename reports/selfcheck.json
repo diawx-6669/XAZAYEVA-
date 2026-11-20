@@ -180,27 +180,27 @@
    },
    {
     "error": null,
-    "name": "dev-mixed#9016 (1 issues)",
+    "name": "dev-global#9016 (1 issues)",
     "ok": true
    },
    {
     "error": null,
-    "name": "dev-mixed#9017 (4 issues)",
+    "name": "dev-global#9017 (4 issues)",
     "ok": true
    },
    {
     "error": null,
-    "name": "dev-mixed#9018 (3 issues)",
+    "name": "dev-global#9018 (3 issues)",
     "ok": true
    },
    {
     "error": null,
-    "name": "dev-mixed#9019 (1 issues)",
+    "name": "dev-global#9019 (1 issues)",
     "ok": true
    },
    {
     "error": null,
-    "name": "dev-mixed#9020 (0 issues)",
+    "name": "dev-global#9020 (0 issues)",
     "ok": true
    }
   ],
@@ -282,27 +282,27 @@
    },
    {
     "error": null,
-    "name": "dev-mixed#9016 twin",
+    "name": "dev-global#9016 twin",
     "ok": true
    },
    {
     "error": null,
-    "name": "dev-mixed#9017 twin",
+    "name": "dev-global#9017 twin",
     "ok": true
    },
    {
     "error": null,
-    "name": "dev-mixed#9018 twin",
+    "name": "dev-global#9018 twin",
     "ok": true
    },
    {
     "error": null,
-    "name": "dev-mixed#9019 twin",
+    "name": "dev-global#9019 twin",
     "ok": true
    },
    {
     "error": null,
-    "name": "dev-mixed#9020 twin",
+    "name": "dev-global#9020 twin",
     "ok": true
    }
   ],
@@ -421,14 +421,14 @@
    "steps": 30
   },
   {
-   "F1": 0.617222,
-   "P": 0.566667,
-   "R": 0.59,
+   "F1": 0.517302,
+   "P": 0.488333,
+   "R": 0.5775,
    "agent_saw_reward": false,
    "policy": "simple_reconcile",
-   "return": 0.216244,
-   "return_exp": 0.216244,
-   "steps": 13.7
+   "return": 0.017403,
+   "return_exp": 0.017403,
+   "steps": 13.95
   },
   {
    "F1": 0.0,
@@ -567,17 +567,17 @@
   "dev-mixed#9013",
   "dev-mixed#9014",
   "dev-mixed#9015",
-  "dev-mixed#9016",
-  "dev-mixed#9017",
-  "dev-mixed#9018",
-  "dev-mixed#9019",
-  "dev-mixed#9020"
+  "dev-global#9016",
+  "dev-global#9017",
+  "dev-global#9018",
+  "dev-global#9019",
+  "dev-global#9020"
  ],
  "failure_analysis": {
   "fp_reasons": {
-   "ids_mismatch": 4,
-   "unmatched": 6,
-   "wrong_type": 3
+   "ids_mismatch": 5,
+   "unmatched": 14,
+   "wrong_type": 2
   },
   "recall_by_type": {
    "duplicate_invoice": {
@@ -585,7 +585,7 @@
     "total": 11
    },
    "fx_rate": {
-    "found": 7,
+    "found": 6,
     "total": 11
    },
    "payment_allocation": {
@@ -599,13 +599,15 @@
   }
  },
  "header": {
-  "commit": "6d60892ff66b",
+  "commit": "db1ec7d9040c",
   "config_hashes": {
-   "clean-only": "c2a34f43108117b9",
-   "dev-mixed": "67375a9c4a8eca52",
-   "interaction-heavy": "092ec2014df8c62f",
-   "stress": "e2af29602f62d814",
-   "train-easy": "ec01ffc23ebd793d"
+   "clean-only": "b3ea7789592542fd",
+   "dev-global": "901a6f99473a48ad",
+   "dev-mixed": "2435d9d9eff18731",
+   "interaction-heavy": "69494e59920a9b92",
+   "stress": "7dd64db6b1aeac85",
+   "train-easy": "58e3dda93da800ba",
+   "train-global": "700ad883b68e9fbf"
   },
   "env_version": "0.1.0",
   "generator_version": "auditenv-gen-0.1.0",
@@ -620,105 +622,105 @@
   "reward": 25.0
  },
  "timing": {
-  "elapsed_s": 7.9,
+  "elapsed_s": 8.3,
   "note": "wall-clock, machine dependent: the ONLY non-deterministic block",
   "per_policy": [
    {
-    "max_ms": 77.19812000004822,
-    "mean_ms": 62.85387269998069,
-    "p50_ms": 63.14063099989653,
-    "p95_ms": 70.56561599995348,
+    "max_ms": 86.87589199985268,
+    "mean_ms": 67.3212912499821,
+    "p50_ms": 65.65934099990045,
+    "p95_ms": 78.86353800017787,
     "policy": "random_explorer"
    },
    {
-    "max_ms": 80.8819940000376,
-    "mean_ms": 65.85220384999957,
-    "p50_ms": 65.95167199998286,
-    "p95_ms": 79.26347900001929,
+    "max_ms": 84.16286300007414,
+    "mean_ms": 59.80403389999083,
+    "p50_ms": 55.30020600008356,
+    "p95_ms": 82.65477199984161,
     "policy": "simple_reconcile"
    },
    {
-    "max_ms": 79.86227200001395,
-    "mean_ms": 60.37797984999429,
-    "p50_ms": 61.59312999989197,
-    "p95_ms": 74.31731400004082,
+    "max_ms": 80.18164800000704,
+    "mean_ms": 60.349208849993374,
+    "p50_ms": 54.745367999885275,
+    "p95_ms": 70.83083000020451,
     "policy": "flag_all"
    },
    {
-    "max_ms": 3.1079030000000785,
-    "mean_ms": 2.48418514999571,
-    "p50_ms": 2.4877309999737918,
-    "p95_ms": 2.801144000045497,
+    "max_ms": 10.250601999814535,
+    "mean_ms": 2.154095749995122,
+    "p50_ms": 1.7590709999240062,
+    "p95_ms": 2.1641639998506434,
     "policy": "oracle"
    },
    {
-    "max_ms": 5.901569999991807,
-    "mean_ms": 4.811682000013207,
-    "p50_ms": 4.68435799996314,
-    "p95_ms": 5.795089999992342,
+    "max_ms": 5.093328000157271,
+    "mean_ms": 4.634352149980714,
+    "p50_ms": 4.6144249999997555,
+    "p95_ms": 5.08643100010886,
     "policy": "attack:twins"
    },
    {
-    "max_ms": 4.202900999985104,
-    "mean_ms": 3.1355894499938586,
-    "p50_ms": 2.976479999915682,
-    "p95_ms": 3.870662999929664,
+    "max_ms": 4.356617999974333,
+    "mean_ms": 3.301881899972159,
+    "p50_ms": 3.1274450000182696,
+    "p95_ms": 4.128906000005372,
     "policy": "attack:type_bruteforce"
    },
    {
-    "max_ms": 5.080463000012969,
-    "mean_ms": 3.7206690999994407,
-    "p50_ms": 3.4502900000461523,
-    "p95_ms": 4.943622999917352,
+    "max_ms": 5.149265000000014,
+    "mean_ms": 3.8706405499851826,
+    "p50_ms": 3.6386819999734143,
+    "p95_ms": 5.0719160001335695,
     "policy": "attack:amount_bruteforce"
    },
    {
-    "max_ms": 4.918965999991087,
-    "mean_ms": 3.3903981999912958,
-    "p50_ms": 3.3083449999367076,
-    "p95_ms": 4.000801000074716,
+    "max_ms": 5.54794499998934,
+    "mean_ms": 3.653653200012741,
+    "p50_ms": 3.4959140000410116,
+    "p95_ms": 4.724838000129239,
     "policy": "attack:guess_ids"
    },
    {
-    "max_ms": 5.415429999970911,
-    "mean_ms": 4.365190249995976,
-    "p50_ms": 4.456424000068182,
-    "p95_ms": 4.940864999980477,
+    "max_ms": 5.474998000181586,
+    "mean_ms": 4.713051549992997,
+    "p50_ms": 4.469693000146435,
+    "p95_ms": 5.471482000075412,
     "policy": "attack:evidence_spam"
    },
    {
-    "max_ms": 5.006861999959256,
-    "mean_ms": 3.6114285500048027,
-    "p50_ms": 3.303370000026007,
-    "p95_ms": 4.764717999933055,
+    "max_ms": 5.347922000055405,
+    "mean_ms": 4.538604149990988,
+    "p50_ms": 4.51600800010965,
+    "p95_ms": 5.168072999822471,
     "policy": "attack:junk_explanation"
    },
    {
-    "max_ms": 11.18596300000263,
-    "mean_ms": 3.2406774500032043,
-    "p50_ms": 2.8419830000530055,
-    "p95_ms": 3.2992389999435545,
+    "max_ms": 13.267271999893637,
+    "mean_ms": 4.433925250009452,
+    "p50_ms": 3.755836999971507,
+    "p95_ms": 5.04700600004071,
     "policy": "attack:persuasive_wrong"
    },
    {
-    "max_ms": 3.279731000020547,
-    "mean_ms": 2.841702050011463,
-    "p50_ms": 2.7767770000082237,
-    "p95_ms": 3.248148000011497,
+    "max_ms": 4.8594099998808815,
+    "mean_ms": 3.592278799953874,
+    "p50_ms": 3.366865000089092,
+    "p95_ms": 4.858337999849027,
     "policy": "attack:wrong_currency"
    },
    {
-    "max_ms": 6.900733000065884,
-    "mean_ms": 4.953222350030728,
-    "p50_ms": 4.7492380000448975,
-    "p95_ms": 6.706467000071825,
+    "max_ms": 5.318301999977848,
+    "mean_ms": 4.777002200012248,
+    "p50_ms": 4.647130999956062,
+    "p95_ms": 5.214737999949648,
     "policy": "attack:all_types_all_docs"
    },
    {
-    "max_ms": 3.021821000061209,
-    "mean_ms": 2.6320740499897965,
-    "p50_ms": 2.55606500002159,
-    "p95_ms": 3.002422999998089,
+    "max_ms": 3.3379509998212598,
+    "mean_ms": 2.728686449950146,
+    "p50_ms": 2.733256999817968,
+    "p95_ms": 3.078397000081168,
     "policy": "attack:empty"
    }
   ]

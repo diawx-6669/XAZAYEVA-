@@ -41,7 +41,9 @@ def make_policy(book) -> dict:
         "payment_allocation": "invoice_refs_in_order_up_to_open_balance",
         "ar_relief_rate": "rate of the invoice transaction date",
         "fx_difference_account": "7900",
-        "unapplied_cash": "account 2400 is used only for receipts with invoice_refs = null",
+        "unapplied_cash": ("account 2400 holds only cash that cannot be applied: a whole receipt with invoice_refs = null, "
+                           "or the part of a receipt exceeding the open balance of the invoices it references "
+                           "(overpayment), converted at the payment's policy rate"),
         "credit_notes": "an invoice with a negative total whose lines read 'Credit note for <invoice_id>: ...' cancels that invoice; both stay in the books",
         "accounts": dict(ACCOUNTS),
     }

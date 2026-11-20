@@ -50,6 +50,7 @@ class InvoiceDoc:
     tags: list
     posted_rate: str | None = None  # set only by an fx_rate mutation
     posted_base: int | None = None  # set only by a duplicate copied "as posted"
+    posted_at: datetime | None = None  # set only by period_cutoff/backdated_posting: ledger date != document date
 
     @property
     def total(self) -> int:
@@ -165,7 +166,8 @@ class Book:
             specs = [("cn_rev", "4000", amt, 0, k, None), ("cn_ar", "1200", 0, amt, k, None)]
         else:
             specs = [("inv_ar", "1200", amt, 0, k, None), ("inv_rev", "4000", 0, amt, k, None)]
-        self.post(("inv", k), inv.issued_at, inv.utc_fmt, inv.entity_id, specs)
+        ts = inv.posted_at or inv.issued_at
+        self.post(("inv", k), ts, inv.utc_fmt, inv.entity_id, specs)
 
     def post_payment(self, p: PaymentDoc):
         alloc = p.alloc if p.posted_alloc is None else p.posted_alloc

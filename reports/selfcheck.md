@@ -1,10 +1,10 @@
 # AuditEnv self-check
 
-commit `6d60892ff66b` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · Linux x86_64
+commit `db1ec7d9040c` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · Linux x86_64
 
-Хеши конфигов: `clean-only` c2a34f43108117b9, `dev-mixed` 67375a9c4a8eca52, `interaction-heavy` 092ec2014df8c62f, `stress` e2af29602f62d814, `train-easy` ec01ffc23ebd793d
+Хеши конфигов: `clean-only` b3ea7789592542fd, `dev-global` 901a6f99473a48ad, `dev-mixed` 2435d9d9eff18731, `interaction-heavy` 69494e59920a9b92, `stress` 7dd64db6b1aeac85, `train-easy` 58e3dda93da800ba, `train-global` 700ad883b68e9fbf
 
-Эпизоды: 20 (5 clean-only, 5 interaction-heavy, 10 dev-mixed). Всё до раздела «Замеры времени» детерминировано: повторный прогон на том же коммите даёт те же байты.
+Эпизоды: 20 (5 clean-only, 5 interaction-heavy, 5 dev-mixed, 5 dev-global). Всё до раздела «Замеры времени» детерминировано: повторный прогон на том же коммите даёт те же байты.
 
 ## Табло
 
@@ -56,11 +56,11 @@ commit `6d60892ff66b` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · Li
 - PASS — dev-mixed#9013 (1 issues)
 - PASS — dev-mixed#9014 (3 issues)
 - PASS — dev-mixed#9015 (0 issues)
-- PASS — dev-mixed#9016 (1 issues)
-- PASS — dev-mixed#9017 (4 issues)
-- PASS — dev-mixed#9018 (3 issues)
-- PASS — dev-mixed#9019 (1 issues)
-- PASS — dev-mixed#9020 (0 issues)
+- PASS — dev-global#9016 (1 issues)
+- PASS — dev-global#9017 (4 issues)
+- PASS — dev-global#9018 (3 issues)
+- PASS — dev-global#9019 (1 issues)
+- PASS — dev-global#9020 (0 issues)
 
 ### Надёжность награды
 
@@ -102,18 +102,18 @@ commit `6d60892ff66b` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · Li
 - PASS — dev-mixed#9013 twin
 - PASS — dev-mixed#9014 twin
 - PASS — dev-mixed#9015 twin
-- PASS — dev-mixed#9016 twin
-- PASS — dev-mixed#9017 twin
-- PASS — dev-mixed#9018 twin
-- PASS — dev-mixed#9019 twin
-- PASS — dev-mixed#9020 twin
+- PASS — dev-global#9016 twin
+- PASS — dev-global#9017 twin
+- PASS — dev-global#9018 twin
+- PASS — dev-global#9019 twin
+- PASS — dev-global#9020 twin
 
 ## Диагностика политик (режим eval, средние по 20 эпизодам)
 
 | Политика | P | R | F1 | Возврат | Возврат (эксп.) | Шаги | Агент видел награду |
 |---|---|---|---|---|---|---|---|
 | random_explorer | 0.000 | 0.000 | 0.350 | -0.320 | -0.320 | 30.0 | нет |
-| simple_reconcile | 0.567 | 0.590 | 0.617 | 0.216 | 0.216 | 13.7 | нет |
+| simple_reconcile | 0.488 | 0.578 | 0.517 | 0.017 | 0.017 | 13.9 | нет |
 | flag_all | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | 4.0 | нет |
 | oracle | 0.650 | 0.650 | 1.000 | 1.000 | -0.300 | 1.0 | нет |
 | attack:twins | 0.022 | 0.306 | 0.040 | -0.921 | -1.000 | 1.0 | нет |
@@ -132,29 +132,29 @@ commit `6d60892ff66b` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · Li
 | Тип ошибки | Найдено / всего |
 |---|---|
 | duplicate_invoice | 11 / 11 |
-| fx_rate | 7 / 11 |
+| fx_rate | 6 / 11 |
 | payment_allocation | 6 / 6 |
 | period_cutoff | 9 / 9 |
 
-Коды причин ложных выводов: `ids_mismatch`: 4, `unmatched`: 6, `wrong_type`: 3
+Коды причин ложных выводов: `ids_mismatch`: 5, `unmatched`: 14, `wrong_type`: 2
 
 ## Замеры времени (недетерминированно, зависит от машины)
 
-Полный self-check: 7.9 c.
+Полный self-check: 8.3 c.
 
 | Политика | ср, мс | p50, мс | p95, мс | макс, мс |
 |---|---|---|---|---|
-| random_explorer | 63 | 63 | 71 | 77 |
-| simple_reconcile | 66 | 66 | 79 | 81 |
-| flag_all | 60 | 62 | 74 | 80 |
-| oracle | 2 | 2 | 3 | 3 |
-| attack:twins | 5 | 5 | 6 | 6 |
+| random_explorer | 67 | 66 | 79 | 87 |
+| simple_reconcile | 60 | 55 | 83 | 84 |
+| flag_all | 60 | 55 | 71 | 80 |
+| oracle | 2 | 2 | 2 | 10 |
+| attack:twins | 5 | 5 | 5 | 5 |
 | attack:type_bruteforce | 3 | 3 | 4 | 4 |
-| attack:amount_bruteforce | 4 | 3 | 5 | 5 |
-| attack:guess_ids | 3 | 3 | 4 | 5 |
-| attack:evidence_spam | 4 | 4 | 5 | 5 |
-| attack:junk_explanation | 4 | 3 | 5 | 5 |
-| attack:persuasive_wrong | 3 | 3 | 3 | 11 |
-| attack:wrong_currency | 3 | 3 | 3 | 3 |
-| attack:all_types_all_docs | 5 | 5 | 7 | 7 |
+| attack:amount_bruteforce | 4 | 4 | 5 | 5 |
+| attack:guess_ids | 4 | 3 | 5 | 6 |
+| attack:evidence_spam | 5 | 4 | 5 | 5 |
+| attack:junk_explanation | 5 | 5 | 5 | 5 |
+| attack:persuasive_wrong | 4 | 4 | 5 | 13 |
+| attack:wrong_currency | 4 | 3 | 5 | 5 |
+| attack:all_types_all_docs | 5 | 5 | 5 | 5 |
 | attack:empty | 3 | 3 | 3 | 3 |

@@ -7,7 +7,8 @@
   "required": ["name", "version", "base_currencies", "foreign_currencies", "n_foreign", "foreign_share", "timezones",
                "period_starts", "period_months", "n_entities", "n_invoices", "utc_share", "distractors",
                "clean_probability", "n_errors", "errors", "interactions", "min_interactions", "fx_variants",
-               "allocation_variants", "max_steps", "tolerance_minor", "max_attempts"],
+               "allocation_variants", "duplicate_variants", "cutoff_variants", "min_lookalikes_per_type", "max_steps",
+               "tolerance_minor", "max_attempts"],
   "$defs": {
     "range": {"type": "array", "items": {"type": "integer", "minimum": 0}, "minItems": 2, "maxItems": 2},
     "prob": {"type": "number", "minimum": 0, "maximum": 1},
@@ -20,9 +21,11 @@
     "foreign_currencies": {"type": "array", "items": {"$ref": "#/$defs/cur"}},
     "n_foreign": {"$ref": "#/$defs/range"},
     "foreign_share": {"$ref": "#/$defs/prob"},
-    "timezones": {"type": "array", "minItems": 1, "items": {"enum": ["Asia/Almaty", "Asia/Tashkent", "Asia/Dubai", "Asia/Kolkata", "Asia/Tokyo", "America/Bogota", "America/Lima"]}},
+    "timezones": {"type": "array", "minItems": 1, "items": {"enum": ["Asia/Almaty", "Asia/Tashkent", "Asia/Dubai", "Asia/Kolkata", "Asia/Tokyo", "America/Bogota", "America/Lima", "Asia/Kathmandu", "Pacific/Kiritimati", "Pacific/Pago_Pago"]}},
     "period_starts": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^20[0-9]{2}-(0[1-9]|1[0-2])$"}},
-    "period_months": {"type": "integer", "minimum": 1, "maximum": 6},
+    "period_months": {"oneOf": [{"type": "integer", "minimum": 1, "maximum": 6},
+                                  {"type": "array", "items": {"type": "integer", "minimum": 1, "maximum": 6}, "minItems": 2, "maxItems": 2}],
+                       "description": "length of the reporting period in months: fixed, or a [min, max] range drawn per episode"},
     "n_entities": {"type": "array", "items": {"type": "integer", "minimum": 1, "maximum": 500}, "minItems": 2, "maxItems": 2},
     "n_invoices": {"type": "array", "items": {"type": "integer", "minimum": 5, "maximum": 2000}, "minItems": 2, "maxItems": 2},
     "utc_share": {"$ref": "#/$defs/range"},
@@ -34,7 +37,8 @@
         "partial_open": {"$ref": "#/$defs/prob"}, "refund": {"$ref": "#/$defs/prob"},
         "bank_fee": {"$ref": "#/$defs/prob"}, "rounding_residual": {"$ref": "#/$defs/prob"},
         "boundary_time": {"$ref": "#/$defs/prob"}, "credit_note_reissue": {"$ref": "#/$defs/prob"},
-        "unidentified_receipt": {"$ref": "#/$defs/prob"}
+        "unidentified_receipt": {"$ref": "#/$defs/prob"}, "night_fx": {"$ref": "#/$defs/prob"},
+        "overpayment": {"$ref": "#/$defs/prob"}, "weekend_fx": {"$ref": "#/$defs/prob"}
       }
     },
     "clean_probability": {"$ref": "#/$defs/prob"},
@@ -53,11 +57,23 @@
     "min_interactions": {"type": "integer", "minimum": 0, "maximum": 2},
     "fx_variants": {
       "type": "object", "additionalProperties": false,
-      "properties": {"adjacent_day": {"type": "number", "minimum": 0}, "utc_date": {"type": "number", "minimum": 0}, "inverted": {"type": "number", "minimum": 0}}
+      "properties": {"adjacent_day": {"type": "number", "minimum": 0}, "utc_date": {"type": "number", "minimum": 0}, "inverted": {"type": "number", "minimum": 0},
+                     "historical_rate": {"type": "number", "minimum": 0}, "wrong_pair": {"type": "number", "minimum": 0}, "due_date": {"type": "number", "minimum": 0}}
     },
     "allocation_variants": {
       "type": "object", "additionalProperties": false,
-      "properties": {"unallocated": {"type": "number", "minimum": 0}, "partial": {"type": "number", "minimum": 0}}
+      "properties": {"unallocated": {"type": "number", "minimum": 0}, "partial": {"type": "number", "minimum": 0}, "wrong_invoice": {"type": "number", "minimum": 0}}
+    },
+    "duplicate_variants": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"copy": {"type": "number", "minimum": 0}, "paid_twice": {"type": "number", "minimum": 0}}
+    },
+    "cutoff_variants": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"utc_trap": {"type": "number", "minimum": 0}, "backdated_posting": {"type": "number", "minimum": 0}, "prior_period": {"type": "number", "minimum": 0}}
+    },
+    "min_lookalikes_per_type": {"type": "integer", "minimum": 0, "maximum": 3,
+                                "description": "every episode gets at least this many CORRECT look-alikes (distractor kinds) per error type"
     },
     "max_steps": {"const": 100},
     "tolerance_minor": {"type": "integer", "minimum": 0, "maximum": 49, "description": "matcher tolerance |claimed - expected| in minor units; < MIN_AMOUNT/2 so no two distortions can be confused"},

@@ -3,60 +3,60 @@
   "episode_id": "ep-3bwbxj4nsy",
   "config": "dev-mixed",
   "seed": 201,
-  "public_digest": "f4004a2dad6e1ba10a7a30958722e827d5b1dc55fddc648b503094eb1a0890cb"
+  "public_digest": "ea9d407946694237c4af1bdd9ddf5c49c95832a42232c160f454f33fcbfb2794"
  },
  {
   "episode_id": "ep-yee4e3r3ar",
   "config": "dev-mixed",
   "seed": 202,
-  "public_digest": "8cabc0944427daad014710d5050aaf5aca1acbc985209d1f16a7558bd50d0bcf"
+  "public_digest": "aad9a6912c81f87abfab660d6583c0d56da29af3ec072931d66815e11e6b2e9e"
  },
  {
   "episode_id": "ep-vw9vceq4qf",
   "config": "dev-mixed",
   "seed": 203,
-  "public_digest": "929633c654308258d5d8c891bc2b01f64b8a7f52ccf1c00ae44ccfec8e50b363"
+  "public_digest": "cd5bb234555594ffc467e11bdff2dd2b53d54576c1e71babdbd3fc4c22afd744"
  },
  {
   "episode_id": "ep-eedmc2zyem",
-  "config": "dev-mixed",
+  "config": "dev-global",
   "seed": 204,
-  "public_digest": "34b031275d1878627e4322582d361fcf5196974de635096e6dc48c254d967e0f"
+  "public_digest": "c2334e1c4b74afbdaff3cca0673035d31f6154019a9e960fcd53d487d378ddff"
  },
  {
   "episode_id": "ep-ghqjfb86vj",
-  "config": "dev-mixed",
+  "config": "dev-global",
   "seed": 205,
-  "public_digest": "ef9a03b26cfae2221706ce0929a4366e2e7dad096995de3932176873026a3650"
+  "public_digest": "3275146dd82d18371b283d7561ca778fa9c95c88c2d5a6a1af9aa2731d8e6a57"
  },
  {
   "episode_id": "ep-vq9n3qwk8v",
   "config": "interaction-heavy",
   "seed": 206,
-  "public_digest": "daab19ec606d76ce2e831989e73967294afcb8deb6816db40d145086489c442a"
+  "public_digest": "4c100cefa7479d39444a3cf05dc8c5b902e82dc9385c3bf2e227308587afc13a"
  },
  {
   "episode_id": "ep-byttstzrqb",
   "config": "interaction-heavy",
   "seed": 207,
-  "public_digest": "ebb57a0e0d2b388dd7afa8ef70ba82414402c9458011762c9f1ccccce7f8e272"
+  "public_digest": "43ec533bc6f510c536041b0a8e96aa17bb31bb5e54b42ccaac4f2f97e25deca6"
  },
  {
   "episode_id": "ep-htfdvq2mvr",
   "config": "interaction-heavy",
   "seed": 208,
-  "public_digest": "dc0796c191ce2dea01ce73f001dbfbb9a894c33f91b9ebf3545fd7c6122271f8"
+  "public_digest": "0e2d0b0b8fd80cb13aadc08277bf690a701151d1823103d97d1788af38e41614"
  },
  {
   "episode_id": "ep-ap6e6dpf7p",
   "config": "clean-only",
   "seed": 209,
-  "public_digest": "e33bfd0955077cf0fad32f493f12866d63aea18698c65c305cd301936bcbd8d6"
+  "public_digest": "89c1fe1289c4c8ebd665391eedd63412eb8d5a35a0a28ef1ec5fc77abf6cc9d6"
  },
  {
   "episode_id": "ep-etjx7zm8qz",
   "config": "clean-only",
   "seed": 210,
-  "public_digest": "f2c3a190f69c0355ce52834e33aaa8314955936f53d844413b7f058163c35526"
+  "public_digest": "5222366bfd232883b85431ea40dfd412bb8d4a8ca02fb6e9e373e37f6ac17a38"
  }
 ]

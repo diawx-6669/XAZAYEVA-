@@ -618,7 +618,7 @@ def render_md(rep) -> str:
          f"commit `{h['commit']}` · env {h['env_version']} · {h['generator_version']} · Python {h['python']} · "
          f"{h['platform']}", "",
          "Хеши конфигов: " + ", ".join(f"`{k}` {v}" for k, v in h["config_hashes"].items()), "",
-         f"Эпизоды: {len(rep['episodes'])} (5 clean-only, 5 interaction-heavy, 10 dev-mixed). Всё до раздела "
+         f"Эпизоды: {len(rep['episodes'])} (5 clean-only, 5 interaction-heavy, 5 dev-mixed, 5 dev-global). Всё до раздела "
          f"«{TIMING_MARK[3:]}» детерминировано: повторный прогон на том же коммите даёт те же байты.", "",
          "## Табло", "", "| Блок | Пройдено | Баллы |", "|---|---|---|"]
     for k, v in rep["blocks"].items():

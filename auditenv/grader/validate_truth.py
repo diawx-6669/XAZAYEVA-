@@ -80,6 +80,9 @@ def verify_evidence(pd, issue: dict, ev: list):
         if not set(p[0]["invoice_refs"]) <= have:
             return False, "missing_invoice", None
         r = [x for x in rows if x["payment_id"] == aid and x["account"] == "2400" and x["credit_minor"]]
+        if not r:  # wrong_invoice: a Cr 1200 row of this receipt on an invoice it does not reference
+            r = [x for x in rows if x["payment_id"] == aid and x["account"] == "1200" and x["credit_minor"]
+                 and x["invoice_id"] and x["invoice_id"] not in p[0]["invoice_refs"]]
         if not r:
             return False, "missing_ledger_row", None
         amount = r[0]["credit_minor"]

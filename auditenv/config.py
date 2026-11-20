@@ -32,14 +32,21 @@ DEFAULT_CONFIG = {
         "boundary_time": 0.6,
         "credit_note_reissue": 0.3,
         "unidentified_receipt": 0.3,
+        "night_fx": 0.5,
+        "overpayment": 0.3,
+        "weekend_fx": 0.5,
     },
     "clean_probability": 0.2,
     "n_errors": [1, 4],
     "errors": {"duplicate_invoice": 1.0, "payment_allocation": 1.0, "fx_rate": 1.0, "period_cutoff": 1.0},
     "interactions": {"partial_fx_cutoff": 0.0, "duplicate_fx": 0.0},
     "min_interactions": 0,
-    "fx_variants": {"adjacent_day": 0.5, "utc_date": 0.4, "inverted": 0.1},
-    "allocation_variants": {"unallocated": 0.5, "partial": 0.5},
+    "fx_variants": {"adjacent_day": 0.35, "utc_date": 0.3, "inverted": 0.05, "historical_rate": 0.15,
+                    "wrong_pair": 0.1, "due_date": 0.05},
+    "allocation_variants": {"unallocated": 0.4, "partial": 0.4, "wrong_invoice": 0.2},
+    "duplicate_variants": {"copy": 0.7, "paid_twice": 0.3},
+    "cutoff_variants": {"utc_trap": 0.6, "backdated_posting": 0.2, "prior_period": 0.2},
+    "min_lookalikes_per_type": 1,
     "max_steps": 100,
     "tolerance_minor": 1,
     "max_attempts": 40,
@@ -77,6 +84,8 @@ def validate_config(cfg: dict) -> None:
     def bad(msg):
         raise ConfigError(f"config {name!r}: {msg}")
 
+    if isinstance(cfg["period_months"], list) and cfg["period_months"][0] > cfg["period_months"][1]:
+        bad("period_months: min > max")
     for k in ("n_foreign", "n_entities", "n_invoices", "utc_share", "n_errors"):
         lo, hi = cfg[k]
         if lo > hi:

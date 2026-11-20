@@ -137,14 +137,18 @@ def test_utc_trap_in_cutoff():
     for seed in range(30):
         ep = generate_episode(seed, single("period_cutoff"))
         pd = ep.public()
+        variant = {m["issue_id"]: m["variant"] for m in ep.provenance["mutations"]}
         for i in ep.truth["issues"]:
             inv = pd.invoice_by_id[i["affected_ids"][0]]
+            if variant[i["issue_id"]] != "utc_trap":
+                assert not pd.in_period(inv["issued_at"])
+                continue
             assert inv["issued_at"].endswith("+00:00")
             utc_date = inv["issued_at"][:10]
             assert pd.policy["period_boundary"]["start"][:10] <= utc_date < pd.policy["period_boundary"]["end"][:10]
             assert not pd.in_period(inv["issued_at"])
             n += 1
-    assert n > 10
+    assert n > 5
 
 
 def test_varied_names_ids_currencies_timezones():

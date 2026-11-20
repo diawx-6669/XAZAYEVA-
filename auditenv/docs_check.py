@@ -100,7 +100,11 @@ def compute_facts(need: set) -> dict:
         elif name == "period_months_range":
             from .config import load_config
 
-            ms = [load_config(p)["period_months"] for p in sorted(CONFIGS_DIR.glob("*.json")) if _is_cfg(p)]
+            ms = []
+            for p in sorted(CONFIGS_DIR.glob("*.json")):
+                if _is_cfg(p):
+                    pm = load_config(p)["period_months"]
+                    ms += pm if isinstance(pm, list) else [pm]
             facts[name] = str(ms[0]) if min(ms) == max(ms) else _rng(ms)
         elif name == "n_configs":
             facts[name] = str(sum(1 for p in CONFIGS_DIR.glob("*.json") if _is_cfg(p)))

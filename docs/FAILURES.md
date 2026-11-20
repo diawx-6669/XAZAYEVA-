@@ -6,7 +6,32 @@ seed 5000–5099 / 5000–5049), режим `train`, коды причин из 
 (`grader/matcher.py::miss_reason`). Воспроизвести: табло `make check` содержит тот же разбор
 на 20 эпизодах self‑check (`reports/selfcheck.md`, раздел «Разбор сбоев»).
 
-## Полнота по типам и вариантам
+## Полнота по типам и вариантам (раунд 2, все открытые конфиги)
+
+<!--generated:variants-->
+Замер: 300 эпизодов (`python -m auditenv analyze --n 300 --docs`), режим train.
+
+| Тип / вариант | Встречается | Найдено simple_reconcile | Recall |
+|---|---|---|---|
+| duplicate_invoice / copy | 84 | 84 | 100% |
+| duplicate_invoice / copy_as_posted | 57 | 57 | 100% |
+| duplicate_invoice / paid_twice | 13 | 13 | 100% |
+| fx_rate / adjacent_day | 119 | 63 | 53% |
+| fx_rate / due_date | 11 | 8 | 73% |
+| fx_rate / historical_rate | 12 | 4 | 33% |
+| fx_rate / inverted | 11 | 11 | 100% |
+| fx_rate / utc_date | 32 | 31 | 97% |
+| fx_rate / wrong_pair | 23 | 13 | 57% |
+| payment_allocation / partial | 115 | 115 | 100% |
+| payment_allocation / unallocated | 43 | 43 | 100% |
+| payment_allocation / wrong_invoice | 5 | 0 | 0% |
+| period_cutoff / backdated_posting | 8 | 8 | 100% |
+| period_cutoff / prior_period | 40 | 40 | 100% |
+| period_cutoff / utc_trap | 31 | 31 | 100% |
+| **итого** | **604** | **521** | **86%** |
+<!--/generated-->
+
+## Полнота по типам и вариантам (раунд 1, архив)
 
 | Тип / вариант | Найдено | Почему |
 |---|---|---|

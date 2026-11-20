@@ -11,6 +11,10 @@ TIMEZONES = {
     "Asia/Tokyo": (9, 0),
     "America/Bogota": (-5, 0),
     "America/Lima": (-5, 0),
+    # extreme offsets, still without DST: quarter hour, +14 (dateline), -11
+    "Asia/Kathmandu": (5, 45),
+    "Pacific/Kiritimati": (14, 0),
+    "Pacific/Pago_Pago": (-11, 0),
 }
 
 

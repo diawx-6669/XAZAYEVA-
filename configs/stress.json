@@ -1,6 +1,6 @@
 {
   "name": "stress",
-  "version": "1.0",
+  "version": "2.0",
   "foreign_currencies": ["USD", "EUR", "JPY", "KWD"],
   "n_foreign": [3, 4],
   "period_months": 6,

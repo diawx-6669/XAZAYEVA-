@@ -104,7 +104,8 @@ def inject_errors(book, seed, cfg, attempt, clean=None):
             target = r.choice(cands)
 
             def run(b, et=et, target=target):
-                res = et.inject(b, target, r, cfg)
+                kw = {"used": frozenset(used)} if typ == "payment_allocation" else {}
+                res = et.inject(b, target, r, cfg, **kw)
                 return None if res is None else [res]
 
             book, res = _try_inject(book, run)
@@ -112,10 +113,7 @@ def inject_errors(book, seed, cfg, attempt, clean=None):
                 injected.extend(res)
                 plan["singles"].append(typ)
                 used.add(target.split(":")[-1])  # fx_rate targets look like "inv:i012"
-                if typ == "duplicate_invoice":
-                    used.add(res[0].target)
-                if typ == "payment_allocation":
-                    used.update(book.payments[target].refs or [])
+                used.update(res[0].touched)
     plan["ordered"] = dict(sorted(ordered.items()))
     got = {}
     for inj in injected:
@@ -175,7 +173,7 @@ def generate_episode(seed, config=None) -> Episode:
                            "expected_amount_minor": inj.expected_amount_minor, "currency": inj.currency,
                            "evidence_sets": [list(e) for e in inj.evidence_sets]})
             mutations.append({"issue_id": iid, "type": inj.type, "variant": inj.variant, "order": n,
-                              "before": inj.before, "after": inj.after})
+                              "detail": inj.detail, "before": inj.before, "after": inj.after})
         truth = {"episode_id": book.episode_id, "issues": issues, "tolerance_minor": cfg["tolerance_minor"]}
         from ..ids import salted
 

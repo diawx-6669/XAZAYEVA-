@@ -24,10 +24,22 @@ RENT_DESC = "Office rent"
 PRICE_MAJOR = {"KZT": (5000, 400000), "USD": (10, 900), "EUR": (10, 800), "JPY": (1500, 130000), "KWD": (3, 280)}
 REF_PER_USD = {"USD": "1", "KZT": "480", "EUR": "0.92", "JPY": "150", "KWD": "0.307"}
 
+FEE_MAJOR = {"KZT": (300, 2500), "USD": (1, 8), "EUR": (1, 8), "JPY": (100, 1200), "KWD": (1, 3)}
+
 DISTRACTOR_KINDS = [
     "recurring_rent", "repeat_amount", "split_payment", "multi_invoice_payment", "partial_open",
     "refund", "bank_fee", "rounding_residual", "boundary_time", "credit_note_reissue", "unidentified_receipt",
+    "night_fx", "overpayment", "weekend_fx",
 ]
+# Correct look-alikes of each error type (config.min_lookalikes_per_type forces at least N of them into EVERY
+# episode, clean or not, so "a look-alike exists" never tells clean from erroneous books).
+LOOKALIKES = {
+    "duplicate_invoice": ["recurring_rent", "repeat_amount", "credit_note_reissue"],
+    "payment_allocation": ["unidentified_receipt", "overpayment", "partial_open", "split_payment"],
+    "fx_rate": ["night_fx", "weekend_fx", "rounding_residual"],
+    "period_cutoff": ["boundary_time"],
+}
+NEEDS_FOREIGN = {"night_fx", "weekend_fx", "rounding_residual"}
 # Invoices with these tags never get an automatically planned payment.
 NO_PAY_TAGS = {"cancelled", "credit_note", "boundary_end", "carrier_pfc", "carrier_dfx"}
 
@@ -163,6 +175,16 @@ class StoryBuilder:
                         "unit_price_minor": u, "amount_minor": q * u})
         return out
 
+    def night_time(self, d: date) -> datetime:
+        """A local time on day d whose UTC calendar date is a different day (needs offset != 0)."""
+        off = offset_minutes(self.tz_name)
+        midnight = datetime(d.year, d.month, d.day, tzinfo=self.tz)
+        if off > 0:
+            mins = self.r.randint(10, max(11, off - 10))
+        else:
+            mins = 24 * 60 + off + self.r.randint(10, max(11, -off - 10))
+        return midnight + timedelta(minutes=mins, seconds=self.r.randint(0, 59))
+
     def add_invoice(self, entity, dt, cur, lines, utc_fmt=None, **kw) -> InvoiceEv:
         key = f"i{len(self.invoices):03d}"
         inv = InvoiceEv(key=key, entity=entity, issued_at=self.uniq(dt), currency=cur, line_items=lines,
@@ -224,14 +246,24 @@ class StoryBuilder:
         k = min(r.randint(*cfg["n_foreign"]), len(pool))
         self.foreign = sorted(r.sample(pool, k)) if k > 0 else []
         y, m = (int(x) for x in r.choice(cfg["period_starts"]).split("-"))
+        pm = cfg["period_months"]
+        months = r.randint(*pm) if isinstance(pm, list) else pm
         self.period_start = datetime(y, m, 1, tzinfo=self.tz)
-        self.period_end = add_months(self.period_start, cfg["period_months"])
+        self.period_end = add_months(self.period_start, months)
         self.first_day = self.period_start.date()
         self.last_day = (self.period_end - timedelta(days=1)).date()
         self.utc_share = r.randint(*cfg["utc_share"])
         self.entities = [f"e{i:02d}" for i in range(r.randint(*cfg["n_entities"]))]
         self.rates = self.gen_rates()
         present = [k for k in DISTRACTOR_KINDS if self.chance(cfg["distractors"].get(k, 0.0))]
+        need = cfg.get("min_lookalikes_per_type", 0)
+        for typ in sorted(LOOKALIKES):
+            kinds = [k for k in LOOKALIKES[typ] if self.foreign or k not in NEEDS_FOREIGN]
+            missing = [k for k in kinds if k not in present]
+            r.shuffle(missing)
+            while sum(k in present for k in kinds) < min(need, len(kinds)) and missing:
+                present.append(missing.pop())
+        present = [k for k in DISTRACTOR_KINDS if k in present]  # stable order
         self.present = present
 
         n_inv = r.randint(*cfg["n_invoices"])
@@ -264,15 +296,35 @@ class StoryBuilder:
 
         if "credit_note_reissue" in present:
             mid = self.first_day + (self.last_day - self.first_day) // 2
-            x = self.regular_invoice(self.first_day, mid, cur=self.base, tags=["cancelled"])
+            cn_cur = r.choice(self.foreign) if self.foreign and self.chance(0.5) else self.base
+            x = self.regular_invoice(self.first_day, mid, cur=cn_cur, tags=["cancelled"])
             cn_dt = x.issued_at + timedelta(days=r.randint(1, 3), hours=r.randint(0, 5))
             cn_lines = [{"description": li["description"], "service_period": li["service_period"],
                          "quantity": li["quantity"], "unit_price_minor": -li["unit_price_minor"],
                          "amount_minor": -li["amount_minor"]} for li in x.line_items]
-            cn = self.add_invoice(x.entity, cn_dt, self.base, cn_lines, kind="credit_note", cancels=x.key,
+            cn = self.add_invoice(x.entity, cn_dt, cn_cur, cn_lines, kind="credit_note", cancels=x.key,
                                   tags=["credit_note"])
             re_dt = cn.issued_at + timedelta(hours=r.randint(1, 30))
-            self.add_invoice(x.entity, re_dt, self.base, [dict(li) for li in x.line_items], tags=["reissue"])
+            self.add_invoice(x.entity, re_dt, cn_cur, [dict(li) for li in x.line_items], tags=["reissue"])
+
+        if "night_fx" in present and self.foreign:
+            # Correct foreign document at local night: the UTC calendar date differs from the local one, the
+            # posting uses the LOCAL date rate. A UTC-date reader would wrongly call it an fx_rate error.
+            for _ in range(r.randint(1, 2)):
+                cur = r.choice(self.foreign)
+                d = self.first_day + timedelta(days=r.randint(1, max(1, (self.last_day - self.first_day).days - 3)))
+                self.add_invoice(r.choice(self.entities), self.night_time(d), cur, self.lines(cur, month_str(d)),
+                                 utc_fmt=True, tags=["night_fx"])
+
+        if "weekend_fx" in present and self.foreign:
+            # Foreign document dated on a weekend: no rate for that date, previous_business_day applies.
+            d = self.first_day + timedelta(days=r.randint(0, max(0, (self.last_day - self.first_day).days - 3)))
+            while is_business_day(d):
+                d += timedelta(days=1)
+            if d <= self.last_day - timedelta(days=2):
+                cur = r.choice(self.foreign)
+                dt = datetime(d.year, d.month, d.day, r.randint(9, 18), r.randint(0, 59), r.randint(0, 59), tzinfo=self.tz)
+                self.add_invoice(r.choice(self.entities), dt, cur, self.lines(cur, month_str(d)), tags=["weekend_fx"])
 
         if "boundary_time" in present:
             ld = self.last_day
@@ -296,6 +348,7 @@ class StoryBuilder:
                 mins = r.randint(10, off - 10)
             else:
                 mins = 24 * 60 + off + r.randint(10, -off - 10)
+            mins = min(mins, 24 * 60 - 1)
             self.add_payment(inv.entity, midnight + timedelta(minutes=mins), cur, inv.total, [inv.key],
                              [(inv.key, inv.total)], utc_fmt=True, tags=["carrier_pfc"])
         if self.foreign and cfg["interactions"].get("duplicate_fx", 0) > 0:
@@ -312,12 +365,13 @@ class StoryBuilder:
         if "bank_fee" in present:
             pays = [p for p in self.payments.values() if p.refs]
             got = False
+            lo, hi = FEE_MAJOR[self.base]
             for p in pays:
                 if self.chance(0.3):
-                    p.fee = r.randint(300, 2500) * 10 ** EXPONENTS[self.base]
+                    p.fee = r.randint(lo, hi) * 10 ** EXPONENTS[self.base]
                     got = True
             if pays and not got:
-                r.choice(pays).fee = r.randint(300, 2500) * 10 ** EXPONENTS[self.base]
+                r.choice(pays).fee = r.randint(lo, hi) * 10 ** EXPONENTS[self.base]
 
         if "refund" in present:
             self.plan_refunds()
@@ -398,6 +452,16 @@ class StoryBuilder:
                             pay([inv], p1, t1, ["rounding_residual"])
                             pay([inv], p2, t2, ["rounding_residual"])
                         break
+
+        if "overpayment" in present:
+            # The client pays more than the invoice: the invoice is closed, the excess legitimately sits on 2400.
+            inv = take(lambda i: True)
+            if inv is not None:
+                ts = self.after(inv.issued_at)
+                if ts is not None:
+                    extra = max(1, inv.total * r.randint(5, 30) // 100)
+                    self.add_payment(inv.entity, ts, inv.currency, inv.total + extra, [inv.key], [(inv.key, inv.total)],
+                                     tags=["overpayment"])
 
         if "partial_open" in present:
             for _ in range(r.randint(1, 2)):

@@ -209,7 +209,8 @@ def _all_config_periods():
         cfg = load_config(p)
         for ps in cfg["period_starts"]:
             for tz in cfg["timezones"]:
-                out.add((tz, ps, cfg["period_months"]))
+                pm = cfg["period_months"]
+                out.add((tz, ps, max(pm) if isinstance(pm, list) else pm))
     return sorted(out)
 
 

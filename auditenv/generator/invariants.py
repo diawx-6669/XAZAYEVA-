@@ -134,20 +134,29 @@ def expected_allocations(pd) -> dict:
 
 
 def check_allocation(pd) -> list:
+    """Per payment AND per invoice: Cr 1200 on each referenced invoice must equal its policy allocation
+    (converted at the invoice's rate); Cr 1200 on an invoice the receipt does not reference is
+    misapplied; 2400 may hold only the part exceeding the open balances (or a receipt without refs).
+    Violation amount = the misapplied base amount (2400 that should be on 1200 + 1200 on wrong invoices),
+    or, failing that, the total per-invoice difference."""
     out = []
     prow = payment_rows(pd)
     exp = expected_allocations(pd)
     for p in sorted(pd.payments, key=lambda p: p["payment_id"]):
         pid = p["payment_id"]
         rows = prow.get(pid, [])
-        cr1200 = sum(r["credit_minor"] - r["debit_minor"] for r in rows if r["account"] == "1200")
         cr2400 = sum(r["credit_minor"] - r["debit_minor"] for r in rows if r["account"] == "2400")
+        per_inv = {}
+        for r in rows:
+            if r["account"] == "1200":
+                per_inv[r["invoice_id"]] = per_inv.get(r["invoice_id"], 0) + r["credit_minor"] - r["debit_minor"]
         if p["invoice_refs"] is None:
+            cr1200 = sum(per_inv.values())
             if cr1200 != 0:
                 out.append(_v("allocation", pid, abs(cr1200)))
             continue
         alloc, remaining = exp[pid]
-        exp1200 = 0
+        want = {}
         for ref, a in alloc:
             inv = pd.invoice_by_id.get(ref)
             if inv is None:
@@ -155,17 +164,19 @@ def check_allocation(pd) -> list:
             rate, _ = pd.correct_rate(inv["issued_at"], inv["currency"])
             if rate is None:
                 continue
-            exp1200 += pd.to_base(a, p["currency"], rate)
-        if remaining == 0:
-            if cr2400 != 0:
-                out.append(_v("allocation", pid, abs(cr2400)))
-            elif cr1200 != exp1200:
-                out.append(_v("allocation", pid, abs(exp1200 - cr1200)))
-        else:
+            want[ref] = want.get(ref, 0) + pd.to_base(a, p["currency"], rate)
+        if remaining:
             rate, _ = pd.correct_rate(p["timestamp"], p["currency"])
             exp2400 = pd.to_base(remaining, p["currency"], rate) if rate else 0
-            if cr2400 != exp2400 or cr1200 != exp1200:
-                out.append(_v("allocation", pid, abs(cr2400 - exp2400) or abs(cr1200 - exp1200)))
+        else:
+            exp2400 = 0
+        wrong_inv = sum(v for k, v in per_inv.items() if k not in want)
+        excess2400 = max(0, cr2400 - exp2400)
+        diff = sum(abs(per_inv.get(k, 0) - want.get(k, 0)) for k in set(per_inv) | set(want))
+        if excess2400 or wrong_inv:
+            out.append(_v("allocation", pid, excess2400 + abs(wrong_inv)))
+        elif diff or cr2400 != exp2400:
+            out.append(_v("allocation", pid, diff or abs(cr2400 - exp2400)))
     return out
 
 
@@ -198,17 +209,25 @@ def check_fx(pd, skip_invoice_ids=()) -> list:
 
 
 def check_period(pd) -> list:
+    """Recognition = invoice issue date (local): every invoice in this ledger must be issued inside the
+    period, AND every ledger row must be dated inside it. A backdated posting (row inside, document
+    outside) is caught by the document date; a UTC-trap invoice by both."""
+    flagged = {}
+    irows = invoice_rows(pd)
+    for inv in pd.invoices:
+        if not pd.in_period(inv["issued_at"]) and inv["invoice_id"] in irows:
+            flagged[inv["invoice_id"]] = invoice_posted_amount(irows[inv["invoice_id"]])
     groups = {}
     for r in pd.ledger:
         if not pd.in_period(r["timestamp"]):
             key = r["invoice_id"] if (r["invoice_id"] and not r["payment_id"]) else (r["payment_id"] or r["row_id"])
             groups.setdefault(key, []).append(r)
-    out = []
     for key in sorted(groups):
+        if key in flagged:
+            continue
         rows = groups[key]
-        amt = sum(r["debit_minor"] for r in rows if r["account"] == "1200") or sum(r["debit_minor"] for r in rows)
-        out.append(_v("period", key, amt))
-    return out
+        flagged[key] = sum(r["debit_minor"] for r in rows if r["account"] == "1200") or sum(r["debit_minor"] for r in rows)
+    return [_v("period", k, flagged[k]) for k in sorted(flagged)]
 
 
 def billing_signature(inv) -> str:
