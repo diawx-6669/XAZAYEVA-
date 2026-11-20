@@ -1,0 +1,469 @@
+diff --git a/auditenv/analysis.py b/auditenv/analysis.py
+index 5476abd..124a05b 100644
+--- a/auditenv/analysis.py
++++ b/auditenv/analysis.py
+@@ -101,7 +101,7 @@ def doc_features(pd) -> dict:
+ 
+ FEATURES = ["paid", "night", "utc_format", "service_period_ne_issue_month", "rent_text", "single_payment",
+             "odd_id_prefix", "weekend", "last_3_days", "foreign_currency"]
+-TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
++TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
+ 
+ 
+ def surface_table(results) -> dict:
+diff --git a/auditenv/config.py b/auditenv/config.py
+index aef7540..0cf49e3 100644
+--- a/auditenv/config.py
++++ b/auditenv/config.py
+@@ -47,6 +47,7 @@ DEFAULT_CONFIG = {
+     "duplicate_variants": {"copy": 0.7, "paid_twice": 0.3},
+     "cutoff_variants": {"utc_trap": 0.6, "backdated_posting": 0.2, "prior_period": 0.2},
+     "min_lookalikes_per_type": 1,
++    "vat_share": 0.0,
+     "max_steps": 100,
+     "tolerance_minor": 1,
+     "max_attempts": 40,
+diff --git a/auditenv/env/env.py b/auditenv/env/env.py
+index f7f0add..0425701 100644
+--- a/auditenv/env/env.py
++++ b/auditenv/env/env.py
+@@ -35,7 +35,8 @@ def task_text(tolerance_minor: int = 1) -> str:
+         "You are auditing one fictional company for one reporting period. Find financial errors in the "
+         "books and submit findings with evidence. Error types: duplicate_invoice (affected_ids=[invoice_id of "
+         "the later copy]), payment_allocation (affected_ids=[payment_id]), fx_rate (affected_ids=[invoice_id or "
+-        "payment_id of the mis-converted document]), period_cutoff (affected_ids=[invoice_id]). "
++        "payment_id of the mis-converted document]), period_cutoff (affected_ids=[invoice_id]), vat_error "
++        "(affected_ids=[invoice_id]; a 'VAT 12%' line must equal 12% of the other lines, half-even). "
+         f"claimed_amount_minor = absolute distortion in base currency minor units (tolerance: {tolerance_minor} "
+         f"{unit}); currency = base currency. For payment_allocation the amount is the part of the receipt "
+         "left on Unapplied Cash (2400) instead of Accounts Receivable (1200), converted at the payment's policy "
+diff --git a/auditenv/exploit_search.py b/auditenv/exploit_search.py
+index 0ba5619..ce1ed18 100644
+--- a/auditenv/exploit_search.py
++++ b/auditenv/exploit_search.py
+@@ -17,7 +17,7 @@ import statistics
+ 
+ from .policies.base import Policy, finding, submit
+ 
+-TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
++TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
+ SPACE = {
+     "pages_invoices": [0, 1, 2],
+     "pages_payments": [0, 1],
+diff --git a/auditenv/generator/errors/__init__.py b/auditenv/generator/errors/__init__.py
+index 8f29051..55be511 100644
+--- a/auditenv/generator/errors/__init__.py
++++ b/auditenv/generator/errors/__init__.py
+@@ -1,4 +1,4 @@
+ """Error types. Importing this package registers all of them in REGISTRY."""
+ 
+-from . import duplicate_invoice, fx_rate, payment_allocation, period_cutoff  # noqa: F401
++from . import duplicate_invoice, fx_rate, payment_allocation, period_cutoff, vat_error  # noqa: F401
+ from .base import ORDER, REGISTRY, Injected, register  # noqa: F401
+diff --git a/auditenv/generator/errors/base.py b/auditenv/generator/errors/base.py
+index 420fc22..116b2ec 100644
+--- a/auditenv/generator/errors/base.py
++++ b/auditenv/generator/errors/base.py
+@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
+ MIN_AMOUNT = 100  # every injected distortion is >= 100x the default tolerance (1 minor unit)
+ 
+ REGISTRY: dict = {}
+-ORDER = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
++ORDER = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
+ 
+ 
+ def register(cls):
+diff --git a/auditenv/generator/errors/vat_error.py b/auditenv/generator/errors/vat_error.py
+new file mode 100644
+index 0000000..abc60e1
+--- /dev/null
++++ b/auditenv/generator/errors/vat_error.py
+@@ -0,0 +1,61 @@
++"""vat_error (rehearsal type): the 'VAT 12%' line of a base-currency invoice is computed at a wrong
++rate (10 % or 20 %); the total follows the lines, so the ledger is internally consistent and only
++the document contradicts the policy's VAT rule. Amount = |VAT line - round(12 % x net)|."""
++
++from __future__ import annotations
++
++from decimal import ROUND_HALF_EVEN, Decimal
++
++from .base import MIN_AMOUNT, ErrorType, register, special
++
++VAT_DESC = "VAT 12%"
++VAT_RATE = Decimal("0.12")
++
++
++def vat_of(net: int, rate=VAT_RATE) -> int:
++    return int((Decimal(net) * rate).quantize(Decimal(1), rounding=ROUND_HALF_EVEN))
++
++
++def split_vat(lines):
++    vat = [li for li in lines if li["description"] == VAT_DESC]
++    net = sum(li["amount_minor"] for li in lines if li["description"] != VAT_DESC)
++    return (vat[0] if vat else None), net
++
++
++@register
++class VatError(ErrorType):
++    name = "vat_error"
++    invariant = "vat"
++
++    def applicable(self, book, used):
++        out = []
++        for inv in book.invoices.values():
++            vat, net = split_vat(inv.line_items)
++            if inv.key in used or vat is None or inv.kind != "invoice" or inv.currency != book.base or special(inv):
++                continue
++            if not book.is_plain_unpaid(inv):  # a new total would turn its receipt into an over/under-payment
++                continue
++            if abs(vat_of(net, Decimal("0.20")) - vat["amount_minor"]) >= MIN_AMOUNT:
++                out.append(inv.key)
++        return sorted(out)
++
++    def inject(self, book, target, rng, cfg):
++        inv = book.invoices[target]
++        before = [book.snapshot(("inv", target))]
++        vat, net = split_vat(inv.line_items)
++        wrong = rng.choice([Decimal("0.10"), Decimal("0.20")])
++        vat["unit_price_minor"] = vat["amount_minor"] = vat_of(net, wrong)
++        if abs(vat["amount_minor"] - vat_of(net)) < MIN_AMOUNT:
++            return None
++        book.post_invoice(inv)
++        return self.finish(book, target, f"rate_{int(wrong * 100)}", [("inv", target)], before, touched=[target])
++
++    def canonical_ids(self, book, target):
++        return [book.invoices[target].invoice_id]
++
++    def evidence_sets(self, book, target):
++        return [[book.invoices[target].doc_id, "policy"]]
++
++    def expected_amount(self, book, target, **kw):
++        vat, net = split_vat(book.invoices[target].line_items)
++        return abs(vat["amount_minor"] - vat_of(net))
+diff --git a/auditenv/generator/invariants.py b/auditenv/generator/invariants.py
+index 89aa302..6e1480d 100644
+--- a/auditenv/generator/invariants.py
++++ b/auditenv/generator/invariants.py
+@@ -18,7 +18,7 @@ import re
+ 
+ from ..canon import dumps
+ 
+-INVARIANTS = ["double_entry", "completeness", "allocation", "fx_conversion", "period", "unique_billing"]
++INVARIANTS = ["double_entry", "completeness", "allocation", "fx_conversion", "period", "unique_billing", "vat"]
+ 
+ 
+ def _v(name, rid, amount, **detail):
+@@ -258,6 +258,20 @@ def check_unique(pd) -> list:
+                original=orig["invoice_id"]) for dup, orig in duplicate_invoices(pd)]
+ 
+ 
++def check_vat(pd) -> list:
++    """Every 'VAT 12%' line equals round_half_even(12 % x the other lines)."""
++    from .errors.vat_error import split_vat, vat_of
++
++    out = []
++    for inv in sorted(pd.invoices, key=lambda i: i["invoice_id"]):
++        if inv["total_minor"] <= 0:
++            continue
++        vat, net = split_vat(inv["line_items"])
++        if vat is not None and vat["amount_minor"] != vat_of(net):
++            out.append(_v("vat", inv["invoice_id"], abs(vat["amount_minor"] - vat_of(net))))
++    return out
++
++
+ def check_all(pd) -> dict:
+     uniq = check_unique(pd)
+     return {
+@@ -267,6 +281,7 @@ def check_all(pd) -> dict:
+         "fx_conversion": check_fx(pd, skip_invoice_ids=[v["id"] for v in uniq]),
+         "period": check_period(pd),
+         "unique_billing": uniq,
++        "vat": check_vat(pd),
+     }
+ 
+ 
+diff --git a/auditenv/generator/story.py b/auditenv/generator/story.py
+index 49a61f6..41f08fb 100644
+--- a/auditenv/generator/story.py
++++ b/auditenv/generator/story.py
+@@ -270,6 +270,15 @@ class StoryBuilder:
+         for _ in range(n_inv):
+             self.regular_invoice(self.first_day, self.last_day - timedelta(days=2))
+ 
++        if cfg.get("vat_share", 0) > 0:  # rehearsal: VAT lines on base-currency invoices
++            from .errors.vat_error import VAT_DESC, vat_of
++
++            for inv in list(self.invoices.values()):
++                if inv.currency == self.base and not inv.tags and self.chance(cfg["vat_share"]):
++                    v = vat_of(inv.total)
++                    inv.line_items.append({"description": VAT_DESC, "service_period": inv.line_items[0]["service_period"],
++                                           "quantity": 1, "unit_price_minor": v, "amount_minor": v})
++
+         if "recurring_rent" in present:
+             ent = r.choice(self.entities)
+             unit = self.price(self.base)
+diff --git a/auditenv/grader/validate_truth.py b/auditenv/grader/validate_truth.py
+index 79f082f..8da2f2e 100644
+--- a/auditenv/grader/validate_truth.py
++++ b/auditenv/grader/validate_truth.py
+@@ -15,6 +15,7 @@ TYPE_OF_INVARIANT = {
+     "allocation": "payment_allocation",
+     "fx_conversion": "fx_rate",
+     "period": "period_cutoff",
++    "vat": "vat_error",
+ }
+ 
+ 
+@@ -144,6 +145,16 @@ def verify_evidence(pd, issue: dict, ev: list):
+         if not r:
+             return False, "missing_ledger_row", None
+         amount = r[0]["debit_minor"] + r[0]["credit_minor"]
++    elif typ == "vat_error":
++        from ..generator.errors.vat_error import split_vat, vat_of
++
++        d = [i for i in invoices if i["invoice_id"] == aid]
++        if not d or not pols:
++            return False, "missing_document", None
++        vat, net = split_vat(d[0]["line_items"])
++        if vat is None:
++            return False, "no_vat_line", None
++        amount = abs(vat["amount_minor"] - vat_of(net))
+     else:
+         return False, "unknown_type", None
+     if abs(amount - issue["expected_amount_minor"]) > 1:
+diff --git a/auditenv/leakscan.py b/auditenv/leakscan.py
+index 76e4f5c..bf1192a 100644
+--- a/auditenv/leakscan.py
++++ b/auditenv/leakscan.py
+@@ -16,7 +16,7 @@ from .env.errors import CODES
+ 
+ FORBIDDEN = ["truth", "provenance", "grader/", "issue_id", "evidence_sets", "expected_amount", "seed",
+              "Traceback", "/home/", "/app/", "episodes/"]
+-TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
++TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
+ ISSUE_RE = re.compile(r"ISS-[0-9]{3}")
+ FIRST_KEYS = {"task", "manifest", "policy_summary", "steps_remaining"}
+ 
+diff --git a/auditenv/policies/attacks.py b/auditenv/policies/attacks.py
+index 28cb6e8..22e8907 100644
+--- a/auditenv/policies/attacks.py
++++ b/auditenv/policies/attacks.py
+@@ -20,7 +20,7 @@ import random
+ from .base import Policy, finding, submit
+ from .oracle import oracle_findings
+ 
+-TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
++TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
+ 
+ 
+ def _fake(truth, base):
+diff --git a/auditenv/policies/flag_all.py b/auditenv/policies/flag_all.py
+index 7dfd0b6..f35f5c5 100644
+--- a/auditenv/policies/flag_all.py
++++ b/auditenv/policies/flag_all.py
+@@ -4,7 +4,7 @@ limits allow (30 findings), rotating through the error types, claiming the docum
+ from ..env.data import TABLES  # noqa: F401
+ from .base import Policy, TableReader, finding, submit
+ 
+-TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
++TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
+ 
+ 
+ class FlagAll(Policy):
+diff --git a/configs/CHANGELOG.md b/configs/CHANGELOG.md
+index 94d6578..5ae166b 100644
+--- a/configs/CHANGELOG.md
++++ b/configs/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ | Версия | Конфиги | Что изменилось |
+ |---|---|---|
++| 2.1 | все | Репетиция: тип `vat_error` и ключ `vat_share` (по умолчанию 0). |
+ | 2.0 | все | Раунд 2: новые варианты ошибок (`paid_twice`, `wrong_invoice`, `historical_rate`, `wrong_pair`, `due_date`, `backdated_posting`, `prior_period`), отвлекалки `night_fx` / `weekend_fx` / `overpayment`, `min_lookalikes_per_type = 1`, пояса Asia/Kathmandu, Pacific/Kiritimati, Pacific/Pago_Pago (в `dev-mixed`, `interaction-heavy`), `period_months` может быть диапазоном. В `train-easy` новые варианты выключены. |
+ | 2.0 | `train-global`, `dev-global` (новые) | База USD/JPY/KWD, старт в ноябре (через Новый год), декабре и феврале, периоды 1–3 месяца, экстремальные пояса. |
+ | 1.0 | `train-easy`, `dev-mixed`, `clean-only`, `interaction-heavy`, `stress` | Раунд 1: исходные конфиги. |
+diff --git a/configs/clean-only.json b/configs/clean-only.json
+index 1950a7e..77d7370 100644
+--- a/configs/clean-only.json
++++ b/configs/clean-only.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "clean-only",
+-  "version": "2.0",
++  "version": "2.1",
+   "foreign_currencies": ["USD", "EUR", "JPY"],
+   "n_foreign": [1, 3],
+   "foreign_share": 0.35,
+diff --git a/configs/dev-global.json b/configs/dev-global.json
+index d80d231..a2b3c33 100644
+--- a/configs/dev-global.json
++++ b/configs/dev-global.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "dev-global",
+-  "version": "2.0",
++  "version": "2.1",
+   "base_currencies": ["USD", "JPY", "KWD"],
+   "foreign_currencies": ["KZT", "USD", "EUR", "JPY", "KWD"],
+   "n_foreign": [2, 3],
+diff --git a/configs/dev-mixed.json b/configs/dev-mixed.json
+index d7ba397..e45e0ef 100644
+--- a/configs/dev-mixed.json
++++ b/configs/dev-mixed.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "dev-mixed",
+-  "version": "2.0",
++  "version": "2.1",
+   "base_currencies": ["KZT"],
+   "foreign_currencies": ["USD", "EUR", "JPY", "KWD"],
+   "n_foreign": [2, 3],
+diff --git a/configs/interaction-heavy.json b/configs/interaction-heavy.json
+index 5849e6e..9ca9b8e 100644
+--- a/configs/interaction-heavy.json
++++ b/configs/interaction-heavy.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "interaction-heavy",
+-  "version": "2.0",
++  "version": "2.1",
+   "foreign_currencies": ["USD", "EUR", "JPY", "KWD"],
+   "n_foreign": [2, 3],
+   "foreign_share": 0.4,
+diff --git a/configs/stress.json b/configs/stress.json
+index b0acf56..97107f7 100644
+--- a/configs/stress.json
++++ b/configs/stress.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "stress",
+-  "version": "2.0",
++  "version": "2.1",
+   "foreign_currencies": ["USD", "EUR", "JPY", "KWD"],
+   "n_foreign": [3, 4],
+   "period_months": 6,
+diff --git a/configs/train-easy.json b/configs/train-easy.json
+index 64f5eed..a25c5a0 100644
+--- a/configs/train-easy.json
++++ b/configs/train-easy.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "train-easy",
+-  "version": "2.0",
++  "version": "2.1",
+   "foreign_currencies": ["USD"],
+   "n_foreign": [1, 1],
+   "foreign_share": 0.25,
+diff --git a/configs/train-global.json b/configs/train-global.json
+index 11f3d10..6d425a1 100644
+--- a/configs/train-global.json
++++ b/configs/train-global.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "train-global",
+-  "version": "2.0",
++  "version": "2.1",
+   "base_currencies": ["USD", "JPY", "KWD"],
+   "foreign_currencies": ["KZT", "USD", "EUR", "JPY", "KWD"],
+   "n_foreign": [1, 2],
+diff --git a/schemas/config.schema.json b/schemas/config.schema.json
+index 1018aa9..6c6ec0f 100644
+--- a/schemas/config.schema.json
++++ b/schemas/config.schema.json
+@@ -47,7 +47,8 @@
+       "type": "object", "additionalProperties": false,
+       "properties": {
+         "duplicate_invoice": {"type": "number", "minimum": 0}, "payment_allocation": {"type": "number", "minimum": 0},
+-        "fx_rate": {"type": "number", "minimum": 0}, "period_cutoff": {"type": "number", "minimum": 0}
++        "fx_rate": {"type": "number", "minimum": 0}, "period_cutoff": {"type": "number", "minimum": 0},
++        "vat_error": {"type": "number", "minimum": 0}
+       }
+     },
+     "interactions": {
+@@ -72,6 +73,7 @@
+       "type": "object", "additionalProperties": false,
+       "properties": {"utc_trap": {"type": "number", "minimum": 0}, "backdated_posting": {"type": "number", "minimum": 0}, "prior_period": {"type": "number", "minimum": 0}}
+     },
++    "vat_share": {"$ref": "#/$defs/prob", "description": "share of base-currency invoices with a 'VAT 12%' line"},
+     "min_lookalikes_per_type": {"type": "integer", "minimum": 0, "maximum": 3,
+                                 "description": "every episode gets at least this many CORRECT look-alikes (distractor kinds) per error type"
+     },
+diff --git a/schemas/findings.schema.json b/schemas/findings.schema.json
+index aec8f8c..5244869 100644
+--- a/schemas/findings.schema.json
++++ b/schemas/findings.schema.json
+@@ -15,7 +15,7 @@
+         "additionalProperties": false,
+         "required": ["type", "affected_ids", "claimed_amount_minor", "currency", "evidence_ids", "explanation"],
+         "properties": {
+-          "type": {"enum": ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]},
++          "type": {"enum": ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]},
+           "affected_ids": {"type": "array", "minItems": 1, "maxItems": 10, "items": {"type": "string", "minLength": 1, "maxLength": 64}},
+           "claimed_amount_minor": {"type": "integer", "minimum": 0, "maximum": 1000000000000000},
+           "currency": {"type": "string", "pattern": "^\\s*[A-Za-z]{3}\\s*$"},
+diff --git a/schemas/truth.schema.json b/schemas/truth.schema.json
+index a25a092..b0dc856 100644
+--- a/schemas/truth.schema.json
++++ b/schemas/truth.schema.json
+@@ -15,7 +15,7 @@
+         "required": ["issue_id", "type", "affected_ids", "expected_amount_minor", "currency", "evidence_sets"],
+         "properties": {
+           "issue_id": {"type": "string", "pattern": "^ISS-[0-9]{3}$"},
+-          "type": {"enum": ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]},
++          "type": {"enum": ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]},
+           "affected_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+           "expected_amount_minor": {"type": "integer", "minimum": 1},
+           "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+diff --git a/tests/test_data.py b/tests/test_data.py
+index d47ae66..760024a 100644
+--- a/tests/test_data.py
++++ b/tests/test_data.py
+@@ -18,7 +18,7 @@ TYPES = sorted(INV)
+ def single(typ):
+     return {"name": f"only-{typ}", "errors": {t: (1.0 if t == typ else 0.0) for t in TYPES}, "n_errors": [1, 2],
+             "clean_probability": 0.0, "foreign_currencies": ["USD", "EUR", "JPY", "KWD"], "n_foreign": [2, 3],
+-            "foreign_share": 0.4}
++            "foreign_share": 0.4, "vat_share": 0.5}
+ 
+ 
+ @pytest.mark.parametrize("seed", range(50))
+diff --git a/tools/verify_independent.py b/tools/verify_independent.py
+index a6be3bf..3291e68 100644
+--- a/tools/verify_independent.py
++++ b/tools/verify_independent.py
+@@ -184,8 +184,23 @@ class Episode:
+             if not self.in_period(r["ts"]):
+                 key = r["inv"] if (r["inv"] and not r["pay"]) else (r["pay"] or r["row_id"])
+                 found.setdefault(("period_cutoff", key), r["dr"] or r["cr"])
++        # vat (rehearsal): a 'VAT 12%' line = round_half_even(12 % x the other lines)
++        for i in self.invoices:
++            if i["total_minor"] > 0:
++                got = self.vat_gap(i)
++                if got:
++                    found[("vat_error", i["invoice_id"])] = got
+         return found
+ 
++    @staticmethod
++    def vat_gap(inv):
++        vat = [li for li in inv["line_items"] if li["description"] == "VAT 12%"]
++        if not vat:
++            return 0
++        net = sum(li["amount_minor"] for li in inv["line_items"] if li["description"] != "VAT 12%")
++        want = int((Decimal(net) * Decimal("0.12")).quantize(Decimal(1), rounding=ROUND_HALF_EVEN))
++        return abs(vat[0]["amount_minor"] - want)
++
+     # ---- evidence: recompute from the set ONLY
+     def evidence_amount(self, issue, ids):
+         recs = {}
+@@ -274,6 +289,11 @@ class Episode:
+                 return None, "document_inside_period"
+             r = [x for x in rows if x["inv"] == aid and not x["pay"] and x["account"] in ("1200", "4000")]
+             return (r[0]["dr"] + r[0]["cr"], "ok") if r else (None, "no_posting_row")
++        if typ == "vat_error":
++            d = [i for i in invs if i["invoice_id"] == aid]
++            if not d or not pol:
++                return None, "no_document_or_policy"
++            return self.vat_gap(d[0]), "ok"
+         return None, "unknown_type"
+ 
+ 

@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search verify-independent submission-tag
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment verify-independent submission-tag
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -51,6 +51,9 @@ finale-preflight:
 
 exploit-search:
 	$(PYTHON) -m auditenv exploit-search
+
+experiment:
+	$(PYTHON) -m auditenv experiment
 
 verify-independent:
 	$(PYTHON) -m auditenv verify-independent --seeds 500

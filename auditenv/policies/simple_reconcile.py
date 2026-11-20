@@ -21,8 +21,23 @@ from ..timeutil import parse_ts, tzinfo_for
 from .base import Policy, TableReader, finding, submit
 
 
+BASE_RULES = frozenset({"dup", "alloc", "fx", "cutoff"})
+# Optional refinements (off in the official baseline; used only by `make experiment`, docs/EXPERIMENT.md):
+#   fx_prev_business_day  use the latest rate on/before the local date (policy fx_missing_rate)
+#   credit_note_aware     ignore credit notes and the invoices they cancel when looking for duplicates
+#   overpayment_aware     a 2400 credit is an error only if the receipt does not exceed its invoices' totals
+#   skip_dup_in_fx        do not re-check the FX of an invoice already reported as a duplicate
+#   placebo               no effect at all (negative control)
+OPTIONAL_RULES = ("fx_prev_business_day", "credit_note_aware", "overpayment_aware", "skip_dup_in_fx")
+ALL_RULES = tuple(sorted(BASE_RULES)) + OPTIONAL_RULES + ("placebo",)
+
+
 class SimpleReconcile(Policy):
     name = "simple_reconcile"
+
+    def __init__(self, seed: int = 0, rules=BASE_RULES):
+        self.rules = frozenset(rules)
+        super().__init__(seed)
 
     def reset(self):
         super().reset()
@@ -73,24 +88,35 @@ class SimpleReconcile(Policy):
             rows = [r for r in inv_rows.get(iid, []) if r["account"] == "1200" and r["debit_minor"] > 0]
             return rows[0] if rows else None
 
+        R = self.rules
+        cancelled = set()
+        if "credit_note_aware" in R:
+            for i in invs:
+                if i["total_minor"] < 0 and i["line_items"] and i["line_items"][0]["description"].startswith("Credit note for "):
+                    cancelled.add(i["line_items"][0]["description"][len("Credit note for "):].split(": ", 1)[0])
         # duplicates
         groups = {}
-        for i in invs:
-            if i["total_minor"] <= 0:
+        dups = set()
+        for i in invs if "dup" in R else []:
+            if i["total_minor"] <= 0 or i["invoice_id"] in cancelled:
                 continue
             items = sorted(json.dumps(li, sort_keys=True) for li in i["line_items"])
             groups.setdefault((i["entity_id"], i["currency"], tuple(items)), []).append(i)
         for key in sorted(groups):
             g = sorted(groups[key], key=lambda i: (parse_ts(i["issued_at"]), i["invoice_id"]))
             for dup in g[1:]:
+                dups.add(dup["invoice_id"])
                 row = ar_row(dup["invoice_id"])
                 if row:
                     out.append(finding("duplicate_invoice", [dup["invoice_id"]], row["debit_minor"], base,
                                        [g[0]["doc_id"], dup["doc_id"], row["row_id"]], "same entity and line items"))
         # allocation
         inv_doc = {i["invoice_id"]: i["doc_id"] for i in invs}
-        for p in pays:
+        inv_total = {i["invoice_id"]: i["total_minor"] for i in invs}
+        for p in pays if "alloc" in R else []:
             if not p["invoice_refs"]:
+                continue
+            if "overpayment_aware" in R and p["amount_minor"] > sum(inv_total.get(x, 0) for x in p["invoice_refs"]):
                 continue
             un = [r for r in pay_rows.get(p["payment_id"], []) if r["account"] == "2400" and r["credit_minor"] > 0]
             if un:
@@ -98,13 +124,18 @@ class SimpleReconcile(Policy):
                 out.append(finding("payment_allocation", [p["payment_id"]], un[0]["credit_minor"], base, ev,
                                    "receipt with invoice refs left on unapplied cash"))
         # fx
-        for d in invs + pays:
+        for d in invs + pays if "fx" in R else []:
             if d["currency"] == base:
                 continue
             is_inv = "invoice_id" in d
+            if is_inv and "skip_dup_in_fx" in R and d["invoice_id"] in dups:
+                continue
             ts = d["issued_at"] if is_inv else d["timestamp"]
             day = parse_ts(ts).astimezone(tz).date().isoformat()
             fx = rates.get((day, d["currency"]))
+            if fx is None and "fx_prev_business_day" in R:
+                older = sorted(k for k in rates if k[1] == d["currency"] and k[0] <= day)
+                fx = rates[older[-1]] if older else None
             if fx is None:
                 continue  # simplification: no previous-business-day fallback
             amount = abs(d["total_minor"]) if is_inv else d["amount_minor"]
@@ -123,7 +154,7 @@ class SimpleReconcile(Policy):
                 out.append(finding("fx_rate", ids, abs(posted - correct), base,
                                    [d["doc_id"], row["row_id"], fx["fx_id"], "policy"], "re-converted at local-date rate"))
         # cutoff
-        for i in invs:
+        for i in invs if "cutoff" in R else []:
             t = parse_ts(i["issued_at"])
             if not (start <= t < end):
                 row = ar_row(i["invoice_id"])

@@ -344,6 +344,13 @@ def cmd_exploit_search(a):
     print(json.dumps({k: r[k] for k in ("train", "dev_heldout", "best_theta", "evaluations")}, indent=1, sort_keys=True))
 
 
+def cmd_experiment(a):
+    from .experiment import main as ex_main
+
+    r = ex_main()
+    print(json.dumps({k: r[k] for k in ("chosen_rules", "test", "verdict", "train_evaluations")}, indent=1, sort_keys=True))
+
+
 def cmd_lock_configs(a):
     from .config import lock_entries
 
@@ -427,6 +434,7 @@ def main(argv=None) -> int:
     sub.add_parser("verify-provenance")
     sub.add_parser("lock-configs")
     sub.add_parser("exploit-search")
+    sub.add_parser("experiment")
     ea = sub.add_parser("export-audit")
     ea.add_argument("--out", default=str(ROOT / "audit"))
     cs = sub.add_parser("check-schemas")
