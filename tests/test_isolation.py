@@ -102,10 +102,14 @@ def test_agent_process_environment_is_clean(monkeypatch):
     monkeypatch.setenv("AUDITENV_SEED_SALT", "secret")
     c = ChildPolicy("random_explorer")
     try:
-        env = Path(f"/proc/{c.proc.pid}/environ").read_bytes().split(b"\0")
-        env = dict(x.decode().split("=", 1) for x in env if b"=" in x)
-        assert env == AGENT_ENV
-        assert os.listdir(Path(f"/proc/{c.proc.pid}/cwd")) == []
+        assert c.env == AGENT_ENV  # exactly what the process was started with
+        try:  # the kernel's view, when readable (root without CAP_SYS_PTRACE cannot read a `nobody` agent)
+            env = Path(f"/proc/{c.proc.pid}/environ").read_bytes().split(b"\0")
+            env = dict(x.decode().split("=", 1) for x in env if b"=" in x)
+            assert env == AGENT_ENV
+            assert os.listdir(Path(f"/proc/{c.proc.pid}/cwd")) == []
+        except PermissionError:
+            assert os.listdir(c.tmp.name) == []
         assert "-I" in c.proc.args and "-S" in c.proc.args
         assert str(ROOT) not in " ".join(c.proc.args[1:])  # code is a private copy, not the repo
     finally:

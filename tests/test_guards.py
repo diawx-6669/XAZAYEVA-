@@ -21,8 +21,10 @@ def test_agent_cannot_read_parent_environ_salt():
                           "--config", "clean-only"], cwd=ROOT, env=env, capture_output=True, text=True, timeout=120)
     res = json.loads(out.stdout)
     assert res["reward"] == 1.0  # honest empty answer on a clean book: the salt was NOT readable
-    # control: with the old behaviour (same uid as the evaluator) the spy DOES get the salt
+    # control: with BOTH layers off (same uid as the evaluator AND a dumpable evaluator) the spy DOES get
+    # the salt - each layer alone is enough to stop it (main: prctl non-dumpable, round 2: nobody)
     env["AUDITENV_KEEP_UID"] = "1"
+    env["AUDITENV_INSECURE_DUMPABLE"] = "1"
     out = subprocess.run([sys.executable, "-m", "auditenv", "run", "--policy-cmd",
                           f"{sys.executable} {ROOT / 'tests' / 'agents' / 'environ_spy.py'}", "--seed", "1",
                           "--config", "clean-only"], cwd=ROOT, env=env, capture_output=True, text=True, timeout=120)
