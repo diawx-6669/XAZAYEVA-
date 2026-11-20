@@ -98,3 +98,17 @@ class AttackPolicy(Policy):
 
     def act(self, obs):
         return submit(self.truth["episode_id"], attack_findings(self.attack, self.truth, self.public, self.seed))
+
+
+# Best strategy found by the automatic exploit search (python -m auditenv exploit-search, CEM over
+# 240 strategies on train seeds, no truth access). Frozen here as a regression attack: it must stay
+# below silence and below simple_reconcile on held-out episodes (tests/test_exploit_search.py).
+CEM_BEST = {"amount_pick": "ledger_main", "id_pick": "latest", "n_evidence": 10, "n_findings": 2, "pages_invoices": 2, "pages_ledger": 4, "pages_payments": 0, "type": "period_cutoff"}
+
+
+def cem_best_policy(seed: int = 0):
+    from ..exploit_search import StrategyPolicy
+
+    p = StrategyPolicy(dict(CEM_BEST), seed)
+    p.name = "attack:cem_best"
+    return p

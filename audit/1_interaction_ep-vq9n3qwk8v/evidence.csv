@@ -1,0 +1,15 @@
+issue_id,type,evidence_set,evidence_id,record_kind,what_it_says
+ISS-001,fx_rate,1,DC-9RFGXW4X,invoice,invoice SF-GQHCTDN client CP-BMYMM3 issued 2026-07-26T09:40:24+04:00 (local 2026-07-26T09:40:24+04:00) total 4494.00 EUR
+ISS-001,fx_rate,1,LR-Z2FMDA6,ledger,account 1200 Dr 2403768.70 Cr 0.00 KZT at 2026-07-26T09:40:24+04:00 invoice=SF-GQHCTDN payment=None
+ISS-001,fx_rate,1,fx:2026-07-24:EUR:KZT,fx,rate 533.546 KZT per 1 EUR on 2026-07-24
+ISS-001,fx_rate,1,policy,policy,"policy.json (rules: rate date, previous business day, period, rounding)"
+ISS-001,fx_rate,2,DC-9RFGXW4X,invoice,invoice SF-GQHCTDN client CP-BMYMM3 issued 2026-07-26T09:40:24+04:00 (local 2026-07-26T09:40:24+04:00) total 4494.00 EUR
+ISS-001,fx_rate,2,LR-WPGDZH3,ledger,account 4000 Dr 0.00 Cr 2403768.70 KZT at 2026-07-26T09:40:24+04:00 invoice=SF-GQHCTDN payment=None
+ISS-001,fx_rate,2,fx:2026-07-24:EUR:KZT,fx,rate 533.546 KZT per 1 EUR on 2026-07-24
+ISS-001,fx_rate,2,policy,policy,"policy.json (rules: rate date, previous business day, period, rounding)"
+ISS-002,duplicate_invoice,1,DC-9RFGXW4X,invoice,invoice SF-GQHCTDN client CP-BMYMM3 issued 2026-07-26T09:40:24+04:00 (local 2026-07-26T09:40:24+04:00) total 4494.00 EUR
+ISS-002,duplicate_invoice,1,DC-WRFX5PCZ,invoice,invoice SF-2PXQJSM client CP-BMYMM3 issued 2026-07-27T10:24:24+04:00 (local 2026-07-27T10:24:24+04:00) total 4494.00 EUR
+ISS-002,duplicate_invoice,1,LR-TCRSGGY,ledger,account 1200 Dr 2403768.70 Cr 0.00 KZT at 2026-07-27T10:24:24+04:00 invoice=SF-2PXQJSM payment=None
+ISS-002,duplicate_invoice,2,DC-9RFGXW4X,invoice,invoice SF-GQHCTDN client CP-BMYMM3 issued 2026-07-26T09:40:24+04:00 (local 2026-07-26T09:40:24+04:00) total 4494.00 EUR
+ISS-002,duplicate_invoice,2,DC-WRFX5PCZ,invoice,invoice SF-2PXQJSM client CP-BMYMM3 issued 2026-07-27T10:24:24+04:00 (local 2026-07-27T10:24:24+04:00) total 4494.00 EUR
+ISS-002,duplicate_invoice,2,LR-B6JW68W,ledger,account 4000 Dr 0.00 Cr 2403768.70 KZT at 2026-07-27T10:24:24+04:00 invoice=SF-2PXQJSM payment=None

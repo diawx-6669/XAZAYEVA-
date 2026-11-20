@@ -1,0 +1,3 @@
+issue_id,type,evidence_set_used,my_recomputed_amount,matches_truth (yes/no),comment,auditor,date
+ISS-001,fx_rate,,,,,,
+ISS-002,payment_allocation,,,,,,

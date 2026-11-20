@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search verify-independent submission-tag
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -13,6 +13,8 @@ help:
 	@echo "make trajectories  regenerate trajectories/trajectories.jsonl"
 	@echo "make demo          scripted demo (scripts/demo.sh)"
 	@echo "make docs-check    numbers in README/docs match reality (tests, trajectories, episode sizes)"
+	@echo "make finale-preflight  offline pre-flight for the finale: image, contract tests, demo (<1 min)"
+	@echo "make exploit-search    automatic reward-exploit search (CEM) -> reports/exploit_search.md"
 	@echo "make docker-check  build image and run 'make check' with --network none --cpus 2 --memory 4g"
 
 venv:
@@ -43,6 +45,21 @@ golden:
 
 docs-check:
 	$(PYTHON) -m auditenv docs-check
+
+finale-preflight:
+	sh scripts/finale_preflight.sh
+
+exploit-search:
+	$(PYTHON) -m auditenv exploit-search
+
+verify-independent:
+	$(PYTHON) -m auditenv verify-independent --seeds 500
+
+submission-tag:
+	@echo "Run on 22.11 after the final make check (docs/SUBMISSION.md):"
+	@echo "  git tag -a v1.0-submission -m 'Genesis Hackathon submission'"
+	@echo "  git push origin v1.0-submission"
+	@git log -1 --format='  SHA for the form: %H'
 
 version:
 	@git rev-parse --short=12 HEAD > VERSION 2>/dev/null || echo unknown > VERSION; cat VERSION

@@ -514,12 +514,16 @@ def diagnostics(eps: Episodes, log_path=None) -> tuple:
     erroneous episodes, experimental return, steps. None = undefined ('n/a' in the report)."""
     log = GraderLog(log_path)
     rows, timing = [], []
-    names = DIAG_POLICIES + [f"attack:{a}" for a in ATTACKS]
+    names = DIAG_POLICIES + [f"attack:{a}" for a in ATTACKS] + ["attack:cem_best"]
     for name in names:
         stats, times = [], []
         for ep in eps.all():
             t0 = time.monotonic()
-            if name.startswith("attack:"):
+            if name == "attack:cem_best":
+                from .policies.attacks import cem_best_policy
+
+                r = run_episode(name, episode=ep, mode="eval", grader_log=log, policy_obj=cem_best_policy())
+            elif name.startswith("attack:"):
                 pol = AttackPolicy(name.split(":", 1)[1], ep.truth, ep.public())
                 r = run_episode(name, episode=ep, mode="eval", grader_log=log, policy_obj=pol)
             else:

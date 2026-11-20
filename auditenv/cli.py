@@ -330,6 +330,20 @@ def cmd_verify_provenance(a):
     return 1 if bad else 0
 
 
+def cmd_export_audit(a):
+    from .audit_export import main as audit_main
+
+    for r in audit_main(a.out):
+        print(f"export-audit: {r['episode_id']} ({r['issues']} issues) -> {r['out']}")
+
+
+def cmd_exploit_search(a):
+    from .exploit_search import main as es_main
+
+    r = es_main()
+    print(json.dumps({k: r[k] for k in ("train", "dev_heldout", "best_theta", "evaluations")}, indent=1, sort_keys=True))
+
+
 def cmd_lock_configs(a):
     from .config import lock_entries
 
@@ -412,6 +426,9 @@ def main(argv=None) -> int:
     vi.add_argument("--seeds", type=int, default=500)
     sub.add_parser("verify-provenance")
     sub.add_parser("lock-configs")
+    sub.add_parser("exploit-search")
+    ea = sub.add_parser("export-audit")
+    ea.add_argument("--out", default=str(ROOT / "audit"))
     cs = sub.add_parser("check-schemas")
     cs.add_argument("--no-log", action="store_true")
     sub.add_parser("lint")
