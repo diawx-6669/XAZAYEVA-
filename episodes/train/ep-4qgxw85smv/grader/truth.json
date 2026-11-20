@@ -1,1 +1,1 @@
-{"episode_id":"ep-4qgxw85smv","issues":[{"affected_ids":["PMT-TJ4GMV"],"currency":"KZT","evidence_sets":[["DC-QDGASMNN","DC-ZC43TN5H","LR-F9QYW6"]],"expected_amount_minor":187431312,"issue_id":"ISS-001","type":"payment_allocation"},{"affected_ids":["SF-N64NKNP7"],"currency":"KZT","evidence_sets":[["DC-3C23HVCR","LR-XRX43G","policy"],["DC-3C23HVCR","LR-2ZRMRJ","policy"]],"expected_amount_minor":201011960,"issue_id":"ISS-002","type":"period_cutoff"}]}
+{"episode_id":"ep-4qgxw85smv","issues":[],"tolerance_minor":1}

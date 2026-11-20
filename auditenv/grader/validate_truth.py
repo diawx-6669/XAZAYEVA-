@@ -126,7 +126,9 @@ def verify_evidence(pd, issue: dict, ev: list):
     return True, "ok", amount
 
 
-def validate(pd, truth: dict, tolerance: int = 1) -> dict:
+def validate(pd, truth: dict, tolerance: int | None = None) -> dict:
+    if tolerance is None:
+        tolerance = truth.get("tolerance_minor", 1)
     found = solve(pd)
     want = {(i["type"], tuple(i["affected_ids"])): i for i in truth["issues"]}
     got = {(i["type"], tuple(i["affected_ids"])): i for i in found["issues"]}

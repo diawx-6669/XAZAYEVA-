@@ -1,1 +1,1 @@
-{"episode_id":"ep-jpekadpkeb","issues":[{"affected_ids":["BNK-ZVQXF7"],"currency":"KZT","evidence_sets":[["DC-WR8SBVM","DC-HREX8YJ","LR-W5DFKM"]],"expected_amount_minor":206317038,"issue_id":"ISS-001","type":"payment_allocation"}]}
+{"episode_id":"ep-jpekadpkeb","issues":[],"tolerance_minor":1}

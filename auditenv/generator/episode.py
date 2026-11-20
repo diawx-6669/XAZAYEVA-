@@ -18,7 +18,7 @@ from .books import build_book
 from .errors import ORDER, REGISTRY
 from .errors.base import weighted_choice
 from .export import book_tables, serialize_tables
-from .interactions import SCENARIOS
+from .interactions import SCENARIO_TYPES, SCENARIOS
 from .story import build_story
 
 
@@ -54,10 +54,17 @@ def _try_inject(book, fn):
     return trial, res
 
 
-def inject_errors(book, seed, cfg, attempt):
+def is_clean_episode(seed, cfg) -> bool:
+    """Clean or not is decided ONCE per seed from its own stream, without `attempt`: a regeneration
+    (coincidence scan, failed injection) must not flip the episode between clean and erroneous,
+    otherwise the clean share would drift away from clean_probability."""
+    return make_rng(seed, "clean").random() < cfg["clean_probability"]
+
+
+def inject_errors(book, seed, cfg, attempt, clean=None):
     r = make_rng(seed, "errors", attempt)
-    if r.random() < cfg["clean_probability"]:
-        return book, [], {"clean": True}
+    if clean if clean is not None else is_clean_episode(seed, cfg):
+        return book, [], {"clean": True, "ordered": {}, "injected": {}}
     lo, hi = cfg["n_errors"]
     n_target = r.randint(max(lo, 1), max(hi, 1))
     used: set = set()
@@ -82,6 +89,12 @@ def inject_errors(book, seed, cfg, attempt):
     weights = {k: v for k, v in cfg["errors"].items() if v > 0}
     picks = [weighted_choice(r, weights) for _ in range(max(0, n_target - len(injected)))]
     picks = [p for p in picks if p]
+    ordered = {}
+    for name in plan["scenarios"]:
+        for t in SCENARIO_TYPES[name]:
+            ordered[t] = ordered.get(t, 0) + 1
+    for t in picks:
+        ordered[t] = ordered.get(t, 0) + 1
     for typ in ORDER:
         for _ in range(picks.count(typ)):
             et = REGISTRY[typ]
@@ -103,6 +116,11 @@ def inject_errors(book, seed, cfg, attempt):
                     used.add(res[0].target)
                 if typ == "payment_allocation":
                     used.update(book.payments[target].refs or [])
+    plan["ordered"] = dict(sorted(ordered.items()))
+    got = {}
+    for inj in injected:
+        got[inj.type] = got.get(inj.type, 0) + 1
+    plan["injected"] = dict(sorted(got.items()))
     if not injected:
         return book, None, plan
     return book, injected, plan
@@ -127,8 +145,11 @@ def _story_summary(book) -> dict:
 
 
 def generate_episode(seed, config=None) -> Episode:
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise TypeError(f"seed must be an int, got {type(seed).__name__}")
     cfg = load_config(config)
     chash = config_hash(cfg)
+    clean = is_clean_episode(seed, cfg)
     rejections = []
     for attempt in range(cfg["max_attempts"]):
         story = build_story(seed, cfg, attempt)
@@ -142,7 +163,7 @@ def generate_episode(seed, config=None) -> Episode:
             rejections.append({"attempt": attempt, "reason": "coincidence_in_clean_book",
                                "found": sorted({i["type"] for i in found["issues"]}) or ["structural"]})
             continue
-        book, injected, plan = inject_errors(book, seed, cfg, attempt)
+        book, injected, plan = inject_errors(book, seed, cfg, attempt, clean=clean)
         if injected is None:
             rejections.append({"attempt": attempt, "reason": "injection_failed", "plan": plan})
             continue
@@ -155,7 +176,7 @@ def generate_episode(seed, config=None) -> Episode:
                            "evidence_sets": [list(e) for e in inj.evidence_sets]})
             mutations.append({"issue_id": iid, "type": inj.type, "variant": inj.variant, "order": n,
                               "before": inj.before, "after": inj.after})
-        truth = {"episode_id": book.episode_id, "issues": issues}
+        truth = {"episode_id": book.episode_id, "issues": issues, "tolerance_minor": cfg["tolerance_minor"]}
         from ..ids import salted
 
         provenance = {"seed": seed, "seed_salted": salted(), "attempt": attempt, "rejections": rejections, "config": cfg,

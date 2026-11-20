@@ -19,6 +19,13 @@ def offset_minutes(name: str) -> int:
     return h * 60 + (m if h >= 0 else -m)
 
 
+def utc_offset_str(name: str) -> str:
+    """'+05:00', '-05:00', '+05:45': the explicit offset that policy.json states next to the zone name."""
+    off = offset_minutes(name)
+    sign = "+" if off >= 0 else "-"
+    return f"{sign}{abs(off) // 60:02d}:{abs(off) % 60:02d}"
+
+
 def tzinfo_for(name: str) -> timezone:
     return timezone(timedelta(minutes=offset_minutes(name)))
 

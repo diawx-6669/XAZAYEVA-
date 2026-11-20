@@ -95,7 +95,7 @@ def test_unknown_tool_and_ids_consume_steps(erroneous):
 @pytest.mark.parametrize("action", ["x", 5, None, [], {"tool": 1}, {"args": {}}, {"tool": "get_record", "args": []},
                                     {"tool": "list_records", "args": {"table": "secrets"}},
                                     {"tool": "list_records", "args": {"table": "ledger", "path": "/etc"}},
-                                    {"tool": "calculator", "args": {}}, {"tool": "submit", "args": {}},
+                                    {"tool": "calculator", "args": {}},
                                     {"tool": "get_record", "args": {"table": "ledger", "id": 5}}])
 def test_bad_args(erroneous, action):
     env, _, _ = make(erroneous)

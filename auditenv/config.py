@@ -60,16 +60,50 @@ def _schema():
     return json.loads((SCHEMAS_DIR / "config.schema.json").read_text("utf-8"))
 
 
+class ConfigError(ValueError):
+    """A config that is schema-valid but cannot produce the episodes it asks for."""
+
+
 def validate_config(cfg: dict) -> None:
     import jsonschema
 
-    jsonschema.validate(cfg, _schema())
+    try:
+        jsonschema.validate(cfg, _schema())
+    except jsonschema.ValidationError as e:
+        where = "/".join(str(x) for x in e.absolute_path) or "<root>"
+        raise ConfigError(f"config {cfg.get('name', '?')!r}: {where}: {e.message}") from None
+    name = cfg["name"]
+
+    def bad(msg):
+        raise ConfigError(f"config {name!r}: {msg}")
+
     for k in ("n_foreign", "n_entities", "n_invoices", "utc_share", "n_errors"):
         lo, hi = cfg[k]
         if lo > hi:
-            raise ValueError(f"config {k}: min > max")
+            bad(f"{k}: min > max")
     if cfg["max_steps"] != 100:
-        raise ValueError("max_steps is fixed to 100 by the case")
+        bad("max_steps is fixed to 100 by the case")
+    if cfg["utc_share"][1] > 100:
+        bad("utc_share is a percentage (0..100)")
+    foreign = [c for c in cfg["foreign_currencies"] if c not in cfg["base_currencies"]]
+    can_foreign = bool(foreign) and cfg["n_foreign"][1] > 0 and cfg["foreign_share"] > 0
+    if cfg["clean_probability"] < 1:
+        if cfg["n_errors"][1] == 0:
+            bad("n_errors is [.., 0] but clean_probability < 1: set clean_probability to 1 or allow errors")
+        weights = {k: v for k, v in cfg["errors"].items() if v > 0}
+        inter = any(v > 0 for v in cfg["interactions"].values())
+        if not weights and not inter:
+            bad("every error weight and every interaction is 0, but clean_probability < 1")
+        if not can_foreign and set(weights) <= {"fx_rate"}:
+            if weights:
+                bad("only fx_rate errors are enabled, but the config has no foreign currency to mis-convert")
+            bad("only interaction scenarios are enabled, but they need a foreign currency")
+    if cfg["min_interactions"] > sum(1 for v in cfg["interactions"].values() if v > 0):
+        bad("min_interactions exceeds the number of enabled interaction scenarios")
+    if cfg["min_interactions"] > 0 and not can_foreign:
+        bad("interaction scenarios need a foreign currency (both mix FX with another error)")
+    if cfg["min_interactions"] > 0 and 2 * cfg["min_interactions"] > max(cfg["n_errors"][1], 2 * cfg["min_interactions"]):
+        bad("n_errors too small for the required interaction scenarios (2 issues each)")
 
 
 def load_config(cfg=None) -> dict:

@@ -77,6 +77,23 @@ class InProcess:
         pass
 
 
+def run_id(episode_id: str, policy: str, policy_rng: int, mode: str, repeat: int = 0) -> str:
+    """Deterministic, unique per (episode, policy, policy RNG, mode, repeat): replays and audits can
+    group trajectory lines by run without relying on line order. (No 'seed' in field names: leakscan.)"""
+    from .canon import sha256_hex
+
+    return "run-" + sha256_hex(f"{episode_id}|{policy}|{policy_rng}|{mode}|{repeat}".encode())[:16]
+
+
+def run_metadata(env, mode: str) -> dict:
+    from . import GENERATOR_VERSION, __version__
+
+    m = env._data.manifest
+    return {"env_version": __version__, "generator_version": m.get("generator_version", GENERATOR_VERSION),
+            "config_hash": m.get("config_hash"), "mode": mode, "max_steps": env.max_steps,
+            "time_limit_s": env.time_limit}
+
+
 def run_episode(policy_name: str, *, episode=None, episode_dir=None, seed=None, config=None, mode="train",
                 grader_log=None, policy_seed: int = 0, isolate: bool = True, record: bool = True,
                 time_limit: float = 60.0, policy_obj=None) -> dict:
@@ -98,9 +115,11 @@ def run_episode(policy_name: str, *, episode=None, episode_dir=None, seed=None, 
     traj = []
     t0 = time.monotonic()
     eid = env.episode_id
+    rid = run_id(eid, policy_name, policy_seed, mode)
+    meta = run_metadata(env, mode)
     if record:
-        traj.append({"episode_id": eid, "policy": policy_name, "step": 0, "action": None, "observation": obs,
-                     "reward": 0.0, "terminated": False, "truncated": False})
+        traj.append({"episode_id": eid, "run_id": rid, "policy": policy_name, "step": 0, "action": None,
+                     "observation": obs, "reward": 0.0, "terminated": False, "truncated": False, "run": meta})
     reward, terminated, truncated = 0.0, False, False
     try:
         while not (terminated or truncated):
@@ -115,15 +134,19 @@ def run_episode(policy_name: str, *, episode=None, episode_dir=None, seed=None, 
             else:
                 obs, reward, terminated, truncated, info = env.step(action)
             if record:
-                traj.append({"episode_id": eid, "policy": policy_name, "step": env.steps_used, "action": action,
-                             "observation": obs, "reward": reward, "terminated": terminated,
-                             "truncated": truncated})
+                rec = {"episode_id": eid, "run_id": rid, "policy": policy_name, "step": env.steps_used,
+                       "action": action, "observation": obs, "reward": reward, "terminated": terminated,
+                       "truncated": truncated}
+                if terminated or truncated:
+                    rec["truncation_reason"] = env.truncation_reason
+                traj.append(rec)
     finally:
         agent.close()
     elapsed = time.monotonic() - t0
     g = dict(env.last_grade or {})
     g["elapsed_s"] = round(elapsed, 4)
     g["steps"] = env.steps_used
+    g["run_id"] = rid
     return {"grade": g, "trajectory": traj, "returned_reward": reward}
 
 

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from ...timeutil import offset_minutes
+from ...timeutil import month_str, offset_minutes
 from .base import MIN_AMOUNT, ErrorType, register, special
 
 
@@ -38,6 +38,11 @@ class PeriodCutoff(ErrorType):
         if (off > 0 and inv.issued_at < s.period_end) or (off < 0 and inv.issued_at >= s.period_start):
             return None
         inv.utc_fmt = True
+        # The bill is genuinely for the local month it was issued in: service_period follows the new
+        # local date, so line items never contradict the cutoff (before/after is in provenance).
+        month = month_str(inv.issued_at.astimezone(s.tz).date())
+        for li in inv.line_items:
+            li["service_period"] = month
         book.post_invoice(inv)
         return self.finish(book, target, variant, [("inv", target)], before)
 

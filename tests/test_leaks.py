@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from auditenv.leakscan import scan_lines, scan_observation
 from auditenv.runner import run_episode
 
@@ -36,8 +38,16 @@ def test_committed_trajectories_are_clean():
         for e in json.loads((ROOT / "episodes" / split / "index.json").read_text()):
             truths[e["episode_id"]] = json.loads((ROOT / "episodes" / split / e["episode_id"] / "grader" / "truth.json").read_text())
     assert lines and scan_lines(lines, truths) == []
-    required = {"episode_id", "step", "action", "observation", "reward", "terminated", "truncated"}
+    required = {"episode_id", "run_id", "step", "action", "observation", "reward", "terminated", "truncated"}
     assert all(required <= set(x) for x in lines)
+    runs = {}
+    for x in lines:
+        runs.setdefault(x["run_id"], []).append(x)
+    for rid, recs in runs.items():
+        assert len({r["episode_id"] for r in recs}) == 1 and len({r["policy"] for r in recs}) == 1
+        assert set(recs[0]["run"]) >= {"env_version", "generator_version", "config_hash", "mode"}
+        assert "truncation_reason" in recs[-1] and (recs[-1]["terminated"] or recs[-1]["truncated"])
+        assert not any("seed" in k for r in recs for k in list(r) + list(r.get("run", {})))
     assert {x["policy"] for x in lines} == {"random_explorer", "simple_reconcile", "flag_all"}  # no oracle
 
 
@@ -53,6 +63,7 @@ def test_env_never_reads_grader_dir_for_observations(tmp_path, erroneous):
     assert o["error"] == {"code": "not_found"}
 
 
+@pytest.mark.salt
 def test_seed_salt_blocks_seed_bruteforce(monkeypatch):
     """Without a salt the open generator lets anyone map seed -> episode_id. With the evaluator's
     secret salt the same seed yields a different, unguessable episode."""
@@ -70,6 +81,7 @@ def test_seed_salt_blocks_seed_bruteforce(monkeypatch):
     assert all(IdFactory(make_rng(s, "naming", 0)).episode_id() != salted.episode_id for s in range(2000))
 
 
+@pytest.mark.salt
 def test_agent_process_gets_no_salt_and_no_paths(monkeypatch):
     from auditenv.runner import ChildPolicy
 

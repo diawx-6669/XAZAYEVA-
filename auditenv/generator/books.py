@@ -16,6 +16,13 @@ from ..ids import IdFactory, make_rng
 from ..money import convert_minor
 from ..timeutil import fmt_ts, policy_rate_date
 
+CREDIT_NOTE_PREFIX = "Credit note for "
+
+
+def credit_note_text(invoice_id: str, description: str) -> str:
+    return f"{CREDIT_NOTE_PREFIX}{invoice_id}: {description}"
+
+
 ACCOUNTS = {
     "1000": "Cash",
     "1200": "Accounts Receivable",
@@ -176,7 +183,10 @@ class Book:
         un_doc = p.amount - allocated
         un_base = 0
         if un_doc > 0:
-            un_base = cash if allocated == 0 else self.to_base(un_doc, p.currency, rate)
+            # Unapplied part at the payment's POLICY rate: a wrong cash rate (fx_rate) then shows up only
+            # in 1000/7900, so an allocation error and an fx error on one receipt have independent amounts.
+            good = self.correct_rate(p.timestamp, p.currency)
+            un_base = cash if allocated == 0 else self.to_base(un_doc, p.currency, good)
             specs.append(("pay_unapplied", "2400", 0, un_base, None, k))
         fx = cash - ar_total - un_base
         if fx > 0:
@@ -223,6 +233,11 @@ class Book:
 
     # -------------------------------------------------------------- snapshots
     def inv_public(self, inv: InvoiceDoc) -> dict:
+        lines = copy.deepcopy(inv.line_items)
+        if inv.cancels:  # credit note: the cancelled invoice is referenced in the line text (case 03 has no field for it)
+            ref = self.invoices[inv.cancels].invoice_id
+            for li in lines:
+                li["description"] = credit_note_text(ref, li["description"])
         return {
             "doc_id": inv.doc_id,
             "invoice_id": inv.invoice_id,
@@ -231,8 +246,7 @@ class Book:
             "due_at": fmt_ts(inv.due_at, inv.utc_fmt),
             "currency": inv.currency,
             "total_minor": inv.total,
-            "line_items": copy.deepcopy(inv.line_items),
-            "cancels_invoice_id": self.invoices[inv.cancels].invoice_id if inv.cancels else None,
+            "line_items": lines,
         }
 
     def pay_public(self, p: PaymentDoc) -> dict:

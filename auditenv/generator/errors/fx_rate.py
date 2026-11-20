@@ -57,12 +57,14 @@ class FxRate(ErrorType):
             cands["inverted"] = inv_rate
         return cands
 
-    def inject(self, book, target, rng, cfg, prefer=None):
+    def inject(self, book, target, rng, cfg, prefer=None, exclude=()):
         kind, key, doc, _, _, _ = self._doc(book, target)
-        cands = self.wrong_rates(book, target)
+        cands = {k: v for k, v in self.wrong_rates(book, target).items() if k not in exclude}
         if not cands:
             return None
         variant = prefer if prefer in cands else weighted_choice(rng, cfg["fx_variants"], allowed=set(cands))
+        if variant is None and exclude:  # configured weights allow none of the remaining variants
+            variant = weighted_choice(rng, {k: 1 for k in cands})
         if variant is None:
             variant = sorted(cands)[0]
         rate = cands[variant]

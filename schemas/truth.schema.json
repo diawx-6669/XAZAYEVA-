@@ -4,9 +4,10 @@
   "description": "grader/truth.json - never visible to the agent.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["episode_id", "issues"],
+  "required": ["episode_id", "issues", "tolerance_minor"],
   "properties": {
     "episode_id": {"type": "string"},
+    "tolerance_minor": {"type": "integer", "minimum": 0, "maximum": 49, "description": "amount tolerance used by the matcher (from config.tolerance_minor)"},
     "issues": {
       "type": "array", "maxItems": 12,
       "items": {

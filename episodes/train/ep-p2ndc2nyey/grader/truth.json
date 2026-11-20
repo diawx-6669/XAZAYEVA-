@@ -1,1 +1,1 @@
-{"episode_id":"ep-p2ndc2nyey","issues":[]}
+{"episode_id":"ep-p2ndc2nyey","issues":[{"affected_ids":["SF-XFZAGZSF"],"currency":"KZT","evidence_sets":[["FD-AMPSNJKG","JE-KQ765W9","policy"],["FD-AMPSNJKG","JE-AZG5DEE","policy"]],"expected_amount_minor":100558895,"issue_id":"ISS-001","type":"period_cutoff"}],"tolerance_minor":1}

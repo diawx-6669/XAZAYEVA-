@@ -243,13 +243,20 @@ def contract_checks(eps: Episodes) -> list:
                {"episode_id": erroneous.episode_id, "findings": [{"type": "fx_rate"}]},
                {"episode_id": "ep-other00000", "findings": []},
                {"episode_id": erroneous.episode_id, "findings": [], "extra": 1}]
+        actions = [{"tool": "submit", "args": {"findings": b}} for b in bad]
+        actions += [{"tool": "submit"}, {"tool": "submit", "args": {}}, {"tool": "submit", "args": None}]
         ok = True
-        for b in bad:
+        for a in actions:
             log = GraderLog()
             env = AuditEnv(mode="train", grader_log=log)
             env.reset(episode=erroneous)
-            out = env.step({"tool": "submit", "args": {"findings": b}})
-            ok &= bool(out[1] == -1.0 and out[2] is True and log.records[0]["valid"] is False and log.records[0]["error"])
+            out = env.step(a)
+            ok &= bool(out[1] == -1.0 and out[2] is True and log.records[0]["valid"] is False and log.records[0]["error"]
+                       and out[0] == {"result": {"submitted": True}, "steps_remaining": 99})
+        flat = AuditEnv(mode="train")
+        flat.reset(episode=erroneous)
+        ok &= flat.step({"tool": "submit", "args": {"episode_id": erroneous.episode_id,
+                                                    "findings": oracle_findings(erroneous.truth)}})[1] == 1.0
         return ok
 
     def c_no_leaks():
@@ -282,7 +289,7 @@ def contract_checks(eps: Episodes) -> list:
               ("calculator exact decimal arithmetic", c_calc_correct),
               ("eval mode: reward 0, info {}, result only in grader log", c_eval_mode),
               ("two env instances do not interfere", c_isolation_two_envs), ("reset() isolates episode state", c_reset_isolates),
-              ("invalid findings -> -1, terminated, logged", c_invalid_findings),
+              ("invalid findings / malformed submit -> -1, terminated, logged; flat form ok", c_invalid_findings),
               ("leakscan clean on all trajectories; records read-only", lambda: c_no_leaks() and c_readonly())]
     return run_checks(checks)
 
@@ -484,12 +491,13 @@ def repro_checks(eps: Episodes) -> list:
 
 
 # ============================================================ diagnostics
-def diagnostics(eps: Episodes, log_path=None) -> list:
+def diagnostics(eps: Episodes, log_path=None) -> tuple:
+    """(deterministic rows, timing rows). Times never enter the deterministic part of the report."""
     log = GraderLog(log_path)
-    rows = []
+    rows, timing = [], []
     names = ["random_explorer", "simple_reconcile", "flag_all", "oracle"] + [f"attack:{a}" for a in ATTACKS]
     for name in names:
-        stats = []
+        stats, times = [], []
         for ep in eps.all():
             t0 = time.monotonic()
             if name.startswith("attack:"):
@@ -497,14 +505,26 @@ def diagnostics(eps: Episodes, log_path=None) -> list:
                 r = run_episode(name, episode=ep, mode="eval", grader_log=log, policy_obj=pol)
             else:
                 r = run_episode(name, episode=ep, mode="eval", grader_log=log, isolate=(name != "oracle"))
+            times.append(time.monotonic() - t0)
             g = r["grade"]
             stats.append((g["precision"], g["recall"], g["f1"], g["reward"], g["reward_experimental"], g["steps"],
-                          time.monotonic() - t0, r["returned_reward"]))
+                          r["returned_reward"]))
         col = lambda i: statistics.mean(s[i] for s in stats)  # noqa: E731
-        rows.append({"policy": name, "P": col(0), "R": col(1), "F1": col(2), "return": col(3), "return_exp": col(4),
-                     "steps": col(5), "time_ms": 1000 * col(6), "max_time_ms": 1000 * max(s[6] for s in stats),
-                     "agent_saw_reward": any(s[7] != 0 for s in stats)})
-    return rows
+        rows.append({"policy": name, "P": round(col(0), 6), "R": round(col(1), 6), "F1": round(col(2), 6),
+                     "return": round(col(3), 6), "return_exp": round(col(4), 6), "steps": round(col(5), 3),
+                     "agent_saw_reward": any(s[6] != 0 for s in stats)})
+        ts = sorted(times)
+        timing.append({"policy": name, "mean_ms": 1000 * statistics.mean(ts), "p50_ms": 1000 * _pct(ts, 50),
+                       "p95_ms": 1000 * _pct(ts, 95), "max_ms": 1000 * ts[-1]})
+    return rows, timing
+
+
+def _pct(sorted_vals, q):
+    """Nearest-rank percentile (no numpy)."""
+    if not sorted_vals:
+        return 0.0
+    k = max(0, min(len(sorted_vals) - 1, -(-q * len(sorted_vals) // 100) - 1))
+    return sorted_vals[int(k)]
 
 
 def failure_analysis(eps: Episodes) -> dict:
@@ -529,33 +549,77 @@ TITLES = {"contract": "Контракт и изоляция", "data": "Данн�
           "repro": "Воспроизводимость и обобщение"}
 
 
+def header() -> dict:
+    """Who/what produced the report. Commit comes from the VERSION file written at build time
+    (Docker images have no .git), else from git, else 'unknown'."""
+    import platform
+    import subprocess
+
+    from . import GENERATOR_VERSION, __version__
+    from .config import config_hash, load_config
+
+    commit = "unknown"
+    vf = ROOT / "VERSION"
+    if vf.exists():
+        commit = vf.read_text("utf-8").strip() or "unknown"
+    else:
+        try:
+            commit = subprocess.run(["git", "rev-parse", "--short=12", "HEAD"], cwd=ROOT, capture_output=True,
+                                    text=True, timeout=5).stdout.strip() or "unknown"
+        except (OSError, subprocess.SubprocessError):
+            pass
+    hashes = {}
+    for p in sorted(CONFIGS_DIR.glob("*.json")):
+        raw = json.loads(p.read_text("utf-8"))
+        if isinstance(raw, dict) and "name" in raw and "version" in raw:
+            hashes[p.stem] = config_hash(load_config(p))
+    return {"commit": commit, "env_version": __version__, "generator_version": GENERATOR_VERSION,
+            "config_hashes": hashes, "python": platform.python_version(),
+            "platform": f"{platform.system()} {platform.machine()}"}
+
+
 def run(out_dir=None, quiet=False) -> dict:
     t0 = time.monotonic()
     eps = Episodes(load_split("selfcheck"))
     blocks = {"contract": contract_checks(eps), "data": data_checks(eps), "reward": reward_checks(eps),
               "repro": repro_checks(eps)}
+    for v in blocks.values():  # tracebacks contain paths/line numbers: keep only the last line
+        for c in v:
+            if c["error"]:
+                c["error"] = c["error"].strip().splitlines()[-1][:300]
     out_dir = Path(out_dir or ROOT / "reports")
     out_dir.mkdir(parents=True, exist_ok=True)
     log_path = out_dir / "grader_log.jsonl"
     if log_path.exists():
         log_path.unlink()
-    diag = diagnostics(eps, log_path)
+    diag, timing = diagnostics(eps, log_path)
     fails = failure_analysis(eps)
     score = {k: WEIGHTS[k] * sum(c["ok"] for c in v) / len(v) for k, v in blocks.items()}
-    report = {"blocks": blocks, "score": score, "total": sum(score.values()), "max_total": sum(WEIGHTS.values()),
-              "diagnostics": diag, "failure_analysis": fails, "elapsed_s": round(time.monotonic() - t0, 1),
-              "episodes": [f"{c}#{s}" for c, s in eps.items]}
+    report = {"header": header(), "blocks": blocks, "score": score, "total": sum(score.values()),
+              "max_total": sum(WEIGHTS.values()), "diagnostics": diag, "failure_analysis": fails,
+              "episodes": [f"{c}#{s}" for c, s in eps.items],
+              "timing": {"note": "wall-clock, machine dependent: the ONLY non-deterministic block",
+                         "elapsed_s": round(time.monotonic() - t0, 1), "per_policy": timing}}
     md = render_md(report)
     (out_dir / "selfcheck.md").write_text(md, "utf-8")
-    (out_dir / "selfcheck.json").write_text(json.dumps(report, indent=1, ensure_ascii=False, sort_keys=True), "utf-8")
+    (out_dir / "selfcheck.json").write_text(json.dumps(report, indent=1, ensure_ascii=False, sort_keys=True) + "\n",
+                                            "utf-8")
     if not quiet:
         print(md)
     return report
 
 
+TIMING_MARK = "## Замеры времени"
+
+
 def render_md(rep) -> str:
+    h = rep["header"]
     L = ["# AuditEnv self-check", "",
-         f"Эпизоды: {len(rep['episodes'])} (5 clean-only, 5 interaction-heavy, 10 dev-mixed). Время: {rep['elapsed_s']} c.", "",
+         f"commit `{h['commit']}` · env {h['env_version']} · {h['generator_version']} · Python {h['python']} · "
+         f"{h['platform']}", "",
+         "Хеши конфигов: " + ", ".join(f"`{k}` {v}" for k, v in h["config_hashes"].items()), "",
+         f"Эпизоды: {len(rep['episodes'])} (5 clean-only, 5 interaction-heavy, 10 dev-mixed). Всё до раздела "
+         f"«{TIMING_MARK[3:]}» детерминировано: повторный прогон на том же коммите даёт те же байты.", "",
          "## Табло", "", "| Блок | Пройдено | Баллы |", "|---|---|---|"]
     for k, v in rep["blocks"].items():
         L.append(f"| {TITLES[k]} | {sum(c['ok'] for c in v)}/{len(v)} | {rep['score'][k]:.1f} / {WEIGHTS[k]} |")
@@ -563,19 +627,29 @@ def render_md(rep) -> str:
     for k, v in rep["blocks"].items():
         L += ["", f"### {TITLES[k]}", ""]
         for c in v:
-            L.append(f"- {'PASS' if c['ok'] else 'FAIL'} — {c['name']}" + (f"  \n  `{c['error'].strip().splitlines()[-1][:300]}`" if c["error"] else ""))
+            L.append(f"- {'PASS' if c['ok'] else 'FAIL'} — {c['name']}" + (f"  \n  `{c['error']}`" if c["error"] else ""))
     L += ["", "## Диагностика политик (режим eval, средние по 20 эпизодам)", "",
-          "| Политика | P | R | F1 | Возврат | Возврат (эксп.) | Шаги | Время, мс (ср/макс) | Агент видел награду |",
-          "|---|---|---|---|---|---|---|---|---|"]
+          "| Политика | P | R | F1 | Возврат | Возврат (эксп.) | Шаги | Агент видел награду |",
+          "|---|---|---|---|---|---|---|---|"]
     for r in rep["diagnostics"]:
         L.append(f"| {r['policy']} | {r['P']:.3f} | {r['R']:.3f} | {r['F1']:.3f} | {r['return']:.3f} | {r['return_exp']:.3f} | "
-                 f"{r['steps']:.1f} | {r['time_ms']:.0f} / {r['max_time_ms']:.0f} | {'да' if r['agent_saw_reward'] else 'нет'} |")
+                 f"{r['steps']:.1f} | {'да' if r['agent_saw_reward'] else 'нет'} |")
     fa = rep["failure_analysis"]
     L += ["", "## Разбор сбоев simple_reconcile", "", "| Тип ошибки | Найдено / всего |", "|---|---|"]
     for t, d in sorted(fa["recall_by_type"].items()):
         L.append(f"| {t} | {d['found']} / {d['total']} |")
     L += ["", "Коды причин ложных выводов: " + (", ".join(f"`{k}`: {v}" for k, v in sorted(fa["fp_reasons"].items())) or "нет"), ""]
+    tm = rep["timing"]
+    L += [TIMING_MARK + " (недетерминированно, зависит от машины)", "", f"Полный self-check: {tm['elapsed_s']} c.", "",
+          "| Политика | ср, мс | p50, мс | p95, мс | макс, мс |", "|---|---|---|---|---|"]
+    for r in tm["per_policy"]:
+        L.append(f"| {r['policy']} | {r['mean_ms']:.0f} | {r['p50_ms']:.0f} | {r['p95_ms']:.0f} | {r['max_ms']:.0f} |")
+    L.append("")
     return "\n".join(L)
+
+
+def deterministic_part(md: str) -> str:
+    return md.split(TIMING_MARK)[0]
 
 
 def main(argv=None) -> int:

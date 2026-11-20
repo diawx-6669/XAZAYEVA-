@@ -254,15 +254,19 @@ class StoryBuilder:
 
         if "repeat_amount" in present:
             src = r.choice([i for i in self.invoices.values() if not i.tags])
-            other = r.choice([e for e in self.entities if e != src.entity])
-            dt = self.rand_dt(self.first_day, self.last_day - timedelta(days=2))
-            self.add_invoice(other, dt, src.currency, [dict(li) for li in src.line_items], tags=["repeat_amount"])
+            others = [e for e in self.entities if e != src.entity]
+            if others:  # a repeat for the SAME client would be a real duplicate, not a distractor
+                other = r.choice(others)
+                dt = self.rand_dt(self.first_day, self.last_day - timedelta(days=2))
+                self.add_invoice(other, dt, src.currency, [dict(li) for li in src.line_items], tags=["repeat_amount"])
+            else:
+                present.remove("repeat_amount")
 
         if "credit_note_reissue" in present:
             mid = self.first_day + (self.last_day - self.first_day) // 2
             x = self.regular_invoice(self.first_day, mid, cur=self.base, tags=["cancelled"])
             cn_dt = x.issued_at + timedelta(days=r.randint(1, 3), hours=r.randint(0, 5))
-            cn_lines = [{"description": "Credit note: " + li["description"], "service_period": li["service_period"],
+            cn_lines = [{"description": li["description"], "service_period": li["service_period"],
                          "quantity": li["quantity"], "unit_price_minor": -li["unit_price_minor"],
                          "amount_minor": -li["amount_minor"]} for li in x.line_items]
             cn = self.add_invoice(x.entity, cn_dt, self.base, cn_lines, kind="credit_note", cancels=x.key,

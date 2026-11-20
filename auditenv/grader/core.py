@@ -13,12 +13,13 @@ from .schema import validate_findings
 
 
 class EpisodeGrader:
-    def __init__(self, truth: dict, tolerance: int = 1):
+    def __init__(self, truth: dict, tolerance: int | None = None):
         self._truth = truth
-        self.tolerance = tolerance
+        # The tolerance travels with the truth (config.tolerance_minor -> truth.json); default 1.
+        self.tolerance = truth.get("tolerance_minor", 1) if tolerance is None else tolerance
 
     @classmethod
-    def from_dir(cls, grader_dir, tolerance: int = 1) -> "EpisodeGrader":
+    def from_dir(cls, grader_dir, tolerance: int | None = None) -> "EpisodeGrader":
         truth = json.loads((Path(grader_dir) / "truth.json").read_text("utf-8"))
         return cls(truth, tolerance)
 
@@ -32,7 +33,10 @@ class EpisodeGrader:
                 "n_truth": len(issues)}
         if truncated:
             submission = {"episode_id": self.episode_id, "findings": []}
-        err = validate_findings(submission, self.episode_id)
+        if isinstance(submission, dict) and submission.get("__malformed_submit__"):
+            err = "submit_args_malformed"
+        else:
+            err = validate_findings(submission, self.episode_id)
         if err is not None:
             return {**base, "valid": False, "error": err, "tp": 0, "fp": 0, "fn": len(issues), "n_findings": 0,
                     "precision": 0.0, "recall": 0.0, "f1": 0.0, "reward": -1.0, "reward_experimental": -1.0,

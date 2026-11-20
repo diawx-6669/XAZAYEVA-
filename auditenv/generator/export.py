@@ -10,7 +10,7 @@ from pathlib import Path
 from .. import GENERATOR_VERSION, SCHEMA_VERSION
 from ..canon import dumps_bytes, jsonl_bytes
 from ..money import EXPONENTS
-from ..timeutil import fmt_ts
+from ..timeutil import fmt_ts, utc_offset_str
 from .books import ACCOUNTS
 
 LEDGER_COLUMNS = ["row_id", "timestamp", "account", "debit_minor", "credit_minor", "currency", "entity_id",
@@ -32,6 +32,7 @@ def make_policy(book) -> dict:
             "start": fmt_ts(s.period_start),
             "end": fmt_ts(s.period_end),
             "timezone": s.tz_name,
+            "utc_offset": utc_offset_str(s.tz_name),
             "inclusive_start": True,
             "inclusive_end": False,
         },
@@ -41,7 +42,7 @@ def make_policy(book) -> dict:
         "ar_relief_rate": "rate of the invoice transaction date",
         "fx_difference_account": "7900",
         "unapplied_cash": "account 2400 is used only for receipts with invoice_refs = null",
-        "credit_notes": "an invoice with cancels_invoice_id cancels that invoice; both stay in the books",
+        "credit_notes": "an invoice with a negative total whose lines read 'Credit note for <invoice_id>: ...' cancels that invoice; both stay in the books",
         "accounts": dict(ACCOUNTS),
     }
 

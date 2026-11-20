@@ -107,15 +107,20 @@ def cmd_replay(a):
     dirs = {d.name: d for _, d in episode_dirs()}
     runs, bad = {}, 0
     for rec in lines:
-        runs.setdefault((rec["episode_id"], rec["policy"]), []).append(rec)
-    for (eid, pol), recs in sorted(runs.items()):
-        env = AuditEnv(mode="train")
+        runs.setdefault(rec["run_id"], []).append(rec)
+    for rid, recs in sorted(runs.items()):
+        recs.sort(key=lambda r: r["step"])
+        eid = recs[0]["episode_id"]
+        env = AuditEnv(mode=recs[0]["run"]["mode"])
         obs, _ = env.reset(episode_dir=dirs[eid])
         ok = dumps(obs) == dumps(recs[0]["observation"])
         for rec in recs[1:]:
-            out = env.step(rec["action"])
+            # action None = the policy hung/died; the runner then truncated the episode itself
+            out = env.truncate_now() if rec["action"] is None else env.step(rec["action"])
             ok &= dumps(out[0]) == dumps(rec["observation"]) and out[1] == rec["reward"]
             ok &= out[2] == rec["terminated"] and out[3] == rec["truncated"]
+            if "truncation_reason" in rec:
+                ok &= env.truncation_reason == rec["truncation_reason"]
         bad += not ok
     print(f"replay: {len(runs)} runs, {bad} mismatches")
     return 1 if bad else 0

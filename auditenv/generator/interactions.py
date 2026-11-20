@@ -3,7 +3,9 @@ each issue is measured against the state right before *its own* mutation.
 
 partial_fx_cutoff: a foreign-currency receipt on the last day of the period (local early
   morning / late evening, written in UTC so the UTC date differs) is posted at the wrong
-  rate (preferably the UTC-date rate) AND applied only partially.
+  rate (the UTC-date rate, else an adjacent business day; never inverted) AND applied only
+  partially. The two amounts are independent: fx = |Dr 1000 - correct cash| and allocation =
+  Cr 2400, where the unapplied part is always converted at the payment's POLICY rate.
   -> fx_rate[payment_id] + payment_allocation[payment_id] (same ids, different types).
 duplicate_fx: a foreign invoice is posted at the wrong rate, then entered a second time
   copying the wrong posted amount.
@@ -20,7 +22,9 @@ def partial_fx_cutoff(book, rng, cfg, used):
     if not pays:
         return None
     key = pays[0]
-    fx = REGISTRY["fx_rate"].inject(book, f"pay:{key}", rng, cfg, prefer="utc_date")
+    # inverted is excluded here: 1/rate on a partially applied receipt makes the two amounts hard to
+    # tell apart for a reader; adjacent_day is the fallback when the UTC date has the same rate.
+    fx = REGISTRY["fx_rate"].inject(book, f"pay:{key}", rng, cfg, prefer="utc_date", exclude={"inverted"})
     if fx is None:
         return None
     al = REGISTRY["payment_allocation"].inject(book, key, rng, cfg, variant="partial")
@@ -49,3 +53,5 @@ def duplicate_fx(book, rng, cfg, used):
 
 
 SCENARIOS = {"duplicate_fx": duplicate_fx, "partial_fx_cutoff": partial_fx_cutoff}
+SCENARIO_TYPES = {"duplicate_fx": ["duplicate_invoice", "fx_rate"],
+                  "partial_fx_cutoff": ["fx_rate", "payment_allocation"]}

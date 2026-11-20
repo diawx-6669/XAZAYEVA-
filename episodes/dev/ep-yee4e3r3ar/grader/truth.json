@@ -1,1 +1,1 @@
-{"episode_id":"ep-yee4e3r3ar","issues":[]}
+{"episode_id":"ep-yee4e3r3ar","issues":[{"affected_ids":["RCV-WJ4XGX"],"currency":"KZT","evidence_sets":[["DC-E7589GER","DC-BH4R599N","LR-VDAKJ7"]],"expected_amount_minor":302188144,"issue_id":"ISS-001","type":"payment_allocation"}],"tolerance_minor":1}
