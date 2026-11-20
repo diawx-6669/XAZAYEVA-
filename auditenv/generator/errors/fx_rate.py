@@ -120,6 +120,13 @@ class FxRate(ErrorType):
         sets = [[doc.doc_id, primary, fxid, "policy"]]
         if kind == "inv":
             sets.append([doc.doc_id, book.row_of((kind, key), "inv_rev").row_id, fxid, "policy"])
+        else:
+            # Alternative for a receipt: the other side of the cash line. Cash posted = credits to 1200 and
+            # 2400 plus the 7900 difference, so 1200 (+2400) (+7900) rows replace the 1000 row.
+            other = [r.row_id for r in book.rows_of((kind, key))
+                     if r.role.startswith("pay_ar:") or r.role in ("pay_unapplied", "pay_fx")]
+            if other and len(other) + 3 <= 6:
+                sets.append([doc.doc_id] + other + [fxid, "policy"])
         return sets
 
     def expected_amount(self, book, target, **kw):

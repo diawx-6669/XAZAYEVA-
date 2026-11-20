@@ -121,6 +121,12 @@ class AuditEnv:
 
     # ----------------------------------------------------------------- reset
     def reset(self, seed=None, config=None, *, episode_dir=None, episode=None, options=None):
+        if self._data is not None and not self._done:
+            # The previous episode was abandoned (reset before submit/limit): the grader log records it,
+            # so a training loop cannot silently drop bad episodes from its statistics.
+            self.log.write({"episode_id": self._data.episode_id, "abandoned": True, "inspection_steps": self._steps,
+                            "mode": self.mode, **self.run_meta})
+            self._done = True
         if options:
             episode_dir = options.get("episode_dir", episode_dir)
             config = options.get("config", config)

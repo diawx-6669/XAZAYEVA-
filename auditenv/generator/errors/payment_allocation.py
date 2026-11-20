@@ -25,6 +25,8 @@ class PaymentAllocation(ErrorType):
         for k in p.refs:
             if k in used or len(book.allocations_to(k)) != 1:
                 return False
+            if any(rf.invoice == k for rf in book.refunds):  # a refund must never exceed what was applied
+                return False
         return True
 
     def applicable(self, book, used):
@@ -92,8 +94,16 @@ class PaymentAllocation(ErrorType):
 
     def evidence_sets(self, book, target):
         p = book.payments[target]
-        row = self._misapplied_rows(book, target)[0].row_id
-        return [[p.doc_id] + [book.invoices[k].doc_id for k in p.refs] + [row]]
+        docs = [p.doc_id] + [book.invoices[k].doc_id for k in p.refs]
+        sets = [docs + [self._misapplied_rows(book, target)[0].row_id]]
+        # Alternative (base-currency partial allocation): the Cr 1200 rows that WERE applied. Expected
+        # application (refs in order up to their totals) minus what was applied = the misapplied part.
+        applied = [r.row_id for r in book.rows_of(("pay", target))
+                   if r.role.startswith("pay_ar:") and r.invoice_key in (p.refs or [])]
+        unapplied = [r for r in book.rows_of(("pay", target)) if r.role == "pay_unapplied"]
+        if p.currency == book.base and applied and unapplied and len(docs) + len(applied) <= 6:
+            sets.append(docs + applied)
+        return sets
 
     def expected_amount(self, book, target, **kw):
         return sum(r.credit for r in self._misapplied_rows(book, target))

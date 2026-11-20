@@ -1,0 +1,39 @@
+{
+  "contract_version": "1.0",
+  "interface": "Gymnasium-style JSON: reset(seed, config) -> (observation, info); step(action) -> (observation, reward, terminated, truncated, info)",
+  "max_steps": 100,
+  "page_max": 50,
+  "time_limit_s": 60,
+  "step_cost": "0.002",
+  "reward": "clip(2*F1 - 1 - 0.002*inspection_steps, -1, 1)",
+  "default_seed": 0,
+  "tolerance_minor_default": 1,
+  "tools": {
+    "list_records": {"required": ["table"], "optional": ["cursor", "limit"], "tables": ["ledger", "invoices", "payments", "fx"]},
+    "get_record": {"required": ["table", "id"], "optional": [], "tables": ["ledger", "invoices", "payments", "fx", "policy"]},
+    "get_document": {"required": ["doc_id"], "optional": []},
+    "calculator": {"required": ["expression"], "optional": []},
+    "submit": {"required": ["findings"], "optional": []}
+  },
+  "error_codes": ["unknown_tool", "bad_args", "not_found", "invalid_cursor", "calc_error", "episode_over"],
+  "findings_limits": {"max_findings": 30, "max_evidence_ids": 10, "max_explanation_chars": 1000},
+  "interpretations": {
+    "inspection_steps_on_submit": "steps used BEFORE submit; the submit step itself is not counted",
+    "inspection_steps_on_step_limit": 100,
+    "inspection_steps_on_timeout": "steps used when the limit was hit (the late action is not executed and not graded)",
+    "truncated_answer": "an empty findings list is graded (truncated=true)",
+    "truncated_clean_book_reward": 0.8,
+    "limit_over_page_max": "bad_args",
+    "limit_below_one": "bad_args",
+    "csv_empty_cell": null,
+    "missing_reference": null,
+    "submit_forms": ["{findings: {episode_id, findings: [...]}}", "{episode_id, findings: [...]}"],
+    "malformed_submit": {"reward": -1.0, "terminated": true, "observation": {"result": {"submitted": true}}, "diagnostics": "grader log only"},
+    "foreign_episode_id": {"reward": -1.0, "terminated": true},
+    "step_after_end": {"error": "episode_over", "reward": 0.0, "changes_result": false},
+    "same_error_for_unknown_and_other_table_id": "not_found",
+    "intermediate_reward": 0.0,
+    "eval_mode": {"reward": 0.0, "info": {}, "result": "grader_log.jsonl only"},
+    "abandoned_episode": "reset() before the end writes {abandoned: true} to the grader log"
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "auditenv/grader_log.schema.json",
+  "description": "One line of grader_log.jsonl: a graded episode or an abandoned one. prev_hash chains the lines.",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "episode_id",
+        "valid",
+        "reward",
+        "reward_experimental",
+        "tp",
+        "fp",
+        "fn",
+        "precision",
+        "recall",
+        "f1",
+        "inspection_steps",
+        "truncated",
+        "mode",
+        "prev_hash",
+        "n_truth",
+        "n_findings",
+        "findings",
+        "error"
+      ],
+      "properties": {
+        "episode_id": {
+          "type": "string"
+        },
+        "valid": {
+          "type": "boolean"
+        },
+        "reward": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "reward_experimental": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "tp": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fp": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fn": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "precision": {
+          "type": "number"
+        },
+        "recall": {
+          "type": "number"
+        },
+        "f1": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "inspection_steps": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "train",
+            "eval"
+          ]
+        },
+        "truncation_reason": {
+          "enum": [
+            null,
+            "max_steps",
+            "time_limit",
+            "policy_unresponsive"
+          ]
+        },
+        "prev_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "index",
+              "matched",
+              "reason"
+            ],
+            "properties": {
+              "reason": {
+                "enum": [
+                  null,
+                  "wrong_type",
+                  "ids_mismatch",
+                  "amount_out_of_tolerance",
+                  "currency_mismatch",
+                  "evidence_incomplete",
+                  "duplicate_finding",
+                  "unmatched"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "episode_id",
+        "abandoned",
+        "inspection_steps",
+        "mode",
+        "prev_hash"
+      ],
+      "properties": {
+        "abandoned": {
+          "const": true
+        },
+        "prev_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  ]
+}

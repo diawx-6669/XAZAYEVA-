@@ -20,7 +20,7 @@
       "properties": {
         "error": {"type": "object", "additionalProperties": false, "required": ["code"],
                   "properties": {"code": {"enum": ["unknown_tool", "bad_args", "not_found", "invalid_cursor", "calc_error", "episode_over"]}}},
-        "steps_remaining": {"type": "integer", "minimum": 0, "maximum": 99}
+        "steps_remaining": {"type": "integer", "minimum": 0, "maximum": 100, "description": "100 only when the episode is truncated before the first step (hung policy)"}
       }
     }
   ]

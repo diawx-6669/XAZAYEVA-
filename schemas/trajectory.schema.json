@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "auditenv/trajectory.schema.json",
+  "description": "One line of trajectories/trajectories.jsonl (one env transition of one policy run).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "episode_id",
+    "run_id",
+    "policy",
+    "step",
+    "action",
+    "observation",
+    "reward",
+    "terminated",
+    "truncated"
+  ],
+  "properties": {
+    "episode_id": {
+      "type": "string",
+      "pattern": "^ep-[a-z0-9]{10}$"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^run-[0-9a-f]{16}$"
+    },
+    "policy": {
+      "type": "string"
+    },
+    "split": {
+      "enum": [
+        "train",
+        "dev"
+      ]
+    },
+    "step": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "action": {
+      "description": "the raw action as sent by the policy (any JSON), null at reset and for a hung policy"
+    },
+    "observation": {
+      "$ref": "observation.schema.json"
+    },
+    "reward": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1
+    },
+    "terminated": {
+      "type": "boolean"
+    },
+    "truncated": {
+      "type": "boolean"
+    },
+    "truncation_reason": {
+      "enum": [
+        null,
+        "max_steps",
+        "time_limit",
+        "policy_unresponsive"
+      ]
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "env_version",
+        "generator_version",
+        "config_hash",
+        "mode",
+        "max_steps",
+        "time_limit_s"
+      ],
+      "properties": {
+        "env_version": {
+          "type": "string"
+        },
+        "generator_version": {
+          "type": "string"
+        },
+        "config_hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{16}$"
+        },
+        "mode": {
+          "enum": [
+            "train",
+            "eval"
+          ]
+        },
+        "max_steps": {
+          "const": 100
+        },
+        "time_limit_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    }
+  }
+}

@@ -12,6 +12,10 @@ from .reward import prf, shared_reward
 from .schema import validate_findings
 
 
+class GraderIntegrityError(RuntimeError):
+    pass
+
+
 class EpisodeGrader:
     def __init__(self, truth: dict, tolerance: int | None = None):
         self._truth = truth
@@ -20,7 +24,18 @@ class EpisodeGrader:
 
     @classmethod
     def from_dir(cls, grader_dir, tolerance: int | None = None) -> "EpisodeGrader":
-        truth = json.loads((Path(grader_dir) / "truth.json").read_text("utf-8"))
+        """Loads truth.json; if the episode is listed in an index.json (episodes/<split>/index.json) with a
+        grader_digest, the grader files must match it, otherwise GraderIntegrityError (tampered truth)."""
+        g = Path(grader_dir)
+        truth = json.loads((g / "truth.json").read_text("utf-8"))
+        index = g.parent.parent / "index.json"
+        if index.exists():
+            from ..generator.export import grader_digest_of_dir
+
+            for e in json.loads(index.read_text("utf-8")):
+                if e.get("episode_id") == g.parent.name and "grader_digest" in e:
+                    if grader_digest_of_dir(g) != e["grader_digest"]:
+                        raise GraderIntegrityError(f"grader files of {g.parent.name} do not match index.json")
         return cls(truth, tolerance)
 
     @property

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "auditenv/index.schema.json",
+  "description": "episodes/<split>/index.json",
+  "type": "array",
+  "minItems": 10,
+  "maxItems": 10,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "episode_id",
+      "config",
+      "seed",
+      "public_digest",
+      "grader_digest"
+    ],
+    "properties": {
+      "episode_id": {
+        "type": "string",
+        "pattern": "^ep-[a-z0-9]{10}$"
+      },
+      "config": {
+        "type": "string"
+      },
+      "seed": {
+        "type": "integer"
+      },
+      "public_digest": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "grader_digest": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    }
+  }
+}

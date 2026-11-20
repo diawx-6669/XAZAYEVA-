@@ -167,6 +167,11 @@ def generate_episode(seed, config=None) -> Episode:
             continue
         files = _export(book, cfg, chash, seed, attempt)
         issues, mutations = [], []
+        for inj in injected:
+            # Evidence is read from the FINAL books: a later mutation of the same document (partial_fx_cutoff)
+            # may add/replace rows that an earlier issue's alternative set refers to. Amounts stay as measured
+            # right before each mutation.
+            inj.evidence_sets = REGISTRY[inj.type].evidence_sets(book, inj.target)
         for n, inj in enumerate(injected, start=1):
             iid = f"ISS-{n:03d}"
             issues.append({"issue_id": iid, "type": inj.type, "affected_ids": sorted(inj.affected_ids),

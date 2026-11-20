@@ -25,14 +25,28 @@ def _collect_ids(t: dict) -> list:
     return sorted(ids)
 
 
-def make_mapping(t: dict, seed) -> dict:
+OPAQUE_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def make_mapping(t: dict, seed, opaque: bool = False) -> dict:
+    """Prefix-preserving renaming, or (opaque=True) IDs with NO prefix and a random length of 12-64
+    characters: a policy keyed on 'INV-'/'PMT-' or on the ID length breaks, an honest one does not.
+    The episode_id keeps its 'ep-' + 10 lower-case form (manifest schema)."""
     rng = make_rng(seed, "transform-naming")
     old = _collect_ids(t)
     taken = set(old)
     mapping = {}
+    eid = t["manifest"]["episode_id"]
     for x in old:
         prefix, _, tok = x.rpartition("-")
         while True:
+            if opaque and x != eid:
+                new = "".join(rng.choice(OPAQUE_ALPHABET) for _ in range(rng.randint(12, 64)))
+                if new not in taken:
+                    taken.add(new)
+                    mapping[x] = new
+                    break
+                continue
             alphabet = ALPHABET.lower() if tok.islower() else ALPHABET
             new = f"{prefix}-" + "".join(rng.choice(alphabet) for _ in range(len(tok)))
             if new not in taken:
@@ -76,11 +90,11 @@ def transform_truth(truth: dict, mapping: dict) -> dict:
     return out
 
 
-def transform_episode(ep: Episode, seed) -> tuple:
+def transform_episode(ep: Episode, seed, opaque: bool = False) -> tuple:
     t = parse_files(ep.files)
-    mapping = make_mapping(t, seed)
+    mapping = make_mapping(t, seed, opaque)
     t2 = transform_tables(t, mapping, seed)
     files = serialize_tables(t2)
     truth = transform_truth(ep.truth, mapping)
-    prov = {"transformed_from": ep.episode_id, "transform_seed": seed}
+    prov = {"transformed_from": ep.episode_id, "transform_key": seed, "opaque_ids": opaque}
     return Episode(t2["manifest"]["episode_id"], files, truth, prov), mapping

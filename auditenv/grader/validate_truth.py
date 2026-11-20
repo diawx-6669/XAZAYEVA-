@@ -79,13 +79,31 @@ def verify_evidence(pd, issue: dict, ev: list):
         have = {i["invoice_id"] for i in invoices}
         if not set(p[0]["invoice_refs"]) <= have:
             return False, "missing_invoice", None
+        refs = p[0]["invoice_refs"]
         r = [x for x in rows if x["payment_id"] == aid and x["account"] == "2400" and x["credit_minor"]]
         if not r:  # wrong_invoice: a Cr 1200 row of this receipt on an invoice it does not reference
             r = [x for x in rows if x["payment_id"] == aid and x["account"] == "1200" and x["credit_minor"]
-                 and x["invoice_id"] and x["invoice_id"] not in p[0]["invoice_refs"]]
-        if not r:
+                 and x["invoice_id"] and x["invoice_id"] not in refs]
+        applied = [x for x in rows if x["payment_id"] == aid and x["account"] == "1200" and x["credit_minor"]
+                   and x["invoice_id"] in refs]
+        if r:
+            amount = r[0]["credit_minor"]
+        elif applied and p[0]["currency"] == pd.base:
+            # alternative set: expected application (refs in order up to their totals) minus applied rows
+            left, want = p[0]["amount_minor"], 0
+            by_id = {i["invoice_id"]: i for i in invoices}
+            for ref in refs:
+                a = min(left, max(0, by_id[ref]["total_minor"]))
+                want += a
+                left -= a
+            if {x["invoice_id"] for x in applied} != {ref for ref in refs if by_id[ref]["total_minor"] > 0} - (
+                    set() if len(applied) == len(refs) else {refs[-1]}):
+                return False, "missing_ledger_row", None
+            amount = want - sum(x["credit_minor"] for x in applied)
+            if amount <= 0:
+                return False, "amount_not_reproduced", amount
+        else:
             return False, "missing_ledger_row", None
-        amount = r[0]["credit_minor"]
     elif typ == "fx_rate":
         docs = [d for d in invoices if d["invoice_id"] == aid] + [d for d in payments if d["payment_id"] == aid]
         if not docs or not pols or not fxs:
@@ -106,6 +124,10 @@ def verify_evidence(pd, issue: dict, ev: list):
         else:
             r = [x for x in rows if x["payment_id"] == aid and x["account"] == "1000" and x["debit_minor"]]
             posted = r[0]["debit_minor"] if r else None
+            other = [x for x in rows if x["payment_id"] == aid and x["account"] in ("1200", "2400", "7900")]
+            if posted is None and any(x["account"] == "1200" for x in other):
+                # alternative set: cash = Cr 1200 + Cr 2400 + (Cr 7900 - Dr 7900)
+                posted = sum(x["credit_minor"] - (x["debit_minor"] if x["account"] == "7900" else 0) for x in other)
         if posted is None:
             return False, "missing_ledger_row", None
         amount = abs(posted - correct)
@@ -150,6 +172,8 @@ def validate(pd, truth: dict, tolerance: int | None = None) -> dict:
                 evidence_problems.append((iss["issue_id"], reason))
         if iss["currency"] != pd.base:
             evidence_problems.append((iss["issue_id"], "currency_not_base"))
+        if len({x for s in sets for x in s}) > 10:  # "submit every set" must fit the 10 evidence_ids limit
+            evidence_problems.append((iss["issue_id"], "evidence_union_over_10"))
     ok = not (missing or extra or amount_mismatch or evidence_problems or found["structural"])
     return {"ok": ok, "missing": missing, "extra": extra, "amount_mismatch": amount_mismatch,
             "evidence_problems": evidence_problems, "structural": found["structural"],

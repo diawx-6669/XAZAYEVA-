@@ -48,7 +48,7 @@ def test_committed_trajectories_are_clean():
         assert set(recs[0]["run"]) >= {"env_version", "generator_version", "config_hash", "mode"}
         assert "truncation_reason" in recs[-1] and (recs[-1]["terminated"] or recs[-1]["truncated"])
         assert not any("seed" in k for r in recs for k in list(r) + list(r.get("run", {})))
-    assert {x["policy"] for x in lines} == {"random_explorer", "simple_reconcile", "flag_all"}  # no oracle
+    assert {x["policy"] for x in lines} == {"random_explorer", "simple_reconcile", "flag_all", "step_burner", "hung"}  # no oracle
 
 
 def test_env_never_reads_grader_dir_for_observations(tmp_path, erroneous):

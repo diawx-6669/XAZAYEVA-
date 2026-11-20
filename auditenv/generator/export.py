@@ -143,6 +143,17 @@ def write_episode(ep, out_dir) -> Path:
     return out
 
 
+def grader_files(ep) -> dict:
+    return {"truth.json": dumps_bytes(ep.truth), "provenance.json": dumps_bytes(ep.provenance)}
+
+
+def grader_digest_of_dir(grader_dir) -> str:
+    from ..canon import files_digest
+
+    g = Path(grader_dir)
+    return files_digest({n: (g / n).read_bytes() for n in ("truth.json", "provenance.json")})
+
+
 def read_public_files(public_dir) -> dict:
     p = Path(public_dir)
     return {name: (p / name).read_bytes() for name in PUBLIC_FILES}

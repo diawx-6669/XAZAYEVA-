@@ -33,6 +33,24 @@ def _gen(item):
     return cfg, seed, ep.files, ep.truth, ep.provenance["mutations"]
 
 
+def _gen_to_dir(item):
+    from .generator.episode import generate_episode
+    from .generator.export import write_episode
+
+    cfg, seed, root = item
+    ep = generate_episode(seed, cfg)
+    return str(write_episode(ep, f"{root}/{cfg}-{seed}"))
+
+
+def write_many(items, root, workers=None):
+    workers = workers or min(4, os.cpu_count() or 1)
+    jobs = [(c, s, str(root)) for c, s in items]
+    if workers <= 1:
+        return [_gen_to_dir(j) for j in jobs]
+    with ProcessPoolExecutor(max_workers=workers) as ex:
+        return list(ex.map(_gen_to_dir, jobs, chunksize=8))
+
+
 def generate_many(items, workers=None):
     workers = workers or min(4, os.cpu_count() or 1)
     if workers <= 1:

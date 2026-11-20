@@ -3,60 +3,70 @@
   "episode_id": "ep-3bwbxj4nsy",
   "config": "dev-mixed",
   "seed": 201,
-  "public_digest": "ea9d407946694237c4af1bdd9ddf5c49c95832a42232c160f454f33fcbfb2794"
+  "public_digest": "ea9d407946694237c4af1bdd9ddf5c49c95832a42232c160f454f33fcbfb2794",
+  "grader_digest": "0ac194769311054685f796ded20bcad20068b7a504b304bc7f879337e085236c"
  },
  {
   "episode_id": "ep-yee4e3r3ar",
   "config": "dev-mixed",
   "seed": 202,
-  "public_digest": "aad9a6912c81f87abfab660d6583c0d56da29af3ec072931d66815e11e6b2e9e"
+  "public_digest": "aad9a6912c81f87abfab660d6583c0d56da29af3ec072931d66815e11e6b2e9e",
+  "grader_digest": "852b77e9cb7817b49f9f66d7a85a5fcd65b2e431535d072d2aa405b0a61061bc"
  },
  {
   "episode_id": "ep-vw9vceq4qf",
   "config": "dev-mixed",
   "seed": 203,
-  "public_digest": "cd5bb234555594ffc467e11bdff2dd2b53d54576c1e71babdbd3fc4c22afd744"
+  "public_digest": "18e0aeed513f15ae78f1d9c0a63b1848b2fdfc62d056c96cff44a0c273fb6f07",
+  "grader_digest": "26f610029cf8346bc3800fcd3ea9addc8cd81d3eaf3dfaadaefbe96e3b157ced"
  },
  {
   "episode_id": "ep-eedmc2zyem",
   "config": "dev-global",
   "seed": 204,
-  "public_digest": "c2334e1c4b74afbdaff3cca0673035d31f6154019a9e960fcd53d487d378ddff"
+  "public_digest": "c2334e1c4b74afbdaff3cca0673035d31f6154019a9e960fcd53d487d378ddff",
+  "grader_digest": "45b9b824e25fc00b97da25889bd5838299ddb82cce0214aecf48a51f1077d2f5"
  },
  {
   "episode_id": "ep-ghqjfb86vj",
   "config": "dev-global",
   "seed": 205,
-  "public_digest": "3275146dd82d18371b283d7561ca778fa9c95c88c2d5a6a1af9aa2731d8e6a57"
+  "public_digest": "3275146dd82d18371b283d7561ca778fa9c95c88c2d5a6a1af9aa2731d8e6a57",
+  "grader_digest": "367428b6d94ee0de48189034991dc1929e453cae85eb45560831132b50df3d6d"
  },
  {
   "episode_id": "ep-vq9n3qwk8v",
   "config": "interaction-heavy",
   "seed": 206,
-  "public_digest": "4c100cefa7479d39444a3cf05dc8c5b902e82dc9385c3bf2e227308587afc13a"
+  "public_digest": "4c100cefa7479d39444a3cf05dc8c5b902e82dc9385c3bf2e227308587afc13a",
+  "grader_digest": "ca72a2a20cf15635c5ebd82f01a8fcf7e39d79742018fcf521c55757727505c3"
  },
  {
   "episode_id": "ep-byttstzrqb",
   "config": "interaction-heavy",
   "seed": 207,
-  "public_digest": "43ec533bc6f510c536041b0a8e96aa17bb31bb5e54b42ccaac4f2f97e25deca6"
+  "public_digest": "43ec533bc6f510c536041b0a8e96aa17bb31bb5e54b42ccaac4f2f97e25deca6",
+  "grader_digest": "1fcbf896aab8263bc4d00dd03ff6f8235e7284a37d95775bb63ce57c1f4a21c6"
  },
  {
   "episode_id": "ep-htfdvq2mvr",
   "config": "interaction-heavy",
   "seed": 208,
-  "public_digest": "0e2d0b0b8fd80cb13aadc08277bf690a701151d1823103d97d1788af38e41614"
+  "public_digest": "0e2d0b0b8fd80cb13aadc08277bf690a701151d1823103d97d1788af38e41614",
+  "grader_digest": "89a7e2be4ce51d02fd4fc1b6657b90dccba013e5fe75fb823229bed52fcd6e42"
  },
  {
   "episode_id": "ep-ap6e6dpf7p",
   "config": "clean-only",
   "seed": 209,
-  "public_digest": "89c1fe1289c4c8ebd665391eedd63412eb8d5a35a0a28ef1ec5fc77abf6cc9d6"
+  "public_digest": "4c0429607a196d8a6c8af89459d7b0d05f160d620c35b507f4c81ed7ef578a59",
+  "grader_digest": "eabfd8a16183385b34b0631c5a8d36121eb83db9cd5c3ea707b09d7a177998f4"
  },
  {
   "episode_id": "ep-etjx7zm8qz",
   "config": "clean-only",
   "seed": 210,
-  "public_digest": "5222366bfd232883b85431ea40dfd412bb8d4a8ca02fb6e9e373e37f6ac17a38"
+  "public_digest": "5222366bfd232883b85431ea40dfd412bb8d4a8ca02fb6e9e373e37f6ac17a38",
+  "grader_digest": "a4c54fec349a8ec780b19eb2466ca769b2370e493fc596fb7825b543d0dbc5cf"
  }
 ]

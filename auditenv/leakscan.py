@@ -56,7 +56,8 @@ def scan_lines(lines, truths: dict) -> list:
     for n, rec in enumerate(lines):
         if isinstance(rec, (str, bytes)):
             rec = json.loads(rec)
-        probs = scan_observation(rec["observation"], truths.get(rec["episode_id"]), first=rec["step"] == 0)
+        first = rec["step"] == 0 and "truncation_reason" not in rec  # a hung policy is truncated at step 0
+        probs = scan_observation(rec["observation"], truths.get(rec["episode_id"]), first=first)
         if probs:
             out.append({"line": n, "episode_id": rec["episode_id"], "step": rec["step"], "problems": probs})
     return out

@@ -491,11 +491,30 @@ def repro_checks(eps: Episodes) -> list:
 
 
 # ============================================================ diagnostics
+def _mean(xs):
+    xs = [x for x in xs if x is not None]
+    return round(statistics.mean(xs), 6) if xs else None
+
+
+def _micro(tp, fp, fn):
+    p = tp / (tp + fp) if tp + fp else None
+    r = tp / (tp + fn) if tp + fn else None
+    f1 = 2 * tp / (2 * tp + fp + fn) if (2 * tp + fp + fn) else None
+    return p, r, f1
+
+
+DIAG_POLICIES = ["random_explorer", "simple_reconcile", "flag_all", "oracle", "oracle_observing"]
+
+
 def diagnostics(eps: Episodes, log_path=None) -> tuple:
-    """(deterministic rows, timing rows). Times never enter the deterministic part of the report."""
+    """(deterministic rows, timing rows, grader log head). Times never enter the deterministic part.
+
+    Per policy: macro P/R (mean over episodes where defined: P needs >= 1 finding, R needs >= 1 issue),
+    macro F1, MICRO P/R/F1 (sum TP / sum FP / sum FN over all episodes), return on all / clean /
+    erroneous episodes, experimental return, steps. None = undefined ('n/a' in the report)."""
     log = GraderLog(log_path)
     rows, timing = [], []
-    names = ["random_explorer", "simple_reconcile", "flag_all", "oracle"] + [f"attack:{a}" for a in ATTACKS]
+    names = DIAG_POLICIES + [f"attack:{a}" for a in ATTACKS]
     for name in names:
         stats, times = [], []
         for ep in eps.all():
@@ -504,19 +523,28 @@ def diagnostics(eps: Episodes, log_path=None) -> tuple:
                 pol = AttackPolicy(name.split(":", 1)[1], ep.truth, ep.public())
                 r = run_episode(name, episode=ep, mode="eval", grader_log=log, policy_obj=pol)
             else:
-                r = run_episode(name, episode=ep, mode="eval", grader_log=log, isolate=(name != "oracle"))
+                r = run_episode(name, episode=ep, mode="eval", grader_log=log,
+                                isolate=name not in ("oracle", "oracle_observing"))
             times.append(time.monotonic() - t0)
             g = r["grade"]
-            stats.append((g["precision"], g["recall"], g["f1"], g["reward"], g["reward_experimental"], g["steps"],
-                          r["returned_reward"]))
-        col = lambda i: statistics.mean(s[i] for s in stats)  # noqa: E731
-        rows.append({"policy": name, "P": round(col(0), 6), "R": round(col(1), 6), "F1": round(col(2), 6),
-                     "return": round(col(3), 6), "return_exp": round(col(4), 6), "steps": round(col(5), 3),
-                     "agent_saw_reward": any(s[6] != 0 for s in stats)})
+            stats.append({"clean": not ep.truth["issues"], "tp": g["tp"], "fp": g["fp"], "fn": g["fn"],
+                          "P": g["precision"] if g["tp"] + g["fp"] else None,
+                          "R": g["recall"] if g["tp"] + g["fn"] else None, "F1": g["f1"], "ret": g["reward"],
+                          "ret_exp": g["reward_experimental"], "steps": g["steps"], "seen": r["returned_reward"] != 0})
+        mp, mr, mf = _micro(sum(x["tp"] for x in stats), sum(x["fp"] for x in stats), sum(x["fn"] for x in stats))
+        rows.append({"policy": name, "P": _mean(x["P"] for x in stats), "R": _mean(x["R"] for x in stats),
+                     "F1": _mean(x["F1"] for x in stats),
+                     "micro_P": None if mp is None else round(mp, 6), "micro_R": None if mr is None else round(mr, 6),
+                     "micro_F1": None if mf is None else round(mf, 6),
+                     "return": _mean(x["ret"] for x in stats),
+                     "return_clean": _mean(x["ret"] for x in stats if x["clean"]),
+                     "return_erroneous": _mean(x["ret"] for x in stats if not x["clean"]),
+                     "return_exp": _mean(x["ret_exp"] for x in stats), "steps": _mean(x["steps"] for x in stats),
+                     "agent_saw_reward": any(x["seen"] for x in stats)})
         ts = sorted(times)
         timing.append({"policy": name, "mean_ms": 1000 * statistics.mean(ts), "p50_ms": 1000 * _pct(ts, 50),
                        "p95_ms": 1000 * _pct(ts, 95), "max_ms": 1000 * ts[-1]})
-    return rows, timing
+    return rows, timing, log.head
 
 
 def _pct(sorted_vals, q):
@@ -592,11 +620,12 @@ def run(out_dir=None, quiet=False) -> dict:
     log_path = out_dir / "grader_log.jsonl"
     if log_path.exists():
         log_path.unlink()
-    diag, timing = diagnostics(eps, log_path)
+    diag, timing, log_head = diagnostics(eps, log_path)
     fails = failure_analysis(eps)
     score = {k: WEIGHTS[k] * sum(c["ok"] for c in v) / len(v) for k, v in blocks.items()}
     report = {"header": header(), "blocks": blocks, "score": score, "total": sum(score.values()),
               "max_total": sum(WEIGHTS.values()), "diagnostics": diag, "failure_analysis": fails,
+              "grader_log_head": log_head,
               "episodes": [f"{c}#{s}" for c, s in eps.items],
               "timing": {"note": "wall-clock, machine dependent: the ONLY non-deterministic block",
                          "elapsed_s": round(time.monotonic() - t0, 1), "per_policy": timing}}
@@ -628,17 +657,23 @@ def render_md(rep) -> str:
         L += ["", f"### {TITLES[k]}", ""]
         for c in v:
             L.append(f"- {'PASS' if c['ok'] else 'FAIL'} — {c['name']}" + (f"  \n  `{c['error']}`" if c["error"] else ""))
-    L += ["", "## Диагностика политик (режим eval, средние по 20 эпизодам)", "",
-          "| Политика | P | R | F1 | Возврат | Возврат (эксп.) | Шаги | Агент видел награду |",
-          "|---|---|---|---|---|---|---|---|"]
+    na = lambda v, f="{:.3f}": "n/a" if v is None else f.format(v)  # noqa: E731
+    L += ["", "## Диагностика политик (режим eval, 20 эпизодов)", "",
+          "P, R — макро (среднее по эпизодам, где величина определена); микро — ΣTP/ΣFP/ΣFN по всем эпизодам; "
+          "«n/a» — не определено (нет выводов / нет ошибок). Возврат отдельно на чистых и ошибочных книгах.", "",
+          "| Политика | P | R | F1 | микро P | микро R | микро F1 | Возврат | на чистых | на ошибочных | Возврат (эксп.) | Шаги | Агент видел награду |",
+          "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for r in rep["diagnostics"]:
-        L.append(f"| {r['policy']} | {r['P']:.3f} | {r['R']:.3f} | {r['F1']:.3f} | {r['return']:.3f} | {r['return_exp']:.3f} | "
-                 f"{r['steps']:.1f} | {'да' if r['agent_saw_reward'] else 'нет'} |")
+        L.append(f"| {r['policy']} | {na(r['P'])} | {na(r['R'])} | {na(r['F1'])} | {na(r['micro_P'])} | {na(r['micro_R'])} | "
+                 f"{na(r['micro_F1'])} | {na(r['return'])} | {na(r['return_clean'])} | {na(r['return_erroneous'])} | "
+                 f"{na(r['return_exp'])} | {na(r['steps'], '{:.1f}')} | {'да' if r['agent_saw_reward'] else 'нет'} |")
     fa = rep["failure_analysis"]
     L += ["", "## Разбор сбоев simple_reconcile", "", "| Тип ошибки | Найдено / всего |", "|---|---|"]
     for t, d in sorted(fa["recall_by_type"].items()):
         L.append(f"| {t} | {d['found']} / {d['total']} |")
-    L += ["", "Коды причин ложных выводов: " + (", ".join(f"`{k}`: {v}" for k, v in sorted(fa["fp_reasons"].items())) or "нет"), ""]
+    L += ["", "Коды причин ложных выводов: " + (", ".join(f"`{k}`: {v}" for k, v in sorted(fa["fp_reasons"].items())) or "нет"), "",
+          f"Журнал оценщика `reports/grader_log.jsonl`: цепочка хешей, голова `{rep.get('grader_log_head', '?')}` "
+          "(проверка: `python -m auditenv verify-log`).", ""]
     tm = rep["timing"]
     L += [TIMING_MARK + " (недетерминированно, зависит от машины)", "", f"Полный self-check: {tm['elapsed_s']} c.", "",
           "| Политика | ср, мс | p50, мс | p95, мс | макс, мс |", "|---|---|---|---|---|"]

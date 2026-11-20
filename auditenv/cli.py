@@ -39,7 +39,10 @@ def cmd_export(a):
         for cfg, seed in load_split(split):
             ep = generate_episode(seed, cfg)
             write_episode(ep, root / ep.episode_id)
-            index.append({"episode_id": ep.episode_id, "config": cfg, "seed": seed, "public_digest": files_digest(ep.files)})
+            from .generator.export import grader_files
+
+            index.append({"episode_id": ep.episode_id, "config": cfg, "seed": seed, "public_digest": files_digest(ep.files),
+                          "grader_digest": files_digest(grader_files(ep))})
         (root / "index.json").write_text(json.dumps(index, indent=1) + "\n", "utf-8")
         print(f"{split}: {len(index)} episodes -> {root}")
 
@@ -56,7 +59,10 @@ def cmd_run(a):
     from .runner import run_episode
 
     kw = {"episode_dir": a.episode_dir} if a.episode_dir else {"seed": a.seed, "config": a.config}
-    r = run_episode(a.policy, mode=a.mode, grader_log=a.log, **kw)
+    if not a.policy and not a.policy_cmd:
+        raise SystemExit("run: give --policy NAME or --policy-cmd 'python my_agent.py'")
+    r = run_episode(a.policy or "external", mode=a.mode, grader_log=a.log, policy_cmd=a.policy_cmd,
+                    time_limit=a.time_limit, **kw)
     if a.trajectory_out:
         Path(a.trajectory_out).write_text("".join(dumps(x) + "\n" for x in r["trajectory"]), "utf-8")
     print(json.dumps({k: r["grade"][k] for k in ("episode_id", "tp", "fp", "fn", "f1", "reward", "steps")}
@@ -69,10 +75,19 @@ def cmd_trajectories(a):
 
     TRAJ_PATH.parent.mkdir(parents=True, exist_ok=True)
     n = 0
+    dirs = episode_dirs()
     with TRAJ_PATH.open("w", encoding="utf-8") as fh:
-        for split, d in episode_dirs():
+        for split, d in dirs:
             for pol in AGENT_BASELINES:
                 r = run_episode(pol, episode_dir=d, mode="train")
+                for rec in r["trajectory"]:
+                    fh.write(dumps({**rec, "split": split}) + "\n")
+                    n += 1
+        # termination contract on record: a policy that burns all 100 steps (truncated, max_steps) and a
+        # hung policy (truncated, policy_unresponsive) - one train and one dev episode each
+        for split, d in (dirs[0], dirs[-1]):
+            for pol, tl in (("step_burner", 60.0), ("hung", 1.0)):
+                r = run_episode(pol, episode_dir=d, mode="train", time_limit=tl)
                 for rec in r["trajectory"]:
                     fh.write(dumps({**rec, "split": split}) + "\n")
                     n += 1
@@ -126,16 +141,83 @@ def cmd_replay(a):
     return 1 if bad else 0
 
 
+def cmd_check_schemas(a):
+    """Every committed JSON artefact against its published schema: trajectories (each line), grader log
+    (each line), episodes/*/index.json, public files and truth.json of every committed episode."""
+    from .env.data import PublicData
+    from .schemas import errors, validate_public
+
+    problems = []
+    n = 0
+    if TRAJ_PATH.exists():
+        for k, line in enumerate(TRAJ_PATH.read_text("utf-8").splitlines()):
+            n += 1
+            for m in errors("trajectory", json.loads(line))[:1]:
+                problems.append(f"trajectories.jsonl:{k + 1}: {m}")
+    log = ROOT / "reports" / "grader_log.jsonl"
+    if log.exists() and not getattr(a, "no_log", False):
+        for k, line in enumerate(log.read_text("utf-8").splitlines()):
+            n += 1
+            for m in errors("grader_log", json.loads(line))[:1]:
+                problems.append(f"grader_log.jsonl:{k + 1}: {m}")
+    for split in ("train", "dev"):
+        n += 1
+        for m in errors("index", json.loads((EPISODES_DIR / split / "index.json").read_text("utf-8")))[:1]:
+            problems.append(f"{split}/index.json: {m}")
+    for _, d in episode_dirs():
+        n += 1
+        problems += [f"{d.name}: {m}" for m in validate_public(PublicData.from_dir(d / "public"))[:2]]
+        problems += [f"{d.name}/truth: {m}" for m in errors("truth", json.loads((d / "grader" / "truth.json").read_text()))[:2]]
+    print(f"check-schemas: {n} artefacts/lines validated, {len(problems)} problems")
+    for p in problems[:10]:
+        print(" ", p)
+    return 1 if problems else 0
+
+
+def cmd_lint(a):
+    from .env.data import PublicData
+    from .generator.episode import generate_episode
+    from .lint import lint, unexplained
+    from .selfcheck import load_split
+
+    eps = []
+    for _, d in episode_dirs():
+        eps.append((PublicData.from_dir(d / "public"), json.loads((d / "grader" / "truth.json").read_text("utf-8"))))
+    for cfg, seed in load_split("selfcheck"):
+        ep = generate_episode(seed, cfg)
+        eps.append((ep.public(), ep.truth))
+    hits = sum(len(lint(pd)) for pd, _ in eps)
+    bad = [(pd.episode_id, u) for pd, t in eps for u in [unexplained(pd, t)] if u]
+    print(f"lint: {len(eps)} episodes, {hits} plausibility findings, all explained by truth" if not bad
+          else f"lint: {len(bad)} episodes with UNEXPLAINED implausibilities")
+    for b in bad[:10]:
+        print(" ", b)
+    return 1 if bad else 0
+
+
 def cmd_check(a):
+    """The single verification command (after pytest): scoreboard + every independent cross-check."""
     from . import selfcheck
 
-    rc = selfcheck.main()
-    if TRAJ_PATH.exists():
-        class A:
-            trajectories = str(TRAJ_PATH)
+    class T:
+        trajectories = str(TRAJ_PATH)
 
-        rc |= cmd_leakscan(A)
-        rc |= cmd_replay(A)
+    class V:
+        seeds = getattr(a, "seeds", 500)
+
+    class L:
+        path = str(ROOT / "reports" / "grader_log.jsonl")
+        head = None
+
+    steps = [("selfcheck", lambda: selfcheck.main()), ("leakscan", lambda: cmd_leakscan(T)),
+             ("replay", lambda: cmd_replay(T)), ("verify-log", lambda: cmd_verify_log(L)),
+             ("verify-provenance", lambda: cmd_verify_provenance(a)), ("verify-independent", lambda: cmd_verify_independent(V)),
+             ("lint", lambda: cmd_lint(a)), ("check-schemas", lambda: cmd_check_schemas(a))]
+    rc = 0
+    for name, fn in steps:
+        r = fn() or 0
+        rc |= r
+    print("check: " + ("ALL GREEN" if rc == 0 else "FAILED"))
     return rc
 
 
@@ -189,6 +271,79 @@ def cmd_demo(a):
     print(f"result: reward={r:+.3f} info={info}")
 
 
+def cmd_serve(a):
+    from .serve import serve
+
+    return serve(a.mode, a.log)
+
+
+def cmd_transform(a):
+    from .generator.episode import Episode
+    from .generator.export import read_public_files, write_episode
+    from .generator.transforms import transform_episode
+
+    src = Path(a.episode_dir)
+    truth = json.loads((src / "grader" / "truth.json").read_text("utf-8"))
+    prov = json.loads((src / "grader" / "provenance.json").read_text("utf-8"))
+    ep = Episode(truth["episode_id"], read_public_files(src / "public"), truth, prov)
+    twin, mapping = transform_episode(ep, a.seed, opaque=a.opaque_ids)
+    out = write_episode(twin, a.out)
+    (out / "grader" / "id_map.json").write_text(dumps(dict(sorted(mapping.items()))) + "\n", "utf-8")
+    print(f"{ep.episode_id} -> {twin.episode_id}: {len(mapping)} IDs renamed{' (opaque)' if a.opaque_ids else ''} -> {out}")
+
+
+def cmd_verify_independent(a):
+    """Committed train/dev episodes + the 20 self-check episodes + N fresh seeds, all checked by
+    tools/verify_independent.py in an ISOLATED interpreter (python -I): it cannot import auditenv."""
+    import subprocess
+    import tempfile
+
+    from .analysis import plan, write_many
+    from .selfcheck import load_split
+
+    dirs = [str(d) for _, d in episode_dirs()]
+    with tempfile.TemporaryDirectory(prefix="auditenv-indep-") as tmp:
+        items = load_split("selfcheck") + plan(a.seeds, base_seed=50000)
+        dirs += write_many(items, tmp)
+        out = subprocess.run([sys.executable, "-I", str(ROOT / "tools" / "verify_independent.py"), *dirs],
+                             capture_output=True, text=True)
+    print(out.stdout.strip() + f"  [committed 20 + selfcheck 20 + {a.seeds} seeds]")
+    if out.returncode and out.stderr:
+        print(out.stderr.strip()[-2000:])
+    return out.returncode
+
+
+def cmd_verify_provenance(a):
+    from .generator.episode import generate_episode
+    from .selfcheck import load_split
+    from .verify_provenance import verify, verify_dir
+
+    results = [verify_dir(d) for _, d in episode_dirs()]
+    for cfg, seed in load_split("selfcheck"):
+        ep = generate_episode(seed, cfg)
+        results.append(verify(ep.files, ep.truth, ep.provenance))
+    bad = [r for r in results if not r["ok"]]
+    print(f"verify-provenance: {len(results)} episodes, {sum(r['mutations'] for r in results)} mutations undone and "
+          f"replayed, {len(bad)} failed")
+    for r in bad[:10]:
+        print(" ", r["episode_id"], r["problems"][:3])
+    return 1 if bad else 0
+
+
+def cmd_verify_log(a):
+    from .grader.log import verify_chain
+
+    head = a.head
+    if head is None:
+        rep = ROOT / "reports" / "selfcheck.json"
+        if Path(a.path).resolve() == (ROOT / "reports" / "grader_log.jsonl").resolve() and rep.exists():
+            head = json.loads(rep.read_text("utf-8")).get("grader_log_head")
+    r = verify_chain(a.path, head)
+    print(f"verify-log: {r['records']} records, head {r['head'][:16]}…, "
+          + ("chain OK" + (" (matches published head)" if head else "") if r["ok"] else f"BROKEN at line {r['broken_at']}"))
+    return 0 if r["ok"] else 1
+
+
 def cmd_analyze(a):
     from .analysis import main as analysis_main
 
@@ -217,9 +372,11 @@ def main(argv=None) -> int:
     g.add_argument("--out", required=True)
     sub.add_parser("export")
     r = sub.add_parser("run")
-    r.add_argument("--policy", required=True, choices=["random_explorer", "simple_reconcile", "flag_all", "oracle"])
+    r.add_argument("--policy", choices=["random_explorer", "simple_reconcile", "flag_all", "oracle", "step_burner"])
+    r.add_argument("--policy-cmd", help="your agent as a command speaking JSON lines (docs/ADAPTER.md)")
+    r.add_argument("--time-limit", type=float, default=60.0)
     r.add_argument("--episode-dir")
-    r.add_argument("--seed", type=int)
+    r.add_argument("--seed", type=int, default=None)
     r.add_argument("--config", default="dev-mixed")
     r.add_argument("--mode", default="train", choices=["train", "eval"])
     r.add_argument("--log")
@@ -234,6 +391,23 @@ def main(argv=None) -> int:
     d.add_argument("--seed", type=int, default=9008)
     d.add_argument("--config", default="interaction-heavy")
     sub.add_parser("golden")
+    sv = sub.add_parser("serve")
+    sv.add_argument("--mode", default="train", choices=["train", "eval"])
+    sv.add_argument("--log")
+    tf = sub.add_parser("transform")
+    tf.add_argument("--episode-dir", required=True)
+    tf.add_argument("--out", required=True)
+    tf.add_argument("--seed", type=int, required=True)
+    tf.add_argument("--opaque-ids", action="store_true", help="IDs without prefixes, random length 12-64")
+    vi = sub.add_parser("verify-independent")
+    vi.add_argument("--seeds", type=int, default=500)
+    sub.add_parser("verify-provenance")
+    cs = sub.add_parser("check-schemas")
+    cs.add_argument("--no-log", action="store_true")
+    sub.add_parser("lint")
+    vl = sub.add_parser("verify-log")
+    vl.add_argument("path", nargs="?", default=str(ROOT / "reports" / "grader_log.jsonl"))
+    vl.add_argument("--head", help="expected chain head (e.g. from reports/selfcheck.json)")
     an = sub.add_parser("analyze")
     an.add_argument("--n", type=int, default=300)
     an.add_argument("--out")
@@ -245,7 +419,7 @@ def main(argv=None) -> int:
         from .docs_check import main as docs_main
 
         return docs_main(["--fix"] if a.fix else [])
-    fn = globals()["cmd_" + a.cmd]
+    fn = globals()["cmd_" + a.cmd.replace("-", "_")]
     return fn(a) or 0
 
 

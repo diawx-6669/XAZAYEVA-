@@ -290,7 +290,8 @@ class StoryBuilder:
             if others:  # a repeat for the SAME client would be a real duplicate, not a distractor
                 other = r.choice(others)
                 dt = self.rand_dt(self.first_day, self.last_day - timedelta(days=2))
-                self.add_invoice(other, dt, src.currency, [dict(li) for li in src.line_items], tags=["repeat_amount"])
+                lines = [dict(li, service_period=month_str(dt.date())) for li in src.line_items]  # same amounts, own month
+                self.add_invoice(other, dt, src.currency, lines, tags=["repeat_amount"])
             else:
                 present.remove("repeat_amount")
 

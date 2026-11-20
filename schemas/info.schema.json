@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "auditenv/info.schema.json",
+  "description": "info returned by reset/step. eval mode: always {}. train mode: {'mode': 'train'} after reset, {} while exploring, metrics at the end.",
+  "oneOf": [
+    {
+      "type": "object",
+      "maxProperties": 0
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "const": "train"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "valid",
+        "tp",
+        "fp",
+        "fn",
+        "precision",
+        "recall",
+        "f1",
+        "reward_experimental"
+      ],
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        },
+        "tp": {
+          "type": "integer"
+        },
+        "fp": {
+          "type": "integer"
+        },
+        "fn": {
+          "type": "integer"
+        },
+        "precision": {
+          "type": "number"
+        },
+        "recall": {
+          "type": "number"
+        },
+        "f1": {
+          "type": "number"
+        },
+        "reward_experimental": {
+          "type": "number"
+        }
+      }
+    }
+  ]
+}

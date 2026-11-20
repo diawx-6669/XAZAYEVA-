@@ -8,7 +8,7 @@ from functools import lru_cache
 from .paths import SCHEMAS_DIR
 
 NAMES = ["manifest", "ledger_row", "invoice", "payment", "fx", "policy", "action", "observation", "findings",
-         "truth", "config"]
+         "truth", "config", "trajectory", "grader_log", "info", "index"]
 
 
 @lru_cache(maxsize=None)
