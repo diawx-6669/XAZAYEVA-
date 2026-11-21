@@ -6,6 +6,9 @@ from auditenv.paths import ROOT
 
 sys.path.insert(0, str(ROOT))
 from examples.env_pool import EnvPool, size_config  # noqa: E402
+import pytest
+
+pytestmark = pytest.mark.slow  # heavy round-4 check: in make check, not in make quick
 
 
 def test_pool_results_do_not_depend_on_worker_count():

@@ -7,16 +7,21 @@ from fractions import Fraction
 
 from auditenv.grader.core import EpisodeGrader
 from auditenv.paths import ROOT
+import pytest
+
+pytestmark = pytest.mark.slow  # heavy round-4 check: in make check, not in make quick
 
 sys.path.insert(0, str(ROOT / "tools"))
 _spec = importlib.util.spec_from_file_location("sensitivity", ROOT / "tools" / "sensitivity.py")
 sens = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(sens)
 
-DATA = sens.submissions(4)
+@pytest.fixture(scope="module")
+def data():
+    return sens.submissions(4)
 
 
-def _mean(name, tol):
+def _mean(DATA, name, tol):
     out = []
     for ep, subs in DATA:
         fs, st = subs[name]
@@ -24,16 +29,15 @@ def _mean(name, tol):
     return statistics.fmean(out)
 
 
-def test_tolerance_one_accepts_rounding_difference_but_not_two():
-    has_issues = any(ep.truth["issues"] for ep, _ in DATA)
-    assert has_issues
-    assert _mean("oracle amount+1", 1) == _mean("oracle amount-1", 1) > _mean("oracle amount+1", 0)
-    assert _mean("oracle amount+2", 1) < _mean("oracle amount+1", 1)
+def test_tolerance_one_accepts_rounding_difference_but_not_two(data):
+    assert any(ep.truth["issues"] for ep, _ in data)
+    assert _mean(data, "oracle amount+1", 1) == _mean(data, "oracle amount-1", 1) > _mean(data, "oracle amount+1", 0)
+    assert _mean(data, "oracle amount+2", 1) < _mean(data, "oracle amount+1", 1)
     for t in sens.TOLS:
-        assert _mean("attack:amount_bruteforce", t) < _mean("oracle", 1)
+        assert _mean(data, "attack:amount_bruteforce", t) < _mean(data, "oracle", 1)
 
 
-def test_step_cost_report_renders_and_lambda_zero_ignores_steps():
-    text = sens.step_cost_report(DATA, len(DATA))
+def test_step_cost_report_renders_and_lambda_zero_ignores_steps(data):
+    text = sens.step_cost_report(data, len(data))
     assert "λ = 0.002" in text and "`oracle`" in text
     assert sens.COSTS[1] == Fraction(2, 1000)

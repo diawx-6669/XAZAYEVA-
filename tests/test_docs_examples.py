@@ -17,6 +17,8 @@ import pytest
 
 from auditenv.paths import ROOT
 
+pytestmark = pytest.mark.slow  # heavy round-4 check: in make check, not in make quick
+
 DOCS = ["README.md", "README.en.md", "docs/JURY.md", "docs/ADAPTER.md"]
 SPEC = json.loads((ROOT / "tests" / "docs_examples.json").read_text("utf-8"))
 TIMEOUT = 60

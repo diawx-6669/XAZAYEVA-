@@ -7,6 +7,9 @@ from auditenv.env.data import PublicData
 from auditenv.env.env import AuditEnv
 from auditenv.generator.episode import generate_episode
 from auditenv.paths import ROOT
+import pytest
+
+pytestmark = pytest.mark.slow  # heavy round-4 check: in make check, not in make quick
 
 _spec = importlib.util.spec_from_file_location("min_budget", ROOT / "tools" / "min_budget.py")
 mb = importlib.util.module_from_spec(_spec)

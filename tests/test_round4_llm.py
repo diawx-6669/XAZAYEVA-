@@ -11,6 +11,8 @@ from auditenv.jsonschema_lite import validate
 from auditenv.leakscan import scan_observation
 from auditenv.paths import ROOT
 
+pytestmark = pytest.mark.slow  # heavy round-4 check: in make check, not in make quick
+
 LLM = ROOT / "tools" / "llm"
 _spec = importlib.util.spec_from_file_location("llm_build", LLM / "build.py")
 build = importlib.util.module_from_spec(_spec)

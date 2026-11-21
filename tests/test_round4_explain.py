@@ -11,6 +11,8 @@ from auditenv.explain import EXAMPLES, recompute, render
 from auditenv.generator.episode import generate_episode
 from auditenv.paths import ROOT
 
+pytestmark = pytest.mark.slow  # heavy round-4 check: in make check, not in make quick
+
 
 def test_amounts_recomputed_from_snapshots_on_all_open_episodes():
     n = 0

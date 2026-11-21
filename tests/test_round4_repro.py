@@ -6,6 +6,9 @@ import json
 from auditenv.paths import ROOT
 
 import importlib.util
+import pytest
+
+pytestmark = pytest.mark.slow  # heavy round-4 check: in make check, not in make quick
 
 _spec = importlib.util.spec_from_file_location("repro_cert", ROOT / "tools" / "repro_cert.py")
 repro_cert = importlib.util.module_from_spec(_spec)

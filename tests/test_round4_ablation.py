@@ -6,6 +6,9 @@ import sys
 import auditenv.grader.core as core
 import auditenv.grader.matcher as matcher
 from auditenv.paths import ROOT
+import pytest
+
+pytestmark = pytest.mark.slow  # heavy round-4 check: in make check, not in make quick
 
 sys.path.insert(0, str(ROOT / "tools"))
 _spec = importlib.util.spec_from_file_location("ablation_evidence", ROOT / "tools" / "ablation_evidence.py")

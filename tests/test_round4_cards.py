@@ -3,6 +3,9 @@
 import importlib.util
 
 from auditenv.paths import ROOT
+import pytest
+
+pytestmark = pytest.mark.slow  # heavy round-4 check: in make check, not in make quick
 
 _spec = importlib.util.spec_from_file_location("episode_cards", ROOT / "tools" / "episode_cards.py")
 ec = importlib.util.module_from_spec(_spec)
