@@ -91,7 +91,8 @@ def test_salt_positive_control_without_hardening(tmp_path):
     protection, not luck, is what keeps the salt secret in the test above."""
     r = evaluator(["--policy", "truth_hunter", "--seed", "7", "--config", "dev-mixed", "--mode", "eval",
                    "--log", str(tmp_path / "log.jsonl"), "--trajectory-out", str(tmp_path / "traj.jsonl")],
-                  cwd=tmp_path, salt="jury-" + secrets.token_hex(16), extra={"AUDITENV_INSECURE_DUMPABLE": "1"})
+                  cwd=tmp_path, salt="jury-" + secrets.token_hex(16), extra={"AUDITENV_INSECURE_DUMPABLE": "1",
+                                                                           "AUDITENV_NO_CONCEAL": "1"})
     assert r.returncode == 0, r.stderr
     assert ("LEAK-SALT",) in {tuple(f["affected_ids"]) for f in submitted(tmp_path / "traj.jsonl")}
 
