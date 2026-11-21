@@ -20,7 +20,7 @@ jobs:
           mkdir -p out
           docker run --rm --network none --cpus 2 --memory 4g \
             -v "$PWD/out:/out" auditenv \
-            sh -c 'sh scripts/check.sh; rc=$?; cp -r reports /out/; exit $rc'
+            sh -c 'sh scripts/check.sh; rc=$?; python tools/repro_cert.py --out reports/repro_certificate_ci.json; python tools/repro_cert.py --check || rc=1; cp -r reports /out/; exit $rc'
       - name: Upload reports/
         if: always()
         uses: actions/upload-artifact@v4
