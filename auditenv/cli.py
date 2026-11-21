@@ -292,6 +292,37 @@ def cmd_transform(a):
     print(f"{ep.episode_id} -> {twin.episode_id}: {len(mapping)} IDs renamed{' (opaque)' if a.opaque_ids else ''} -> {out}")
 
 
+def cmd_jury_pairs(a):
+    """N paired transforms for ANY policy (docs/JURY.md): each episode is generated in the evaluator's memory
+    (closed if AUDITENV_SEED_SALT is set), its twin gets shuffled rows and opaque IDs (transform --opaque-ids),
+    the policy runs on both in a separate process; reward and F1 must be equal. Nothing is written to disk."""
+    from .generator.episode import generate_episode
+    from .generator.transforms import transform_episode
+    from .runner import run_episode
+
+    if not a.policy and not a.policy_cmd:
+        raise SystemExit("jury-pairs: give --policy NAME or --policy-cmd 'python my_agent.py'")
+    name = a.policy or "external"
+    rows, bad = [], 0
+    for k in range(a.n):
+        seed = a.seed_start + k
+        ep = generate_episode(seed, a.config)
+        twin, _ = transform_episode(ep, a.transform_seed + k, opaque=True)
+        g = [run_episode(name, episode=e, policy_cmd=a.policy_cmd, record=False)["grade"] for e in (ep, twin)]
+        same = g[0]["reward"] == g[1]["reward"] and g[0]["f1"] == g[1]["f1"]
+        bad += not same
+        rows.append({"pair": k + 1, "seed": seed, "issues": g[0]["n_truth"], "reward": g[0]["reward"],
+                     "reward_twin": g[1]["reward"], "f1": g[0]["f1"], "f1_twin": g[1]["f1"], "equal": same})
+        print(f"{k + 1:2d}  {g[0]['n_truth']} issues  reward {g[0]['reward']:+.3f} / {g[1]['reward']:+.3f}  "
+              f"F1 {g[0]['f1']:.3f} / {g[1]['f1']:.3f}  {'OK' if same else 'MISMATCH'}", flush=True)
+    salted = bool(__import__("os").environ.get("AUDITENV_SEED_SALT"))
+    print(f"jury-pairs: {a.n - bad}/{a.n} pairs equal (policy {name}, config {a.config}, "
+          f"{'salted' if salted else 'UNSALTED (open)'} episodes)")
+    if a.json:
+        Path(a.json).write_text(json.dumps(rows, indent=1, sort_keys=True) + "\n", "utf-8")
+    return 1 if bad else 0
+
+
 def cmd_verify_independent(a):
     """Committed train/dev episodes + the 20 self-check episodes + N fresh seeds, all checked by
     tools/verify_independent.py in an ISOLATED interpreter (python -I): it cannot import auditenv."""
@@ -431,6 +462,14 @@ def main(argv=None) -> int:
     tf.add_argument("--out", required=True)
     tf.add_argument("--seed", type=int, required=True)
     tf.add_argument("--opaque-ids", action="store_true", help="IDs without prefixes, random length 12-64")
+    jp = sub.add_parser("jury-pairs", help="N paired transforms (original vs opaque-ID twin) for any policy")
+    jp.add_argument("--policy", choices=["random_explorer", "simple_reconcile", "flag_all", "oracle"])
+    jp.add_argument("--policy-cmd")
+    jp.add_argument("--n", type=int, default=20)
+    jp.add_argument("--config", default="dev-mixed")
+    jp.add_argument("--seed-start", type=int, default=880000)
+    jp.add_argument("--transform-seed", type=int, default=5)
+    jp.add_argument("--json", help="write the per-pair table here")
     vi = sub.add_parser("verify-independent")
     vi.add_argument("--seeds", type=int, default=500)
     sub.add_parser("verify-provenance")
