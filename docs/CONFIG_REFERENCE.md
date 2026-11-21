@@ -23,7 +23,7 @@ python -m auditenv validate-config configs/dev-mixed.json
 | `n_foreign` | array of integer | [мин, макс] ≥ 0 | `[1, 2]` | сколько иностранных валют в эпизоде [мин, макс] |
 | `foreign_share` | number | 0…1 | `0.3` | доля документов в иностранной валюте |
 | `timezones` | array of enum | ≥ 1 элем. `Asia/Almaty`, `Asia/Tashkent`, `Asia/Dubai`, `Asia/Kolkata`, `Asia/Tokyo`, `America/Bogota`, `America/Lima`, `Asia/Kathmandu`, `Pacific/Kiritimati`, `Pacific/Pago_Pago` | `["Asia/Almaty", "Asia/Tashkent", "Asia/Dubai", "Asia/Kolk…` | часовой пояс компании (без летнего времени) |
-| `period_starts` | array of string | ≥ 1 элем. `^20[0-9]{2}-(0[1-9]|1[0-2])$` | `["2026-07", "2026-08"]` | месяц начала периода `YYYY-MM` |
+| `period_starts` | array of string | ≥ 1 элем. `^20[0-9]{2}-(0[1-9]\|1[0-2])$` | `["2026-07", "2026-08"]` | месяц начала периода `YYYY-MM` |
 | `period_months` | integer или array of integer | 1…6 или [мин, макс] 1…6 | `3` | длина периода в месяцах: число или [мин, макс] |
 | `n_entities` | array of integer | [мин, макс] 1…500 | `[8, 14]` | число клиентов [мин, макс] |
 | `n_invoices` | array of integer | [мин, макс] 5…2000 | `[26, 36]` | число обычных счетов [мин, макс] (плюс отвлекающие случаи) |

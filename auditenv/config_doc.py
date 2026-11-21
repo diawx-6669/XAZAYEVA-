@@ -90,7 +90,7 @@ def _range_text(s: dict, root: dict) -> tuple[str, str]:
     elif hi is not None:
         r = f"≤ {hi}"
     if "pattern" in s:
-        r = f"`{s['pattern']}`"
+        r = "`" + s["pattern"].replace("|", "\\|") + "`"
     return t or "?", r or "любое"
 
 
