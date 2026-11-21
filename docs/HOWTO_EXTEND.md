@@ -7,10 +7,14 @@ trajectories` → `python -m auditenv docs-check --fix` → `make check` (дол
 
 ## 1. Новый тип ошибки (отрепетировано: `vat_error`, 242 секунды)
 
-Репетиция — в локальной ветке `final-rehearsal` (в `main` **не сливается**), полный патч:
-[`docs/rehearsal/vat_error.patch`](rehearsal/vat_error.patch). Патч снят **до** слияния с `main`
-(построчная выручка, свой валидатор схем), поэтому применять его — `git apply -3` с ручной правкой;
-список шагов ниже от этого не меняется.
+Репетиция — в ветке `final-rehearsal` (в `main` **не сливается**), полный патч кода:
+[`docs/rehearsal/vat_error.patch`](rehearsal/vat_error.patch) (27 файлов). **Раунд 3:** патч перенесён на
+текущий код (после слияния с `main`: построчная выручка, свой валидатор схем) — при переносе вручную
+доделаны 2 места (`grader/validate_truth.py::verify_evidence`, `tools/verify_independent.py::evidence_amount`)
+и версии конфигов 2.1 → 2.2. Теперь он применяется без правок: `git apply docs/rehearsal/vat_error.patch`
+(проверяется тестом `tests/test_round3.py::test_vat_rehearsal_patch_applies_cleanly`). После него — общее правило выше
+(`lock-configs`, `export`, `golden`, `trajectories`, `python tools/build_replay.py`, `export-audit`,
+`docs-check --fix`, ≈ 15 с); в ветке `final-rehearsal` весь pytest зелёный и `make check` — `ALL GREEN`.
 Время от создания ветки до зелёного pytest — **242 с** (Claude Code; человеку по этому списку —
 порядка 1–2 часов), затем `make check` — 1 мин 43 с, табло 90/90, `ALL GREEN`.
 

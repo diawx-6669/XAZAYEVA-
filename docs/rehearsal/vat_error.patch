@@ -12,10 +12,10 @@ index 5476abd..124a05b 100644
  
  def surface_table(results) -> dict:
 diff --git a/auditenv/config.py b/auditenv/config.py
-index aef7540..0cf49e3 100644
+index 420ea63..c409bd1 100644
 --- a/auditenv/config.py
 +++ b/auditenv/config.py
-@@ -47,6 +47,7 @@ DEFAULT_CONFIG = {
+@@ -48,6 +48,7 @@ DEFAULT_CONFIG = {
      "duplicate_variants": {"copy": 0.7, "paid_twice": 0.3},
      "cutoff_variants": {"utc_trap": 0.6, "backdated_posting": 0.2, "prior_period": 0.2},
      "min_lookalikes_per_type": 1,
@@ -61,7 +61,7 @@ index 8f29051..55be511 100644
 +from . import duplicate_invoice, fx_rate, payment_allocation, period_cutoff, vat_error  # noqa: F401
  from .base import ORDER, REGISTRY, Injected, register  # noqa: F401
 diff --git a/auditenv/generator/errors/base.py b/auditenv/generator/errors/base.py
-index 420fc22..116b2ec 100644
+index 4520d94..6ee1389 100644
 --- a/auditenv/generator/errors/base.py
 +++ b/auditenv/generator/errors/base.py
 @@ -16,7 +16,7 @@ from dataclasses import dataclass, field
@@ -141,10 +141,10 @@ index 0000000..abc60e1
 +        vat, net = split_vat(book.invoices[target].line_items)
 +        return abs(vat["amount_minor"] - vat_of(net))
 diff --git a/auditenv/generator/invariants.py b/auditenv/generator/invariants.py
-index 89aa302..6e1480d 100644
+index bef0f09..2294c5d 100644
 --- a/auditenv/generator/invariants.py
 +++ b/auditenv/generator/invariants.py
-@@ -18,7 +18,7 @@ import re
+@@ -16,7 +16,7 @@ from __future__ import annotations
  
  from ..canon import dumps
  
@@ -153,7 +153,7 @@ index 89aa302..6e1480d 100644
  
  
  def _v(name, rid, amount, **detail):
-@@ -258,6 +258,20 @@ def check_unique(pd) -> list:
+@@ -256,6 +256,20 @@ def check_unique(pd) -> list:
                 original=orig["invoice_id"]) for dup, orig in duplicate_invoices(pd)]
  
  
@@ -174,7 +174,7 @@ index 89aa302..6e1480d 100644
  def check_all(pd) -> dict:
      uniq = check_unique(pd)
      return {
-@@ -267,6 +281,7 @@ def check_all(pd) -> dict:
+@@ -265,6 +279,7 @@ def check_all(pd) -> dict:
          "fx_conversion": check_fx(pd, skip_invoice_ids=[v["id"] for v in uniq]),
          "period": check_period(pd),
          "unique_billing": uniq,
@@ -183,7 +183,7 @@ index 89aa302..6e1480d 100644
  
  
 diff --git a/auditenv/generator/story.py b/auditenv/generator/story.py
-index 49a61f6..41f08fb 100644
+index 7246f48..cfd3a1b 100644
 --- a/auditenv/generator/story.py
 +++ b/auditenv/generator/story.py
 @@ -270,6 +270,15 @@ class StoryBuilder:
@@ -203,7 +203,7 @@ index 49a61f6..41f08fb 100644
              ent = r.choice(self.entities)
              unit = self.price(self.base)
 diff --git a/auditenv/grader/validate_truth.py b/auditenv/grader/validate_truth.py
-index 79f082f..8da2f2e 100644
+index 5919cbd..dd77f33 100644
 --- a/auditenv/grader/validate_truth.py
 +++ b/auditenv/grader/validate_truth.py
 @@ -15,6 +15,7 @@ TYPE_OF_INVARIANT = {
@@ -214,10 +214,10 @@ index 79f082f..8da2f2e 100644
  }
  
  
-@@ -144,6 +145,16 @@ def verify_evidence(pd, issue: dict, ev: list):
-         if not r:
+@@ -151,6 +152,16 @@ def verify_evidence(pd, issue: dict, ev: list):
+         amount = posting_from_rows(rows, d[0])
+         if amount is None:
              return False, "missing_ledger_row", None
-         amount = r[0]["debit_minor"] + r[0]["credit_minor"]
 +    elif typ == "vat_error":
 +        from ..generator.errors.vat_error import split_vat, vat_of
 +
@@ -245,7 +245,7 @@ index 76e4f5c..bf1192a 100644
  FIRST_KEYS = {"task", "manifest", "policy_summary", "steps_remaining"}
  
 diff --git a/auditenv/policies/attacks.py b/auditenv/policies/attacks.py
-index 28cb6e8..22e8907 100644
+index 2a59eca..7b4722b 100644
 --- a/auditenv/policies/attacks.py
 +++ b/auditenv/policies/attacks.py
 @@ -20,7 +20,7 @@ import random
@@ -271,106 +271,182 @@ index 7dfd0b6..f35f5c5 100644
  
  class FlagAll(Policy):
 diff --git a/configs/CHANGELOG.md b/configs/CHANGELOG.md
-index 94d6578..5ae166b 100644
+index 45c649e..e77c573 100644
 --- a/configs/CHANGELOG.md
 +++ b/configs/CHANGELOG.md
 @@ -8,6 +8,7 @@
  
  | Версия | Конфиги | Что изменилось |
  |---|---|---|
-+| 2.1 | все | Репетиция: тип `vat_error` и ключ `vat_share` (по умолчанию 0). |
++| 2.2 | все | Репетиция: тип `vat_error` и ключ `vat_share` (по умолчанию 0). |
+ | 2.1 | все | Слияние с `main`: размеры эпизодов из `main` (`n_invoices` ≈ 26–36, новый ключ `line_items` = 3–7 строк на счёт, выручка проводится построчно), `stress` уменьшен до 230–260 счетов; ссылка credit note — ключ `cancels_invoice_id` внутри строк. |
  | 2.0 | все | Раунд 2: новые варианты ошибок (`paid_twice`, `wrong_invoice`, `historical_rate`, `wrong_pair`, `due_date`, `backdated_posting`, `prior_period`), отвлекалки `night_fx` / `weekend_fx` / `overpayment`, `min_lookalikes_per_type = 1`, пояса Asia/Kathmandu, Pacific/Kiritimati, Pacific/Pago_Pago (в `dev-mixed`, `interaction-heavy`), `period_months` может быть диапазоном. В `train-easy` новые варианты выключены. |
  | 2.0 | `train-global`, `dev-global` (новые) | База USD/JPY/KWD, старт в ноябре (через Новый год), декабре и феврале, периоды 1–3 месяца, экстремальные пояса. |
- | 1.0 | `train-easy`, `dev-mixed`, `clean-only`, `interaction-heavy`, `stress` | Раунд 1: исходные конфиги. |
+diff --git a/configs/LOCK.json b/configs/LOCK.json
+index 8e2b063..ebc8d57 100644
+--- a/configs/LOCK.json
++++ b/configs/LOCK.json
+@@ -2,50 +2,50 @@
+  {
+   "name": "clean-only",
+   "file": "clean-only.json",
+-  "version": "2.1",
+-  "config_hash": "888d9b2efe8dabab",
+-  "content_hash": "6cb1659204a07b23"
++  "version": "2.2",
++  "config_hash": "b6d09558768ad414",
++  "content_hash": "b56594549b210eab"
+  },
+  {
+   "name": "dev-global",
+   "file": "dev-global.json",
+-  "version": "2.1",
+-  "config_hash": "3e5719530ff397f6",
+-  "content_hash": "e51fadd72ace13c5"
++  "version": "2.2",
++  "config_hash": "7ec3957ea39425ed",
++  "content_hash": "76fdb0e099ec07da"
+  },
+  {
+   "name": "dev-mixed",
+   "file": "dev-mixed.json",
+-  "version": "2.1",
+-  "config_hash": "58d390229a2b5ad5",
+-  "content_hash": "258918937fdf1d3e"
++  "version": "2.2",
++  "config_hash": "9df657735277d52d",
++  "content_hash": "a919f42b7e320731"
+  },
+  {
+   "name": "interaction-heavy",
+   "file": "interaction-heavy.json",
+-  "version": "2.1",
+-  "config_hash": "11d80441ae5df73a",
+-  "content_hash": "89a129019639bd92"
++  "version": "2.2",
++  "config_hash": "fc8b82ee5239bde7",
++  "content_hash": "2dc3947c9cee2e71"
+  },
+  {
+   "name": "stress",
+   "file": "stress.json",
+-  "version": "2.1",
+-  "config_hash": "60b0fe2dbb0fcdfe",
+-  "content_hash": "b67dd765e360c544"
++  "version": "2.2",
++  "config_hash": "9df574484c3413e9",
++  "content_hash": "da78b562708e7e94"
+  },
+  {
+   "name": "train-easy",
+   "file": "train-easy.json",
+-  "version": "2.1",
+-  "config_hash": "8946748a75222c01",
+-  "content_hash": "90e5a35901886a58"
++  "version": "2.2",
++  "config_hash": "db1b8174c8c5cb63",
++  "content_hash": "083025197a6e6b64"
+  },
+  {
+   "name": "train-global",
+   "file": "train-global.json",
+-  "version": "2.1",
+-  "config_hash": "54ed4c6d541dc3f9",
+-  "content_hash": "83f0b214efda3b69"
++  "version": "2.2",
++  "config_hash": "9b84edd49542a1da",
++  "content_hash": "907e6991a6bf5e06"
+  }
+ ]
 diff --git a/configs/clean-only.json b/configs/clean-only.json
-index 1950a7e..77d7370 100644
+index e3054ab..a3c4d46 100644
 --- a/configs/clean-only.json
 +++ b/configs/clean-only.json
 @@ -1,6 +1,6 @@
  {
    "name": "clean-only",
--  "version": "2.0",
-+  "version": "2.1",
+-  "version": "2.1",
++  "version": "2.2",
    "foreign_currencies": ["USD", "EUR", "JPY"],
    "n_foreign": [1, 3],
    "foreign_share": 0.35,
 diff --git a/configs/dev-global.json b/configs/dev-global.json
-index d80d231..a2b3c33 100644
+index f5df1a3..905c35d 100644
 --- a/configs/dev-global.json
 +++ b/configs/dev-global.json
 @@ -1,6 +1,6 @@
  {
    "name": "dev-global",
--  "version": "2.0",
-+  "version": "2.1",
+-  "version": "2.1",
++  "version": "2.2",
    "base_currencies": ["USD", "JPY", "KWD"],
    "foreign_currencies": ["KZT", "USD", "EUR", "JPY", "KWD"],
    "n_foreign": [2, 3],
 diff --git a/configs/dev-mixed.json b/configs/dev-mixed.json
-index d7ba397..e45e0ef 100644
+index 337b72a..2c0b1f4 100644
 --- a/configs/dev-mixed.json
 +++ b/configs/dev-mixed.json
 @@ -1,6 +1,6 @@
  {
    "name": "dev-mixed",
--  "version": "2.0",
-+  "version": "2.1",
+-  "version": "2.1",
++  "version": "2.2",
    "base_currencies": ["KZT"],
    "foreign_currencies": ["USD", "EUR", "JPY", "KWD"],
    "n_foreign": [2, 3],
 diff --git a/configs/interaction-heavy.json b/configs/interaction-heavy.json
-index 5849e6e..9ca9b8e 100644
+index 8afb09f..63349c0 100644
 --- a/configs/interaction-heavy.json
 +++ b/configs/interaction-heavy.json
 @@ -1,6 +1,6 @@
  {
    "name": "interaction-heavy",
--  "version": "2.0",
-+  "version": "2.1",
+-  "version": "2.1",
++  "version": "2.2",
    "foreign_currencies": ["USD", "EUR", "JPY", "KWD"],
    "n_foreign": [2, 3],
    "foreign_share": 0.4,
 diff --git a/configs/stress.json b/configs/stress.json
-index b0acf56..97107f7 100644
+index 14c04f0..be21585 100644
 --- a/configs/stress.json
 +++ b/configs/stress.json
 @@ -1,6 +1,6 @@
  {
    "name": "stress",
--  "version": "2.0",
-+  "version": "2.1",
+-  "version": "2.1",
++  "version": "2.2",
    "foreign_currencies": ["USD", "EUR", "JPY", "KWD"],
    "n_foreign": [3, 4],
    "period_months": 6,
 diff --git a/configs/train-easy.json b/configs/train-easy.json
-index 64f5eed..a25c5a0 100644
+index 4593a72..6b53928 100644
 --- a/configs/train-easy.json
 +++ b/configs/train-easy.json
 @@ -1,6 +1,6 @@
  {
    "name": "train-easy",
--  "version": "2.0",
-+  "version": "2.1",
+-  "version": "2.1",
++  "version": "2.2",
    "foreign_currencies": ["USD"],
    "n_foreign": [1, 1],
    "foreign_share": 0.25,
 diff --git a/configs/train-global.json b/configs/train-global.json
-index 11f3d10..6d425a1 100644
+index 0c9b9aa..c0d48ce 100644
 --- a/configs/train-global.json
 +++ b/configs/train-global.json
 @@ -1,6 +1,6 @@
  {
    "name": "train-global",
--  "version": "2.0",
-+  "version": "2.1",
+-  "version": "2.1",
++  "version": "2.2",
    "base_currencies": ["USD", "JPY", "KWD"],
    "foreign_currencies": ["KZT", "USD", "EUR", "JPY", "KWD"],
    "n_foreign": [1, 2],
 diff --git a/schemas/config.schema.json b/schemas/config.schema.json
-index 1018aa9..6c6ec0f 100644
+index e188606..6311503 100644
 --- a/schemas/config.schema.json
 +++ b/schemas/config.schema.json
-@@ -47,7 +47,8 @@
+@@ -48,7 +48,8 @@
        "type": "object", "additionalProperties": false,
        "properties": {
          "duplicate_invoice": {"type": "number", "minimum": 0}, "payment_allocation": {"type": "number", "minimum": 0},
@@ -380,7 +456,7 @@ index 1018aa9..6c6ec0f 100644
        }
      },
      "interactions": {
-@@ -72,6 +73,7 @@
+@@ -73,6 +74,7 @@
        "type": "object", "additionalProperties": false,
        "properties": {"utc_trap": {"type": "number", "minimum": 0}, "backdated_posting": {"type": "number", "minimum": 0}, "prior_period": {"type": "number", "minimum": 0}}
      },
@@ -415,7 +491,7 @@ index a25a092..b0dc856 100644
            "expected_amount_minor": {"type": "integer", "minimum": 1},
            "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
 diff --git a/tests/test_data.py b/tests/test_data.py
-index d47ae66..760024a 100644
+index 1f44754..01e45e1 100644
 --- a/tests/test_data.py
 +++ b/tests/test_data.py
 @@ -18,7 +18,7 @@ TYPES = sorted(INV)
@@ -428,10 +504,10 @@ index d47ae66..760024a 100644
  
  @pytest.mark.parametrize("seed", range(50))
 diff --git a/tools/verify_independent.py b/tools/verify_independent.py
-index a6be3bf..3291e68 100644
+index 3afd356..48e72bd 100644
 --- a/tools/verify_independent.py
 +++ b/tools/verify_independent.py
-@@ -184,8 +184,23 @@ class Episode:
+@@ -191,8 +191,23 @@ class Episode:
              if not self.in_period(r["ts"]):
                  key = r["inv"] if (r["inv"] and not r["pay"]) else (r["pay"] or r["row_id"])
                  found.setdefault(("period_cutoff", key), r["dr"] or r["cr"])
@@ -455,10 +531,10 @@ index a6be3bf..3291e68 100644
      # ---- evidence: recompute from the set ONLY
      def evidence_amount(self, issue, ids):
          recs = {}
-@@ -274,6 +289,11 @@ class Episode:
+@@ -280,6 +295,11 @@ class Episode:
                  return None, "document_inside_period"
-             r = [x for x in rows if x["inv"] == aid and not x["pay"] and x["account"] in ("1200", "4000")]
-             return (r[0]["dr"] + r[0]["cr"], "ok") if r else (None, "no_posting_row")
+             amt = self.posting_in(rows, d[0])
+             return (amt, "ok") if amt is not None else (None, "no_posting_row")
 +        if typ == "vat_error":
 +            d = [i for i in invs if i["invoice_id"] == aid]
 +            if not d or not pol:

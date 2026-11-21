@@ -115,3 +115,16 @@ def test_doc_commands_tests_and_paths_exist(doc):
             pool = set().union(*(_test_names(f) for f in files))
             for name in re.findall(r"`(test_\w+)`", row):
                 assert name in pool, f"{doc}: {name} not in {files}"
+
+
+# ------------------------------------------------------------------ 6) the vat_error rehearsal patch stays applicable
+def test_vat_rehearsal_patch_applies_cleanly():
+    patch = ROOT / "docs" / "rehearsal" / "vat_error.patch"
+    import shutil
+
+    if not (ROOT / ".git").exists() or not shutil.which("git"):
+        pytest.skip("no git checkout (e.g. inside the image): git apply --check needs the work tree")
+    out = subprocess.run(["git", "apply", "--check", str(patch)], cwd=ROOT, capture_output=True, text=True, timeout=60)
+    assert out.returncode == 0, out.stderr
+    text = patch.read_text("utf-8")
+    assert "auditenv/generator/errors/vat_error.py" in text and text.count("diff --git") >= 20
