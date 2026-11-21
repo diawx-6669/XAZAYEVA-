@@ -107,6 +107,33 @@ four reference policies (`random_explorer`, `simple_reconcile`, `flag_all`, `ora
 Mapping "case requirement → file → test": the table in [`README.md`](README.md); section-10 checks →
 commands: [`docs/JURY.md`](docs/JURY.md).
 
+## Trust card and round-4 tools
+
+| What was checked | Result | Where |
+|---|---|---|
+| Jury-style scoreboard | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
+| Tests (pytest + hypothesis) | <!--fact:n_tests-->656<!--/fact--> | `make check` |
+| Deliberate grader bugs caught by the tests | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` |
+| Independent verifier (no `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> episodes, 0 disagreements | `make check` |
+| Black-box jury simulation (own policies and grader) | <!--fact:jury_sim_open-->0<!--/fact--> open findings | `reports/jury_sim.md` |
+| Vulnerabilities found and closed, each with a guard test | <!--fact:failures_closed-->17<!--/fact--> | `docs/FAILURES.md` |
+| Exhaustive small-case enumeration of the grader | 85 008 cases, 0 violations | `make exhaustive` |
+| Same hashes on Python 3.11 / 3.12 / 3.13, different hash seeds, time zones, locales | 9/9 runs | `make repro-cross` |
+| No real personal or financial data (cards, IBAN, KZ BIN/IIN, e-mail, phones, URLs) | 0 hits on 520 episodes | `make pii-scan`, `docs/SAFETY.md` |
+
+Round-4 commands (outside `make check` unless noted): `make repro-cert` (reproducibility certificate,
+compare machines), `make prepublish` (secrets in the whole git history, read-only), `make min-budget`
+(exact minimal tool calls per evidence set: median 5, max 13 of 100), `make power` (episodes needed to tell
+policies apart), `make difficulty` (Rasch difficulty of error variants), `make coverage-map` (pairwise
+coverage of generator factors), `make sensitivity` (tolerance and step-cost sensitivity), `make ablation`
+(reward without the evidence requirement), `make bench` (multiprocessing env pool), `make verify-release`,
+`make offline-kit`. Grader-side tools for open episodes: `python -m auditenv grade <episode> <findings.json>`
+(reason code per finding) and `python -m auditenv explain <episode>` (before/after HTML, examples in
+`site/explain/`). For LLM agents: tool schemas for OpenAI and Anthropic function calling, a system prompt
+and two few-shot transcripts in `tools/llm/`; a Gymnasium wrapper in `examples/gym_wrapper.py`.
+Short design note: `docs/DESIGN_SHORT.md`; FAQ: `docs/FAQ.md`; agent author guide: `docs/AGENT_GUIDE.md`;
+forecast written before the jury run: `docs/PREDICTION.md`.
+
 ## Limitations (short; full list in `docs/LIMITATIONS.md`)
 
 * A high reward means "found the distortions this generator planted, with the required evidence" —
