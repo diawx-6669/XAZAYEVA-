@@ -75,6 +75,7 @@ def _md_table(text: str, heading: str) -> list:
 
 
 def _md_inline(s: str) -> str:
+    s = re.sub(r"<!--fact:[a-z0-9_]+-->(.*?)<!--/fact-->", r"\1", s)
     s = html.escape(s)
     s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
     return re.sub(r"`(.+?)`", r"<code>\1</code>", s)
