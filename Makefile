@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check repro-cross prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity ablation verify-release offline-kit targets-timing
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check repro-cross prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity ablation verify-release offline-kit targets-timing jury-salts
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -36,6 +36,7 @@ help:
 	@echo "make experiment-v2 E6 v2 on the current generator (new salt)"
 	@echo "make repro-cert-check  recompute the reproducibility certificate and compare with the committed one"
 	@echo "make verify-release  ready to tag? clean tree, tag = HEAD, selfcheck from this code, certificate, SBOM, docs, prepublish"
+	@echo "make jury-salts    black-box jury simulation (closed run + 20 contract checks) under 8 salts -> reports/jury_salts.md"
 	@echo "make targets-timing  run the round-4 targets once and record their wall time -> reports/targets_timing.md"
 	@echo "make offline-kit   dist/: zip of the repo at the tag + saved Docker image + SHA256SUMS for the offline finale"
 	@echo "make submission-tag    print the tag commands and the SHA for the form (docs/SUBMISSION.md)"
@@ -133,6 +134,9 @@ prepublish:
 
 verify-release:
 	$(PYTHON) tools/verify_release.py
+
+jury-salts:
+	$(PYTHON) tools/jury_salts.py --n 8
 
 targets-timing:
 	$(PYTHON) tools/time_targets.py
