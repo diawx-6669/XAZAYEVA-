@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity ablation
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity ablation verify-release
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -35,6 +35,7 @@ help:
 	@echo "make experiment    optional E6 experiment (docs/EXPERIMENT.md); experiment-v2: docs/EXPERIMENT_v2.md"
 	@echo "make experiment-v2 E6 v2 on the current generator (new salt)"
 	@echo "make repro-cert-check  recompute the reproducibility certificate and compare with the committed one"
+	@echo "make verify-release  ready to tag? clean tree, tag = HEAD, selfcheck from this code, certificate, SBOM, docs, prepublish"
 	@echo "make submission-tag    print the tag commands and the SHA for the form (docs/SUBMISSION.md)"
 	@echo "make docker-build  build the image only; make version writes VERSION (commit for the report header)"
 	@echo "make version       write VERSION = short commit id"
@@ -123,6 +124,9 @@ pii-scan:
 
 prepublish:
 	PYTHON=$(PYTHON) sh scripts/prepublish_check.sh
+
+verify-release:
+	$(PYTHON) tools/verify_release.py
 
 submission-tag:
 	@echo "Run on 22.11 after the final make check (docs/SUBMISSION.md):"

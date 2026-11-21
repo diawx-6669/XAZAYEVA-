@@ -246,6 +246,7 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12
 | `make sensitivity` | награда при допуске 0/1/2/5/100 и при цене шага 0…0.01 — обоснование ±1 и 0.002 | `reports/tolerance.md`, `reports/step_cost.md` |
 | `make ablation` | те же ответы с требованием доказательств и без него: что именно закрывают доказательства | `reports/ablation_evidence.md` |
 | `make bench` | пул сред на multiprocessing: шагов/с, эпизодов/с, память, 1 и 2 воркера | `reports/bench.md` |
+| `make verify-release` | готов ли коммит к тегу: чистое дерево, тег = HEAD, self‑check снят с этого кода, сертификат, SBOM, docs‑check, prepublish | вывод в консоль |
 | `python -m auditenv validate-config <file>` | проверка своего конфига, все проблемы сразу с диапазоном и значением по умолчанию | `docs/CONFIG_REFERENCE.md` |
 | `python -m auditenv verify-sbom` | хеши колёс, версии, лицензии, дайджест базового образа | `reports/sbom.json`, `THIRD_PARTY_NOTICES.md` |
 | `python -m auditenv grade <эпизод> <findings.json>` | **инструмент оценщика**: оценить свой ответ, код причины для каждого вывода | вывод в консоль |
