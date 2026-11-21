@@ -4,7 +4,7 @@ import re
 
 from auditenv.paths import ROOT
 
-ROUND4_DOCS = ["docs/SUBMISSION_FORM.md"]
+ROUND4_DOCS = ["docs/SUBMISSION_FORM.md", "docs/AI_USAGE.md", "docs/DESIGN_SHORT.md"]
 
 
 def test_submission_form_lengths():
