@@ -1,0 +1,179 @@
+[
+ {
+  "description": "List one page (at most 50 rows) of a public table. Pass next_cursor from the previous page to continue; cursors are opaque and valid only in this episode.",
+  "input_schema": {
+   "additionalProperties": false,
+   "properties": {
+    "cursor": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "limit": {
+     "maximum": 50,
+     "minimum": 1,
+     "type": "integer"
+    },
+    "table": {
+     "enum": [
+      "ledger",
+      "invoices",
+      "payments",
+      "fx"
+     ]
+    }
+   },
+   "required": [
+    "table"
+   ],
+   "type": "object"
+  },
+  "name": "list_records"
+ },
+ {
+  "description": "Get one record by its ID: ledger row_id, invoice_id, payment_id, an fx id 'fx:DATE:SRC:TGT', or table='policy' with id='policy' for the accounting policy.",
+  "input_schema": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "table": {
+     "enum": [
+      "ledger",
+      "invoices",
+      "payments",
+      "fx",
+      "policy"
+     ]
+    }
+   },
+   "required": [
+    "table",
+    "id"
+   ],
+   "type": "object"
+  },
+  "name": "get_record"
+ },
+ {
+  "description": "Get one invoice or payment document by its doc_id.",
+  "input_schema": {
+   "additionalProperties": false,
+   "properties": {
+    "doc_id": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "doc_id"
+   ],
+   "type": "object"
+  },
+  "name": "get_document"
+ },
+ {
+  "description": "Exact decimal arithmetic: numbers, + - * /, unary minus and parentheses only (no names, calls or powers; at most 200 characters).",
+  "input_schema": {
+   "additionalProperties": false,
+   "properties": {
+    "expression": {
+     "maxLength": 200,
+     "type": "string"
+    }
+   },
+   "required": [
+    "expression"
+   ],
+   "type": "object"
+  },
+  "name": "calculator"
+ },
+ {
+  "description": "Submit all findings and END the episode. An empty findings list is correct for clean books. A malformed submission ends the episode with reward -1.",
+  "input_schema": {
+   "additionalProperties": false,
+   "properties": {
+    "findings": {
+     "additionalProperties": false,
+     "properties": {
+      "episode_id": {
+       "maxLength": 64,
+       "minLength": 1,
+       "type": "string"
+      },
+      "findings": {
+       "items": {
+        "additionalProperties": false,
+        "properties": {
+         "affected_ids": {
+          "items": {
+           "maxLength": 64,
+           "minLength": 1,
+           "type": "string"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "type": "array"
+         },
+         "claimed_amount_minor": {
+          "maximum": 1000000000000000,
+          "minimum": -1000000000000000,
+          "type": "integer"
+         },
+         "currency": {
+          "pattern": "^\\s*[A-Za-z]{3}\\s*$",
+          "type": "string"
+         },
+         "evidence_ids": {
+          "items": {
+           "maxLength": 64,
+           "minLength": 1,
+           "type": "string"
+          },
+          "maxItems": 10,
+          "type": "array"
+         },
+         "explanation": {
+          "maxLength": 1000,
+          "type": "string"
+         },
+         "type": {
+          "enum": [
+           "duplicate_invoice",
+           "payment_allocation",
+           "fx_rate",
+           "period_cutoff"
+          ]
+         }
+        },
+        "required": [
+         "type",
+         "affected_ids",
+         "claimed_amount_minor",
+         "currency",
+         "evidence_ids",
+         "explanation"
+        ],
+        "type": "object"
+       },
+       "maxItems": 30,
+       "type": "array"
+      }
+     },
+     "required": [
+      "episode_id",
+      "findings"
+     ],
+     "type": "object"
+    }
+   },
+   "required": [
+    "findings"
+   ],
+   "type": "object"
+  },
+  "name": "submit"
+ }
+]
