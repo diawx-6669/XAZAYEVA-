@@ -25,6 +25,18 @@ help:
 	@echo "make min-budget    exact minimal tool calls to see one evidence set per issue, 500 episodes -> reports/min_budget.md"
 	@echo "make pii-scan      no real data: cards (Luhn), IBAN, KZ BIN/IIN, e-mail, phones, URLs in 500 episodes + trajectories"
 	@echo "make prepublish    read-only report: other branches, secrets in the whole git history, .gitignore, big files"
+	@echo "make venv          .venv with the pinned wheels from vendor/wheels (offline)"
+	@echo "make test          full pytest only (make check runs it too)"
+	@echo "make selfcheck     scoreboard only -> reports/selfcheck.md"
+	@echo "make golden        rewrite tests/golden_hashes.json (only after an intended generator change)"
+	@echo "make verify-independent  independent verifier on committed + selfcheck + 500 fresh episodes"
+	@echo "make experiment    optional E6 experiment (docs/EXPERIMENT.md); experiment-v2: docs/EXPERIMENT_v2.md"
+	@echo "make experiment-v2 E6 v2 on the current generator (new salt)"
+	@echo "make repro-cert-check  recompute the reproducibility certificate and compare with the committed one"
+	@echo "make submission-tag    print the tag commands and the SHA for the form (docs/SUBMISSION.md)"
+	@echo "make docker-build  build the image only; make version writes VERSION (commit for the report header)"
+	@echo "make version       write VERSION = short commit id"
+	@echo "make clean         remove caches and the local grader log"
 	@echo "make docker-check  build image and run 'make check' with --network none --cpus 2 --memory 4g"
 
 venv:

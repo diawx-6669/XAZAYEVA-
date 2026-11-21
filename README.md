@@ -231,6 +231,33 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12
 | `make finale-preflight` | офлайн‑проверка перед финалом за минуту: образ, тесты контракта, демо |
 | `make submission-tag` | команды для тега `v1.0-submission` и SHA для формы (`docs/SUBMISSION.md`) |
 
+## Раунд 4: инструменты проверки (вне `make check`, кроме отмеченных)
+
+| Команда | Что делает | Результат |
+|---|---|---|
+| `make repro-cert` / `make repro-cert-check` | сертификат воспроизводимости: 20 эпизодов в памяти, golden, конфиги, детерминированная часть self‑check; сравнение с другой машиной | `reports/repro_certificate.md` |
+| `make prepublish` | только отчёт: ветки кроме main, секреты во всей истории git, `.gitignore`, файлы > 5 МБ | вывод в консоль |
+| `make pii-scan` | нет реальных данных (карты по Луну, IBAN, БИН/ИИН, e‑mail, телефоны, URL) на 500 эпизодах и траекториях | `docs/SAFETY.md` |
+| `make min-budget` | точный минимум вызовов инструментов, чтобы увидеть набор доказательств, против лимита 100 | `reports/min_budget.md` |
+| `make power` | сколько эпизодов нужно, чтобы различить политики (Δ = 0.05/0.1/0.2) | `reports/power.md` |
+| `make difficulty` | сложность вариантов ошибок по модели Раша на панели из 10 вариантов simple_reconcile | `reports/difficulty.md` |
+| `make coverage-map` | попарное покрытие факторов генератора на 1000 seed + SVG и причины пробелов | `reports/coverage_map.md` |
+| `make exhaustive` | полный перебор малых случаев награды (в `make check` — урезанный) | `reports/reward_exhaustive.md` |
+| `make bench` | пул сред на multiprocessing: шагов/с, эпизодов/с, память, 1 и 2 воркера | `reports/bench.md` |
+| `python -m auditenv validate-config <file>` | проверка своего конфига, все проблемы сразу с диапазоном и значением по умолчанию | `docs/CONFIG_REFERENCE.md` |
+| `python -m auditenv verify-sbom` | хеши колёс, версии, лицензии, дайджест базового образа | `reports/sbom.json`, `THIRD_PARTY_NOTICES.md` |
+| `python -m auditenv grade <эпизод> <findings.json>` | **инструмент оценщика**: оценить свой ответ, код причины для каждого вывода | вывод в консоль |
+| `python -m auditenv explain <эпизод> [ISS-001]` | **инструмент оценщика**: HTML «до/после» по provenance, пересчёт суммы | `site/explain/` |
+| `tools/llm/` | схемы инструментов для function calling (OpenAI, Anthropic), системный промт, 2 few‑shot | `python tools/llm/build.py` |
+| `examples/gym_wrapper.py` | обёртка `gymnasium.Env` (gymnasium не входит в зависимости) | `tests/test_round4_llm.py` |
+
+Документы раунда 4: `docs/DESIGN_SHORT.md` (записка о дизайне), `docs/DATASHEET.md`, `docs/PREDICTION.md`
+(прогноз до прогона жюри), `docs/SAFETY.md`, `docs/HOTFIX.md`, `docs/AI_USAGE.md`, `docs/SUBMISSION_FORM.md`,
+`docs/CONFIG_REFERENCE.md`, `docs/ROUND4_IDEAS.md`; зал атак — `site/attacks.html`.
+
+Прочие подкоманды CLI — шаги `make check` и служебные: `python -m auditenv check`, `quick`, `demo`, `trajectories`,
+`golden`, `leakscan`, `lint`, `check-schemas`, `exploit-search`, `experiment` (их вызывают одноимённые make‑цели).
+
 ## Как устроен эпизод
 
 ```
