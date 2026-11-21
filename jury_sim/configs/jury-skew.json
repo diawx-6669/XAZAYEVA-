@@ -1,0 +1,98 @@
+{
+ "allocation_variants": {
+  "partial": 0.2,
+  "unallocated": 0.2,
+  "wrong_invoice": 0.6
+ },
+ "base_currencies": [
+  "KWD"
+ ],
+ "clean_probability": 0.0,
+ "cutoff_variants": {
+  "backdated_posting": 0.2,
+  "prior_period": 0.2,
+  "utc_trap": 0.6
+ },
+ "distractors": {
+  "bank_fee": 0.6,
+  "boundary_time": 0.8,
+  "credit_note_reissue": 0.5,
+  "multi_invoice_payment": 0.6,
+  "night_fx": 0.5,
+  "overpayment": 0.3,
+  "partial_open": 0.6,
+  "recurring_rent": 0.6,
+  "refund": 0.5,
+  "repeat_amount": 0.5,
+  "rounding_residual": 0.6,
+  "split_payment": 0.6,
+  "unidentified_receipt": 0.5,
+  "weekend_fx": 0.5
+ },
+ "duplicate_variants": {
+  "copy": 0.7,
+  "paid_twice": 0.3
+ },
+ "errors": {
+  "duplicate_invoice": 0.2,
+  "fx_rate": 3.0,
+  "payment_allocation": 2.0,
+  "period_cutoff": 0.5
+ },
+ "foreign_currencies": [
+  "USD",
+  "JPY"
+ ],
+ "foreign_share": 0.6,
+ "fx_variants": {
+  "adjacent_day": 0.1,
+  "due_date": 0.3,
+  "historical_rate": 0.1,
+  "inverted": 0.2,
+  "utc_date": 0.1,
+  "wrong_pair": 0.2
+ },
+ "interactions": {
+  "duplicate_fx": 0.25,
+  "partial_fx_cutoff": 0.25
+ },
+ "line_items": [
+  3,
+  7
+ ],
+ "max_attempts": 40,
+ "max_steps": 100,
+ "min_interactions": 0,
+ "min_lookalikes_per_type": 1,
+ "n_entities": [
+  8,
+  14
+ ],
+ "n_errors": [
+  3,
+  6
+ ],
+ "n_foreign": [
+  2,
+  3
+ ],
+ "n_invoices": [
+  26,
+  36
+ ],
+ "name": "jury-skew",
+ "period_months": 2,
+ "period_starts": [
+  "2026-05"
+ ],
+ "timezones": [
+  "Asia/Kathmandu",
+  "America/Lima"
+ ],
+ "tolerance_minor": 1,
+ "utc_share": [
+  30,
+  70
+ ],
+ "version": "jury-1"
+}
