@@ -20,7 +20,7 @@
   "interpretations": {
     "inspection_steps_on_submit": "steps used BEFORE submit; the submit step itself is not counted",
     "inspection_steps_on_step_limit": 100,
-    "inspection_steps_on_timeout": "steps used when the limit was hit (the late action is not executed and not graded)",
+    "inspection_steps_on_timeout": 100,
     "truncated_answer": "an empty findings list is graded (truncated=true)",
     "truncated_clean_book_reward": 0.8,
     "limit_over_page_max": "bad_args",

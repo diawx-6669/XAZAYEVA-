@@ -21,13 +21,18 @@ def test_agent_cannot_read_parent_environ_salt():
                           "--config", "clean-only"], cwd=ROOT, env=env, capture_output=True, text=True, timeout=120)
     res = json.loads(out.stdout)
     assert res["reward"] == 1.0  # honest empty answer on a clean book: the salt was NOT readable
-    # control: with BOTH layers off (same uid as the evaluator AND a dumpable evaluator) the spy DOES get
-    # the salt - each layer alone is enough to stop it (main: prctl non-dumpable, round 2: nobody)
+    cmd = [sys.executable, "-m", "auditenv", "run", "--policy-cmd",
+           f"{sys.executable} {ROOT / 'tests' / 'agents' / 'environ_spy.py'}", "--seed", "1", "--config", "clean-only"]
+    # third layer alone (jury sim fix: the salt is handed over a pipe, never in the exec-time environment):
+    # same uid AND a dumpable evaluator, and the spy still cannot read the salt
     env["AUDITENV_KEEP_UID"] = "1"
     env["AUDITENV_INSECURE_DUMPABLE"] = "1"
-    out = subprocess.run([sys.executable, "-m", "auditenv", "run", "--policy-cmd",
-                          f"{sys.executable} {ROOT / 'tests' / 'agents' / 'environ_spy.py'}", "--seed", "1",
-                          "--config", "clean-only"], cwd=ROOT, env=env, capture_output=True, text=True, timeout=120)
+    out = subprocess.run(cmd, cwd=ROOT, env=env, capture_output=True, text=True, timeout=120)
+    assert json.loads(out.stdout)["reward"] == 1.0
+    # control: with ALL THREE layers off (same uid, dumpable evaluator, salt in the exec-time environment)
+    # the spy DOES get the salt - each layer alone is enough to stop it
+    env["AUDITENV_NO_CONCEAL"] = "1"
+    out = subprocess.run(cmd, cwd=ROOT, env=env, capture_output=True, text=True, timeout=120)
     assert json.loads(out.stdout)["reward"] == -1.0
 
 

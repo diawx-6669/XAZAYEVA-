@@ -218,3 +218,33 @@ def test_invalid_structure_minus_one(erroneous, findings):
     obs, r, term, trunc, _ = env.step({"tool": "submit", "args": {"findings": findings}})
     assert r == -1.0 and term and log.records[0]["valid"] is False and log.records[0]["error"]
     assert obs == {"result": {"submitted": True}, "steps_remaining": 99}  # no diagnostics leak to the agent
+
+
+def test_timeout_on_clean_book_is_charged_full_budget(clean):
+    # jury sim finding #5: a hung agent on a clean book must not tie with oracle (1.0)
+    t = [0.0]
+    env = AuditEnv(clock=lambda: t[0], time_limit=60)
+    env.reset(episode=clean)
+    t[0] = 60.5
+    obs, r, term, trunc, _ = env.step({"tool": "calculator", "args": {"expression": "1"}})
+    assert trunc and not term
+    assert env.last_grade["inspection_steps"] == 100
+    assert r == pytest.approx(0.8)
+
+
+def test_hung_policy_is_charged_full_budget(clean):
+    env, _, _ = make(clean)
+    env.truncate_now()
+    assert env.last_grade["inspection_steps"] == 100
+    assert env.last_grade["reward"] == pytest.approx(0.8)
+
+
+def test_negative_claimed_amount_is_a_false_positive_not_invalid(erroneous):
+    # jury sim finding #6: a negative integer is a valid structure; it just cannot match
+    env, _, _ = make(erroneous)
+    good = oracle_findings(erroneous.truth)
+    bad = dict(good[0], claimed_amount_minor=-abs(good[0]["claimed_amount_minor"]) - 5)
+    obs, r, term, trunc, _ = env.step(submit(erroneous.episode_id, good + [bad]))
+    g = env.last_grade
+    assert term and g["tp"] == len(good) and g["fp"] == 1
+    assert r > -1.0

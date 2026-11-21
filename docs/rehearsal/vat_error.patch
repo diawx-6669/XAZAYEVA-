@@ -475,7 +475,7 @@ index aec8f8c..5244869 100644
 -          "type": {"enum": ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]},
 +          "type": {"enum": ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]},
            "affected_ids": {"type": "array", "minItems": 1, "maxItems": 10, "items": {"type": "string", "minLength": 1, "maxLength": 64}},
-           "claimed_amount_minor": {"type": "integer", "minimum": 0, "maximum": 1000000000000000},
+           "claimed_amount_minor": {"type": "integer", "minimum": -1000000000000000, "maximum": 1000000000000000},
            "currency": {"type": "string", "pattern": "^\\s*[A-Za-z]{3}\\s*$"},
 diff --git a/schemas/truth.schema.json b/schemas/truth.schema.json
 index a25a092..b0dc856 100644

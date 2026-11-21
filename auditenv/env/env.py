@@ -249,7 +249,9 @@ class AuditEnv:
 
     def _finish(self, findings, truncated: bool, obs_body: dict, count: bool = True, reason=None):
         self.truncation_reason = reason if truncated else None
-        inspection = self._steps - (0 if truncated else 1)
+        # truncation (step limit, timeout or a hung policy) is charged the full budget, so hanging
+        # never beats an honest submit (jury sim finding #5)
+        inspection = self.max_steps if truncated else self._steps - 1
         g = self._grader.grade(findings, inspection_steps=inspection, seen_ids=frozenset(self._seen),
                                truncated=truncated)
         g = {**g, "mode": self.mode, "truncation_reason": self.truncation_reason, **self.run_meta}

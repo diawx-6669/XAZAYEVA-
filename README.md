@@ -9,7 +9,7 @@
 | Запуск одной командой | `Makefile`, `scripts/check.sh`, `Dockerfile` (образ по дайджесту), `.github/workflows/check.yml` | `make quick` (полная: `make check` / `make docker-check`) | `quick smoke: …s`; у полной — табло `<!--fact:selfcheck_total-->90/90<!--/fact-->` и `check: ALL GREEN` |
 | Версии конфигураций | `configs/*.json` (`version`), `configs/LOCK.json`, `configs/CHANGELOG.md`, `config_version` + `config_hash` в каждом `manifest.json` | `python -m pytest -q tests/test_configs_lock.py` | `5 passed`: содержимое без смены версии не пройдёт |
 | Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1195<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
-| Измеренный разбор сбоев | [`docs/FAILURES.md`](docs/FAILURES.md): 14 закрытых уязвимостей с тестами‑сторожами, полнота по вариантам с интервалами Уилсона, seed каждого примера | `python -m auditenv analyze --n 60` | таблицы признаков и вариантов; oracle и независимый проверяльщик решают 100 % |
+| Измеренный разбор сбоев | [`docs/FAILURES.md`](docs/FAILURES.md): 17 закрытых уязвимостей с тестами‑сторожами, полнота по вариантам с интервалами Уилсона, seed каждого примера | `python -m auditenv analyze --n 60` | таблицы признаков и вариантов; oracle и независимый проверяльщик решают 100 % |
 | Честные ограничения | [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) | `python -m auditenv docs-check` | `0 mismatches`: числа в документах совпадают с реальностью |
 
 ---
@@ -43,7 +43,7 @@ make check
 
 `make check` — это по порядку:
 
-1. весь pytest (<!--fact:n_tests-->478<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
+1. весь pytest (<!--fact:n_tests-->484<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
    поверхностных признаков, атаки на песочницу агента);
 2. табло self‑check в духе жюри: 4 блока × 20 проверок на 20 эпизодах и 20 парных преобразованиях,
    диагностика P/R/F1 (макро и микро), возврат на чистых и ошибочных книгах, шаги, время p50/p95;
