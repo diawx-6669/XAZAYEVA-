@@ -105,6 +105,8 @@ docker run --rm --network none --cpus 2 --memory 4g -e AUDITENV_SEED_SALT=<се�
 python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12 --config dev-mixed
 ```
 
+Памятка жюри (свои 4 политики, закрытые эпизоды с солью, 20 парных преобразований, раздел 10 → команды) —
+[docs/JURY.md](docs/JURY.md); краткая английская версия README — [README.en.md](README.en.md).
 Протокол JSON‑строк, песочница процесса и Gymnasium‑клиент — [docs/ADAPTER.md](docs/ADAPTER.md).
 Как добавить новый тип ошибки, отвлекающий случай, сменить правило курса или допуск —
 [docs/HOWTO_EXTEND.md](docs/HOWTO_EXTEND.md) (отрепетировано на типе `vat_error`).
@@ -132,6 +134,11 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12
 | `python -m auditenv export-audit` | 3 dev‑эпизода в CSV для ручного аудита (`audit/`, `docs/MANUAL_AUDIT.md`) |
 | `make exploit-search` | автопоиск эксплойтов награды (CEM без доступа к эталону) → `reports/exploit_search.md` |
 | `make experiment` | необязательный эксперимент «обучаемый сигнал» по протоколу `docs/EXPERIMENT.md` (не входит в `make check`) |
+| `make experiment-v2` | повтор эксперимента на текущем генераторе по новому протоколу `docs/EXPERIMENT_v2.md` (новая соль; отбор на 4 конфигах, проверка на 6) |
+| `make mutation` | мутационное тестирование оценщика: 23 намеренные ошибки в matcher/reward/normalize/schema → какой тест поймал (`reports/mutation.md`, не входит в `make check`) |
+| `python -m auditenv jury-pairs --policy-cmd "python my_policy.py" --n 20` | 20 парных преобразований (непрозрачные ID) для любой политики, всё в памяти (`docs/JURY.md`) |
+| `python -m auditenv import-csv --src tests/fixtures/<имя> --out D` | компания, собранная вручную в Google Таблицах (CSV) → эпизод (`tests/fixtures/README.md`) |
+| `python tools/build_replay.py` | пересобрать `site/replay.html` — офлайн‑просмотрщик траекторий 5 эпизодов (без эталона) |
 | `make finale-preflight` | офлайн‑проверка перед финалом за минуту: образ, тесты контракта, демо |
 | `make submission-tag` | команды для тега `v1.0-submission` и SHA для формы (`docs/SUBMISSION.md`) |
 
@@ -209,6 +216,7 @@ auditenv/
               truth_hunter.py (враждебная политика только для тестов изоляции)
   runner.py serve.py selfcheck.py leakscan.py lint.py analysis.py verify_provenance.py docs_check.py cli.py
 tools/        verify_independent.py   (независимый проверяльщик: только stdlib)
+              mutation_test.py        (мутационное тестирование оценщика), build_replay.py
 examples/     minimal_agent.py        (агент на ~35 строк)
 configs/      7 конфигов + splits.json + LOCK.json + CHANGELOG.md
 schemas/      15 JSON Schema
@@ -216,9 +224,10 @@ episodes/     train/ (10) и dev/ (10): <episode_id>/public/*, <episode_id>/grad
 trajectories/ trajectories.jsonl
 vendor/wheels/ колёса закреплённых зависимостей (только pure Python) для офлайн-сборки
 reports/      selfcheck.md, selfcheck.json, grader_log.jsonl (генерируются make check)
-tests/        pytest + hypothesis; tests/agents/ — атакующие агенты
+tests/        pytest + hypothesis; tests/agents/ — атакующие агенты; tests/fixtures/ — компании, собранные вручную
 docs/         CASE.md PROJECT.md DESIGN.md CONTRACT.md ADAPTER.md ATTACKS.md LIMITATIONS.md FAILURES.md SUBMISSION.md
-              MANUAL_AUDIT.md HOWTO_EXTEND.md EXPERIMENT.md rehearsal/vat_error.patch
+              MANUAL_AUDIT.md HOWTO_EXTEND.md EXPERIMENT.md EXPERIMENT_v2.md JURY.md rehearsal/vat_error.patch
+site/         index.html (сайт проекта), replay.html (просмотрщик траекторий, tools/build_replay.py)
 audit/        3 dev-эпизода в CSV для ручного аудита (Google Таблицы)
 ```
 
@@ -266,6 +275,9 @@ audit/        3 dev-эпизода в CSV для ручного аудита (Go
 | 04 Контракт в стиле Gymnasium | `env/env.py` (`close/render/metadata/spaces/spec`), `auditenv.make`, `serve.py::AuditEnvClient` | `test_batch_a.py::test_gymnasium_surface`, `test_batch_c.py::test_client_replays_trajectories_byte_identical` |
 | 04/05 Трактовки контракта | `contract.json`, `docs/CONTRACT.md` | `tests/test_contract_json.py` |
 | 09 Зафиксированные зависимости, офлайн‑сборка | `requirements.txt`, `vendor/wheels/`, `jsonschema_lite.py` | `test_jsonschema_lite.py` |
+| 05 Тесты оценщика действительно ловят его баги | `tools/mutation_test.py` (23 мутации) | `make mutation` → `reports/mutation.md`; добитые выжившие — `tests/test_mutation_kills.py` |
+| 02/06 Эталон сверен с компаниями, собранными вручную | `auditenv/fixtures.py` (импорт CSV из Google Таблиц), `tests/fixtures/` | `tests/test_fixtures.py` (решатель, независимый проверяльщик и oracle дают ответ автора) |
+| 06 Парные преобразования для любой политики жюри | `cli.py::cmd_jury_pairs` | `tests/test_round3.py::test_jury_pairs_command_equal_on_opaque_twins` |
 
 ## Как читать табло (`reports/selfcheck.md`)
 
