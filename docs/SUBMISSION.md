@@ -32,7 +32,7 @@
 | 16:00–17:00 | финальный `make docker-check` на свежем клоне; сохранить вывод | Бека | `ALL GREEN` |
 | 17:00 | тег и SHA: `make submission-tag`, затем `git tag -a v1.0-submission -m "Genesis Hackathon submission"` и `git push origin v1.0-submission` | Ералы | тег виден на GitHub |
 | 18:00 | отправить форму: ссылка на репозиторий, тег `v1.0-submission`, SHA; скриншот подтверждения | Алдик | скриншот сохранён в Drive |
-| 19:00 | офлайн‑набор для финала: `docker save auditenv > auditenv.tar`, zip репозитория, видео‑демо, PDF слайдов — на флешку | Алдик | `docker load -i auditenv.tar && make finale-preflight` на другом ноутбуке |
+| 19:00 | офлайн‑набор для финала: `make offline-kit` (zip репозитория по тегу, образ `docker save`, SHA256SUMS в `dist/`), видео‑демо, PDF слайдов — на флешку | Алдик | на другом ноутбуке без сети: команды, которые печатает `make offline-kit` (`sha256sum -c`, `docker load`, `make finale-preflight`) |
 | до 23:59 | запас времени; ничего не менять | — | — |
 
 Если к 16:00 какой‑то пакет не закончен, его ветку **не сливаем**: `main` всегда рабочий.

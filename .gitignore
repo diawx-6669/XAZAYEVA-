@@ -8,3 +8,4 @@ VERSION
 reports/repro_certificate_ci.json
 reports/tmp/
 jury_sim/work/
+dist/
