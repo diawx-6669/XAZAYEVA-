@@ -35,9 +35,16 @@ def test_placeholders_are_not_secrets():
         assert _hits(line) == [], line
 
 
-def test_forbidden_paths_and_gitignore():
+def test_forbidden_paths():
     assert any(re.search(p, "jury_sim/work/salt.txt") for p in pp.FORBIDDEN_PATHS)
     assert not any(re.search(p, "jury_sim/grader.py") for p in pp.FORBIDDEN_PATHS)
+
+
+def test_gitignore_has_no_gaps():
+    import pytest
+
+    if not (ROOT / ".git").exists() or not (ROOT / ".gitignore").exists():  # inside the image
+        pytest.skip("not a git checkout")
     assert pp.gitignore_gaps() == []
 
 

@@ -5,6 +5,8 @@ would have failed inside the jury's container (found by a trial docker build in 
 import fnmatch
 import subprocess
 
+import pytest
+
 from auditenv.paths import ROOT
 
 
@@ -29,9 +31,9 @@ def _ignored(path: str, pats) -> bool:
 
 
 def test_committed_inputs_are_in_the_build_context():
+    if not (ROOT / ".git").exists():  # inside the image (.git is not copied): nothing to compare
+        pytest.skip("not a git checkout")
     files = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True).stdout.splitlines()
-    if not files:  # not a git checkout (e.g. inside the image): nothing to compare
-        return
     pats = _patterns()
     needed = [f for f in files if f.startswith(("reports/", "episodes/", "trajectories/", "tools/", "tests/", "site/",
                                                 "docs/", "schemas/", "configs/", "vendor/", "examples/", "jury_sim/"))
