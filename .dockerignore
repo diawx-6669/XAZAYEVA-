@@ -34,8 +34,11 @@ env/
 **/*.pem
 **/*.key
 
-# Результаты прошлых локальных прогонов: в контейнере make check создаёт их заново
-reports/
+# Временные результаты локальных прогонов. Сам reports/ НЕ исключаем: закоммиченные отчёты (sbom.json,
+# mutation.json, jury_sim.md, repro_certificate.json, ...) читают тесты и docs-check; make check в контейнере
+# перезаписывает selfcheck.* и grader_log.jsonl (tests/test_round4_docker_context.py)
+reports/tmp/
+reports/repro_certificate_ci.json
 build/
 dist/
 
