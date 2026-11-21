@@ -1,0 +1,213 @@
+{
+ "killed": 23,
+ "results": [
+  {
+   "file": "auditenv/grader/matcher.py",
+   "flaky_deselected": [],
+   "id": "M01",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_tolerance_boundary",
+   "seconds": 1.2,
+   "what": "amount tolerance: <= becomes < (an exact-boundary claim is rejected)"
+  },
+  {
+   "file": "auditenv/grader/matcher.py",
+   "flaky_deselected": [],
+   "id": "M02",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_wrong_currency_is_fp",
+   "seconds": 1.5,
+   "what": "currency is not checked"
+  },
+  {
+   "file": "auditenv/grader/matcher.py",
+   "flaky_deselected": [],
+   "id": "M03",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_flag_all_is_bad",
+   "seconds": 1.7,
+   "what": "evidence is not checked"
+  },
+  {
+   "file": "auditenv/grader/matcher.py",
+   "flaky_deselected": [],
+   "id": "M04",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_partial_evidence_is_fp",
+   "seconds": 1.7,
+   "what": "one ID of an evidence set is enough (subset -> intersection)"
+  },
+  {
+   "file": "auditenv/grader/matcher.py",
+   "flaky_deselected": [],
+   "id": "M05",
+   "killed": true,
+   "killed_by": "tests/test_mutation_kills.py::test_lone_wrong_type_is_fp_with_reason_wrong_type",
+   "seconds": 5.2,
+   "what": "type is not checked"
+  },
+  {
+   "file": "auditenv/grader/matcher.py",
+   "flaky_deselected": [],
+   "id": "M06",
+   "killed": true,
+   "killed_by": "tests/test_mutation_kills.py::test_superset_of_affected_ids_is_fp",
+   "seconds": 5.3,
+   "what": "affected_ids: a superset is accepted instead of exact equality"
+  },
+  {
+   "file": "auditenv/grader/matcher.py",
+   "flaky_deselected": [],
+   "id": "M07",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_duplicates_give_no_gain",
+   "seconds": 1.3,
+   "what": "no one-to-one matching: every repeat of a correct finding is a TP"
+  },
+  {
+   "file": "auditenv/grader/matcher.py",
+   "flaky_deselected": [],
+   "id": "M08",
+   "killed": true,
+   "killed_by": "tests/test_mutation_kills.py::test_matching_is_maximum_not_greedy",
+   "seconds": 5.7,
+   "what": "greedy matching instead of maximum matching (no augmenting paths)"
+  },
+  {
+   "file": "auditenv/grader/matcher.py",
+   "flaky_deselected": [],
+   "id": "M09",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_tie_break_smallest_issue_then_index",
+   "seconds": 1.2,
+   "what": "tie-break: the LARGER issue_id wins instead of the smaller"
+  },
+  {
+   "file": "auditenv/grader/normalize.py",
+   "flaky_deselected": [],
+   "id": "M10",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_currency_and_ids_are_normalized",
+   "seconds": 1.3,
+   "what": "IDs are not stripped of whitespace"
+  },
+  {
+   "file": "auditenv/grader/normalize.py",
+   "flaky_deselected": [],
+   "id": "M11",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_currency_and_ids_are_normalized",
+   "seconds": 1.3,
+   "what": "repeated IDs are not de-duplicated"
+  },
+  {
+   "file": "auditenv/grader/normalize.py",
+   "flaky_deselected": [],
+   "id": "M12",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_currency_and_ids_are_normalized",
+   "seconds": 1.1,
+   "what": "currency is not upper-cased"
+  },
+  {
+   "file": "auditenv/grader/normalize.py",
+   "flaky_deselected": [],
+   "id": "M13",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_duplicates_give_no_gain",
+   "seconds": 1.1,
+   "what": "IDs are case-folded (the contract says case is preserved)"
+  },
+  {
+   "file": "auditenv/grader/reward.py",
+   "flaky_deselected": [],
+   "id": "M14",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_silence_beats_any_accusation_on_clean",
+   "seconds": 1.1,
+   "what": "F1 = 0 when truth and findings are both empty"
+  },
+  {
+   "file": "auditenv/grader/reward.py",
+   "flaky_deselected": [],
+   "id": "M15",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_silence_beats_any_accusation_on_clean",
+   "seconds": 1.2,
+   "what": "F1 = 1 when truth is empty but findings are not (accusing a clean book is free)"
+  },
+  {
+   "file": "auditenv/grader/reward.py",
+   "flaky_deselected": [],
+   "id": "M16",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_step_cost_10_vs_50_is_exactly_0_08",
+   "seconds": 1.0,
+   "what": "step cost 0.001 instead of 0.002"
+  },
+  {
+   "file": "auditenv/grader/reward.py",
+   "flaky_deselected": [],
+   "id": "M17",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_property_reward_bounded",
+   "seconds": 1.5,
+   "what": "reward is not clipped to [-1, 1]"
+  },
+  {
+   "file": "auditenv/grader/schema.py",
+   "flaky_deselected": [],
+   "id": "M18",
+   "killed": true,
+   "killed_by": "tests/test_mutation_kills.py::test_grader_int_check_works_even_if_the_schema_validator_accepted_floats",
+   "seconds": 6.1,
+   "what": "float amounts (5.0) are accepted"
+  },
+  {
+   "file": "auditenv/grader/schema.py",
+   "flaky_deselected": [],
+   "id": "M19",
+   "killed": true,
+   "killed_by": "tests/test_contract.py::test_invalid_structure_minus_one[findings3]",
+   "seconds": 2.2,
+   "what": "a foreign episode_id is accepted"
+  },
+  {
+   "file": "auditenv/grader/core.py",
+   "flaky_deselected": [],
+   "id": "M20",
+   "killed": true,
+   "killed_by": "tests/test_contract_json.py::test_behaviour_matches_interpretations",
+   "seconds": 5.7,
+   "what": "a truncated episode is graded on the agent's findings instead of the empty answer"
+  },
+  {
+   "file": "schemas/findings.schema.json",
+   "flaky_deselected": [],
+   "id": "M21",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_bad_json_is_minus_one",
+   "seconds": 1.1,
+   "what": "the 30-findings cap is lifted"
+  },
+  {
+   "file": "auditenv/jsonschema_lite.py",
+   "flaky_deselected": [],
+   "id": "M23",
+   "killed": true,
+   "killed_by": "tests/test_jsonschema_lite.py::test_invalid[value2-type]",
+   "seconds": 5.9,
+   "what": "schema validator: \"integer\" accepts 5.0 and True"
+  },
+  {
+   "file": "auditenv/grader/core.py",
+   "flaky_deselected": [],
+   "id": "M22",
+   "killed": true,
+   "killed_by": "tests/test_reward.py::test_experimental_reward_requires_seen_evidence",
+   "seconds": 1.8,
+   "what": "experimental reward: evidence the agent never saw still counts"
+  }
+ ],
+ "total": 23
+}

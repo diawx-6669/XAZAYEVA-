@@ -127,7 +127,7 @@ def test_tie_break_smallest_issue_then_index():
     fs = [normalize_finding(finding("fx_rate", ["A"], 100, "KZT", ["e"])),
           normalize_finding(finding("fx_rate", ["A"], 101, "KZT", ["e"]))]
     m = match(fs, issues, tol=1)
-    assert len(m["pairs"]) == 2  # maximum matching, not greedy
+    assert len(m["pairs"]) == 2  # both matched (greedy manages this one too; see test_mutation_kills.py)
     m2 = match(fs[:1], issues, tol=1)
     assert m2["pairs"] == {0: "ISS-001"}  # tie: smallest issue_id wins
 

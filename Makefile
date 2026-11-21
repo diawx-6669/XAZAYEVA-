@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 verify-independent submission-tag
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -15,6 +15,7 @@ help:
 	@echo "make docs-check    numbers in README/docs match reality (tests, trajectories, episode sizes)"
 	@echo "make finale-preflight  offline pre-flight for the finale: image, contract tests, demo (<1 min)"
 	@echo "make exploit-search    automatic reward-exploit search (CEM) -> reports/exploit_search.md"
+	@echo "make mutation      hand-written grader mutations vs fast tests -> reports/mutation.md (not in check)"
 	@echo "make docker-check  build image and run 'make check' with --network none --cpus 2 --memory 4g"
 
 venv:
@@ -57,6 +58,9 @@ experiment:
 
 experiment-v2:
 	$(PYTHON) -m auditenv experiment --protocol E6v2
+
+mutation:
+	$(PYTHON) tools/mutation_test.py
 
 verify-independent:
 	$(PYTHON) -m auditenv verify-independent --seeds 500
