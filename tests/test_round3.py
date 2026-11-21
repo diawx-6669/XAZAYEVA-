@@ -72,7 +72,10 @@ def test_jury_pairs_command_equal_on_opaque_twins(tmp_path):
 
 
 # ------------------------------------------------------------------ 3), 4) docs reference only real things
-DOCS = ["docs/JURY.md", "README.en.md"]
+DOCS = ["docs/JURY.md", "README.en.md",
+        # round 4: every command, make target, test name and path these documents cite must exist
+        "docs/FAQ.md", "docs/AGENT_GUIDE.md", "docs/HOTFIX.md", "docs/SAFETY.md", "docs/DESIGN_SHORT.md",
+        "docs/AI_USAGE.md", "docs/DATASHEET.md", "docs/GLOSSARY.md", "docs/SUBMISSION_FORM.md", "README.md"]
 
 
 def _subcommands():
