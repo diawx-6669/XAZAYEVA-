@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check prepublish pii-scan min-budget power difficulty bench
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check prepublish pii-scan min-budget power difficulty bench coverage-map
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -17,6 +17,7 @@ help:
 	@echo "make exploit-search    automatic reward-exploit search (CEM) -> reports/exploit_search.md"
 	@echo "make mutation      hand-written grader mutations vs fast tests -> reports/mutation.md (not in check)"
 	@echo "make repro-cert    reproducibility certificate (20 episode hashes + deterministic selfcheck); repro-cert-check compares"
+	@echo "make coverage-map  pairwise coverage of generator factors on 1000 seeds, SVG heat map, uncovered pairs with reasons"
 	@echo "make bench         env pool (multiprocessing): steps/s, episodes/s, memory, 1 vs 2 workers, 200/1000/2000 rows -> reports/bench.md"
 	@echo "make difficulty    Rasch difficulty of every error variant on a panel of 10 simple_reconcile variants -> reports/difficulty.md"
 	@echo "make power         episodes needed to tell policies apart (paired/unpaired, bootstrap) -> reports/power.md"
@@ -77,6 +78,9 @@ repro-cert:
 
 repro-cert-check:
 	$(PYTHON) tools/repro_cert.py --check
+
+coverage-map:
+	$(PYTHON) tools/coverage_map.py --n 1000
 
 bench:
 	$(PYTHON) examples/env_pool.py

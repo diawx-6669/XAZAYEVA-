@@ -1,0 +1,485 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="530" viewBox="0 0 980 530" font-family="system-ui,sans-serif" font-size="11">
+<style>.t{fill:#0d253d}.z{fill:#ea2261;font-weight:700}@media (prefers-color-scheme:dark){.t{fill:#e8ecf8}}</style>
+<text x="10" y="20" class="t" font-size="14" font-weight="600">Попарное покрытие: вариант ошибки × остальные факторы (2021 issue)</text>
+<text x="10" y="38" class="t">цвет — число issue (лог-шкала); «0» красным — сочетание ни разу не встретилось</text>
+<text class="t" transform="translate(293.0,152) rotate(-60)">tz_sign=+</text>
+<text class="t" transform="translate(339.0,152) rotate(-60)">tz_sign=-</text>
+<text class="t" transform="translate(385.0,152) rotate(-60)">exponent=0</text>
+<text class="t" transform="translate(431.0,152) rotate(-60)">exponent=2</text>
+<text class="t" transform="translate(477.0,152) rotate(-60)">exponent=3</text>
+<text class="t" transform="translate(523.0,152) rotate(-60)">base=KZT</text>
+<text class="t" transform="translate(569.0,152) rotate(-60)">base=USD</text>
+<text class="t" transform="translate(615.0,152) rotate(-60)">base=EUR</text>
+<text class="t" transform="translate(661.0,152) rotate(-60)">base=JPY</text>
+<text class="t" transform="translate(707.0,152) rotate(-60)">base=KWD</text>
+<text class="t" transform="translate(753.0,152) rotate(-60)">interaction=none</text>
+<text class="t" transform="translate(799.0,152) rotate(-60)">interaction=duplicate_fx</text>
+<text class="t" transform="translate(845.0,152) rotate(-60)">interaction=partial_fx_cutoff</text>
+<text class="t" transform="translate(891.0,152) rotate(-60)">weekend=no</text>
+<text class="t" transform="translate(937.0,152) rotate(-60)">weekend=yes</text>
+<text class="t" x="264" y="175" text-anchor="end">duplicate_invoice/copy</text>
+<rect x="271" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.94"/>
+<text x="293.0" y="175" text-anchor="middle" fill="#fff">204</text>
+<rect x="317" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.81"/>
+<text x="339.0" y="175" text-anchor="middle" fill="#fff">83</text>
+<rect x="363" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.70"/>
+<text x="385.0" y="175" text-anchor="middle" fill="#fff">39</text>
+<rect x="409" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.95"/>
+<text x="431.0" y="175" text-anchor="middle" fill="#fff">211</text>
+<rect x="455" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.69"/>
+<text x="477.0" y="175" text-anchor="middle" fill="#fff">37</text>
+<rect x="501" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.92"/>
+<text x="523.0" y="175" text-anchor="middle" fill="#fff">174</text>
+<rect x="547" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.73"/>
+<text x="569.0" y="175" text-anchor="middle" fill="#fff">48</text>
+<rect x="593" y="161" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="175" text-anchor="middle">0</text>
+<rect x="639" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.70"/>
+<text x="661.0" y="175" text-anchor="middle" fill="#fff">38</text>
+<rect x="685" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.65"/>
+<text x="707.0" y="175" text-anchor="middle" fill="#fff">27</text>
+<rect x="731" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.99"/>
+<text x="753.0" y="175" text-anchor="middle" fill="#fff">287</text>
+<rect x="777" y="161" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="799.0" y="175" text-anchor="middle">0</text>
+<rect x="823" y="161" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="845.0" y="175" text-anchor="middle">0</text>
+<rect x="869" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.95"/>
+<text x="891.0" y="175" text-anchor="middle" fill="#fff">208</text>
+<rect x="915" y="161" width="44" height="20" fill="#533afd" fill-opacity="0.80"/>
+<text x="937.0" y="175" text-anchor="middle" fill="#fff">79</text>
+<text class="t" x="264" y="197" text-anchor="end">duplicate_invoice/copy_as_posted</text>
+<rect x="271" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.89"/>
+<text x="293.0" y="197" text-anchor="middle" fill="#fff">141</text>
+<rect x="317" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.76"/>
+<text x="339.0" y="197" text-anchor="middle" fill="#fff">60</text>
+<rect x="363" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.69"/>
+<text x="385.0" y="197" text-anchor="middle" fill="#fff">37</text>
+<rect x="409" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.86"/>
+<text x="431.0" y="197" text-anchor="middle" fill="#fff">116</text>
+<rect x="455" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.73"/>
+<text x="477.0" y="197" text-anchor="middle" fill="#fff">48</text>
+<rect x="501" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.92"/>
+<text x="523.0" y="197" text-anchor="middle" fill="#fff">170</text>
+<rect x="547" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.46"/>
+<text x="569.0" y="197" text-anchor="middle" fill="#0d253d">7</text>
+<rect x="593" y="183" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="197" text-anchor="middle">0</text>
+<rect x="639" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.56"/>
+<text x="661.0" y="197" text-anchor="middle" fill="#fff">15</text>
+<rect x="685" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.49"/>
+<text x="707.0" y="197" text-anchor="middle" fill="#0d253d">9</text>
+<rect x="731" y="183" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="753.0" y="197" text-anchor="middle">0</text>
+<rect x="777" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.94"/>
+<text x="799.0" y="197" text-anchor="middle" fill="#fff">201</text>
+<rect x="823" y="183" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="845.0" y="197" text-anchor="middle">0</text>
+<rect x="869" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.89"/>
+<text x="891.0" y="197" text-anchor="middle" fill="#fff">144</text>
+<rect x="915" y="183" width="44" height="20" fill="#533afd" fill-opacity="0.75"/>
+<text x="937.0" y="197" text-anchor="middle" fill="#fff">57</text>
+<text class="t" x="264" y="219" text-anchor="end">duplicate_invoice/paid_twice</text>
+<rect x="271" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.68"/>
+<text x="293.0" y="219" text-anchor="middle" fill="#fff">34</text>
+<rect x="317" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.63"/>
+<text x="339.0" y="219" text-anchor="middle" fill="#fff">24</text>
+<rect x="363" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.53"/>
+<text x="385.0" y="219" text-anchor="middle" fill="#0d253d">12</text>
+<rect x="409" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.67"/>
+<text x="431.0" y="219" text-anchor="middle" fill="#fff">32</text>
+<rect x="455" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.55"/>
+<text x="477.0" y="219" text-anchor="middle" fill="#fff">14</text>
+<rect x="501" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.66"/>
+<text x="523.0" y="219" text-anchor="middle" fill="#fff">29</text>
+<rect x="547" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.36"/>
+<text x="569.0" y="219" text-anchor="middle" fill="#0d253d">3</text>
+<rect x="593" y="205" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="219" text-anchor="middle">0</text>
+<rect x="639" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.54"/>
+<text x="661.0" y="219" text-anchor="middle" fill="#0d253d">13</text>
+<rect x="685" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.54"/>
+<text x="707.0" y="219" text-anchor="middle" fill="#0d253d">13</text>
+<rect x="731" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.76"/>
+<text x="753.0" y="219" text-anchor="middle" fill="#fff">58</text>
+<rect x="777" y="205" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="799.0" y="219" text-anchor="middle">0</text>
+<rect x="823" y="205" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="845.0" y="219" text-anchor="middle">0</text>
+<rect x="869" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.72"/>
+<text x="891.0" y="219" text-anchor="middle" fill="#fff">45</text>
+<rect x="915" y="205" width="44" height="20" fill="#533afd" fill-opacity="0.54"/>
+<text x="937.0" y="219" text-anchor="middle" fill="#0d253d">13</text>
+<text class="t" x="264" y="241" text-anchor="end">payment_allocation/unallocated</text>
+<rect x="271" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.85"/>
+<text x="293.0" y="241" text-anchor="middle" fill="#fff">111</text>
+<rect x="317" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.68"/>
+<text x="339.0" y="241" text-anchor="middle" fill="#fff">34</text>
+<rect x="363" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.60"/>
+<text x="385.0" y="241" text-anchor="middle" fill="#fff">20</text>
+<rect x="409" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.85"/>
+<text x="431.0" y="241" text-anchor="middle" fill="#fff">106</text>
+<rect x="455" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.60"/>
+<text x="477.0" y="241" text-anchor="middle" fill="#fff">19</text>
+<rect x="501" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.82"/>
+<text x="523.0" y="241" text-anchor="middle" fill="#fff">87</text>
+<rect x="547" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.60"/>
+<text x="569.0" y="241" text-anchor="middle" fill="#fff">20</text>
+<rect x="593" y="227" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="241" text-anchor="middle">0</text>
+<rect x="639" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.62"/>
+<text x="661.0" y="241" text-anchor="middle" fill="#fff">23</text>
+<rect x="685" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.56"/>
+<text x="707.0" y="241" text-anchor="middle" fill="#fff">15</text>
+<rect x="731" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.89"/>
+<text x="753.0" y="241" text-anchor="middle" fill="#fff">145</text>
+<rect x="777" y="227" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="799.0" y="241" text-anchor="middle">0</text>
+<rect x="823" y="227" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="845.0" y="241" text-anchor="middle">0</text>
+<rect x="869" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.85"/>
+<text x="891.0" y="241" text-anchor="middle" fill="#fff">109</text>
+<rect x="915" y="227" width="44" height="20" fill="#533afd" fill-opacity="0.69"/>
+<text x="937.0" y="241" text-anchor="middle" fill="#fff">36</text>
+<text class="t" x="264" y="263" text-anchor="end">payment_allocation/partial</text>
+<rect x="271" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.97"/>
+<text x="293.0" y="263" text-anchor="middle" fill="#fff">238</text>
+<rect x="317" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.81"/>
+<text x="339.0" y="263" text-anchor="middle" fill="#fff">82</text>
+<rect x="363" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.76"/>
+<text x="385.0" y="263" text-anchor="middle" fill="#fff">58</text>
+<rect x="409" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.94"/>
+<text x="431.0" y="263" text-anchor="middle" fill="#fff">200</text>
+<rect x="455" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.77"/>
+<text x="477.0" y="263" text-anchor="middle" fill="#fff">62</text>
+<rect x="501" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.96"/>
+<text x="523.0" y="263" text-anchor="middle" fill="#fff">225</text>
+<rect x="547" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.65"/>
+<text x="569.0" y="263" text-anchor="middle" fill="#fff">27</text>
+<rect x="593" y="249" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="263" text-anchor="middle">0</text>
+<rect x="639" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.71"/>
+<text x="661.0" y="263" text-anchor="middle" fill="#fff">42</text>
+<rect x="685" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.64"/>
+<text x="707.0" y="263" text-anchor="middle" fill="#fff">26</text>
+<rect x="731" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.93"/>
+<text x="753.0" y="263" text-anchor="middle" fill="#fff">183</text>
+<rect x="777" y="249" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="799.0" y="263" text-anchor="middle">0</text>
+<rect x="823" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.88"/>
+<text x="845.0" y="263" text-anchor="middle" fill="#fff">137</text>
+<rect x="869" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.94"/>
+<text x="891.0" y="263" text-anchor="middle" fill="#fff">207</text>
+<rect x="915" y="249" width="44" height="20" fill="#533afd" fill-opacity="0.86"/>
+<text x="937.0" y="263" text-anchor="middle" fill="#fff">113</text>
+<text class="t" x="264" y="285" text-anchor="end">payment_allocation/wrong_invoice</text>
+<rect x="271" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="293.0" y="285" text-anchor="middle" fill="#0d253d">5</text>
+<rect x="317" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.36"/>
+<text x="339.0" y="285" text-anchor="middle" fill="#0d253d">3</text>
+<rect x="363" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.25"/>
+<text x="385.0" y="285" text-anchor="middle" fill="#0d253d">1</text>
+<rect x="409" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.44"/>
+<text x="431.0" y="285" text-anchor="middle" fill="#0d253d">6</text>
+<rect x="455" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.25"/>
+<text x="477.0" y="285" text-anchor="middle" fill="#0d253d">1</text>
+<rect x="501" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="523.0" y="285" text-anchor="middle" fill="#0d253d">5</text>
+<rect x="547" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.25"/>
+<text x="569.0" y="285" text-anchor="middle" fill="#0d253d">1</text>
+<rect x="593" y="271" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="285" text-anchor="middle">0</text>
+<rect x="639" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.25"/>
+<text x="661.0" y="285" text-anchor="middle" fill="#0d253d">1</text>
+<rect x="685" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.25"/>
+<text x="707.0" y="285" text-anchor="middle" fill="#0d253d">1</text>
+<rect x="731" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.48"/>
+<text x="753.0" y="285" text-anchor="middle" fill="#0d253d">8</text>
+<rect x="777" y="271" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="799.0" y="285" text-anchor="middle">0</text>
+<rect x="823" y="271" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="845.0" y="285" text-anchor="middle">0</text>
+<rect x="869" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.39"/>
+<text x="891.0" y="285" text-anchor="middle" fill="#0d253d">4</text>
+<rect x="915" y="271" width="44" height="20" fill="#533afd" fill-opacity="0.39"/>
+<text x="937.0" y="285" text-anchor="middle" fill="#0d253d">4</text>
+<text class="t" x="264" y="307" text-anchor="end">fx_rate/adjacent_day</text>
+<rect x="271" y="293" width="44" height="20" fill="#533afd" fill-opacity="1.00"/>
+<text x="293.0" y="307" text-anchor="middle" fill="#fff">299</text>
+<rect x="317" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.86"/>
+<text x="339.0" y="307" text-anchor="middle" fill="#fff">113</text>
+<rect x="363" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.77"/>
+<text x="385.0" y="307" text-anchor="middle" fill="#fff">62</text>
+<rect x="409" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.99"/>
+<text x="431.0" y="307" text-anchor="middle" fill="#fff">281</text>
+<rect x="455" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.78"/>
+<text x="477.0" y="307" text-anchor="middle" fill="#fff">69</text>
+<rect x="501" y="293" width="44" height="20" fill="#533afd" fill-opacity="1.00"/>
+<text x="523.0" y="307" text-anchor="middle" fill="#fff">300</text>
+<rect x="547" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.66"/>
+<text x="569.0" y="307" text-anchor="middle" fill="#fff">30</text>
+<rect x="593" y="293" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="307" text-anchor="middle">0</text>
+<rect x="639" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.73"/>
+<text x="661.0" y="307" text-anchor="middle" fill="#fff">48</text>
+<rect x="685" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.68"/>
+<text x="707.0" y="307" text-anchor="middle" fill="#fff">34</text>
+<rect x="731" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.97"/>
+<text x="753.0" y="307" text-anchor="middle" fill="#fff">241</text>
+<rect x="777" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.87"/>
+<text x="799.0" y="307" text-anchor="middle" fill="#fff">128</text>
+<rect x="823" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.71"/>
+<text x="845.0" y="307" text-anchor="middle" fill="#fff">43</text>
+<rect x="869" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.98"/>
+<text x="891.0" y="307" text-anchor="middle" fill="#fff">269</text>
+<rect x="915" y="293" width="44" height="20" fill="#533afd" fill-opacity="0.89"/>
+<text x="937.0" y="307" text-anchor="middle" fill="#fff">143</text>
+<text class="t" x="264" y="329" text-anchor="end">fx_rate/utc_date</text>
+<rect x="271" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.76"/>
+<text x="293.0" y="329" text-anchor="middle" fill="#fff">59</text>
+<rect x="317" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.63"/>
+<text x="339.0" y="329" text-anchor="middle" fill="#fff">24</text>
+<rect x="363" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.62"/>
+<text x="385.0" y="329" text-anchor="middle" fill="#fff">23</text>
+<rect x="409" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.72"/>
+<text x="431.0" y="329" text-anchor="middle" fill="#fff">45</text>
+<rect x="455" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.56"/>
+<text x="477.0" y="329" text-anchor="middle" fill="#fff">15</text>
+<rect x="501" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.76"/>
+<text x="523.0" y="329" text-anchor="middle" fill="#fff">58</text>
+<rect x="547" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.49"/>
+<text x="569.0" y="329" text-anchor="middle" fill="#0d253d">9</text>
+<rect x="593" y="315" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="329" text-anchor="middle">0</text>
+<rect x="639" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.44"/>
+<text x="661.0" y="329" text-anchor="middle" fill="#0d253d">6</text>
+<rect x="685" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.51"/>
+<text x="707.0" y="329" text-anchor="middle" fill="#0d253d">10</text>
+<rect x="731" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.51"/>
+<text x="753.0" y="329" text-anchor="middle" fill="#0d253d">10</text>
+<rect x="777" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="799.0" y="329" text-anchor="middle" fill="#0d253d">5</text>
+<rect x="823" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.78"/>
+<text x="845.0" y="329" text-anchor="middle" fill="#fff">68</text>
+<rect x="869" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.80"/>
+<text x="891.0" y="329" text-anchor="middle" fill="#fff">78</text>
+<rect x="915" y="315" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="937.0" y="329" text-anchor="middle" fill="#0d253d">5</text>
+<text class="t" x="264" y="351" text-anchor="end">fx_rate/inverted</text>
+<rect x="271" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.66"/>
+<text x="293.0" y="351" text-anchor="middle" fill="#fff">30</text>
+<rect x="317" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.55"/>
+<text x="339.0" y="351" text-anchor="middle" fill="#fff">14</text>
+<rect x="363" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.48"/>
+<text x="385.0" y="351" text-anchor="middle" fill="#0d253d">8</text>
+<rect x="409" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.63"/>
+<text x="431.0" y="351" text-anchor="middle" fill="#fff">24</text>
+<rect x="455" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.53"/>
+<text x="477.0" y="351" text-anchor="middle" fill="#0d253d">12</text>
+<rect x="501" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.66"/>
+<text x="523.0" y="351" text-anchor="middle" fill="#fff">30</text>
+<rect x="547" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.39"/>
+<text x="569.0" y="351" text-anchor="middle" fill="#0d253d">4</text>
+<rect x="593" y="337" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="351" text-anchor="middle">0</text>
+<rect x="639" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="661.0" y="351" text-anchor="middle" fill="#0d253d">5</text>
+<rect x="685" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="707.0" y="351" text-anchor="middle" fill="#0d253d">5</text>
+<rect x="731" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.62"/>
+<text x="753.0" y="351" text-anchor="middle" fill="#fff">23</text>
+<rect x="777" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.61"/>
+<text x="799.0" y="351" text-anchor="middle" fill="#fff">21</text>
+<rect x="823" y="337" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="845.0" y="351" text-anchor="middle">0</text>
+<rect x="869" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.64"/>
+<text x="891.0" y="351" text-anchor="middle" fill="#fff">26</text>
+<rect x="915" y="337" width="44" height="20" fill="#533afd" fill-opacity="0.59"/>
+<text x="937.0" y="351" text-anchor="middle" fill="#fff">18</text>
+<text class="t" x="264" y="373" text-anchor="end">fx_rate/historical_rate</text>
+<rect x="271" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.65"/>
+<text x="293.0" y="373" text-anchor="middle" fill="#fff">28</text>
+<rect x="317" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.53"/>
+<text x="339.0" y="373" text-anchor="middle" fill="#0d253d">12</text>
+<rect x="363" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="385.0" y="373" text-anchor="middle" fill="#0d253d">5</text>
+<rect x="409" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.62"/>
+<text x="431.0" y="373" text-anchor="middle" fill="#fff">22</text>
+<rect x="455" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.54"/>
+<text x="477.0" y="373" text-anchor="middle" fill="#0d253d">13</text>
+<rect x="501" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.64"/>
+<text x="523.0" y="373" text-anchor="middle" fill="#fff">26</text>
+<rect x="547" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="569.0" y="373" text-anchor="middle" fill="#0d253d">5</text>
+<rect x="593" y="359" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="373" text-anchor="middle">0</text>
+<rect x="639" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="661.0" y="373" text-anchor="middle" fill="#0d253d">5</text>
+<rect x="685" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.39"/>
+<text x="707.0" y="373" text-anchor="middle" fill="#0d253d">4</text>
+<rect x="731" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.63"/>
+<text x="753.0" y="373" text-anchor="middle" fill="#fff">24</text>
+<rect x="777" y="359" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="799.0" y="373" text-anchor="middle">0</text>
+<rect x="823" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.57"/>
+<text x="845.0" y="373" text-anchor="middle" fill="#fff">16</text>
+<rect x="869" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.58"/>
+<text x="891.0" y="373" text-anchor="middle" fill="#fff">17</text>
+<rect x="915" y="359" width="44" height="20" fill="#533afd" fill-opacity="0.62"/>
+<text x="937.0" y="373" text-anchor="middle" fill="#fff">23</text>
+<text class="t" x="264" y="395" text-anchor="end">fx_rate/wrong_pair</text>
+<rect x="271" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.76"/>
+<text x="293.0" y="395" text-anchor="middle" fill="#fff">58</text>
+<rect x="317" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.65"/>
+<text x="339.0" y="395" text-anchor="middle" fill="#fff">27</text>
+<rect x="363" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.59"/>
+<text x="385.0" y="395" text-anchor="middle" fill="#fff">18</text>
+<rect x="409" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.73"/>
+<text x="431.0" y="395" text-anchor="middle" fill="#fff">47</text>
+<rect x="455" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.60"/>
+<text x="477.0" y="395" text-anchor="middle" fill="#fff">20</text>
+<rect x="501" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.76"/>
+<text x="523.0" y="395" text-anchor="middle" fill="#fff">60</text>
+<rect x="547" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.48"/>
+<text x="569.0" y="395" text-anchor="middle" fill="#0d253d">8</text>
+<rect x="593" y="381" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="395" text-anchor="middle">0</text>
+<rect x="639" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.52"/>
+<text x="661.0" y="395" text-anchor="middle" fill="#0d253d">11</text>
+<rect x="685" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.44"/>
+<text x="707.0" y="395" text-anchor="middle" fill="#0d253d">6</text>
+<rect x="731" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.70"/>
+<text x="753.0" y="395" text-anchor="middle" fill="#fff">38</text>
+<rect x="777" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.69"/>
+<text x="799.0" y="395" text-anchor="middle" fill="#fff">37</text>
+<rect x="823" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.51"/>
+<text x="845.0" y="395" text-anchor="middle" fill="#0d253d">10</text>
+<rect x="869" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.75"/>
+<text x="891.0" y="395" text-anchor="middle" fill="#fff">55</text>
+<rect x="915" y="381" width="44" height="20" fill="#533afd" fill-opacity="0.66"/>
+<text x="937.0" y="395" text-anchor="middle" fill="#fff">30</text>
+<text class="t" x="264" y="417" text-anchor="end">fx_rate/due_date</text>
+<rect x="271" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.56"/>
+<text x="293.0" y="417" text-anchor="middle" fill="#fff">15</text>
+<rect x="317" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.31"/>
+<text x="339.0" y="417" text-anchor="middle" fill="#0d253d">2</text>
+<rect x="363" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="385.0" y="417" text-anchor="middle" fill="#0d253d">5</text>
+<rect x="409" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.48"/>
+<text x="431.0" y="417" text-anchor="middle" fill="#0d253d">8</text>
+<rect x="455" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.39"/>
+<text x="477.0" y="417" text-anchor="middle" fill="#0d253d">4</text>
+<rect x="501" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.52"/>
+<text x="523.0" y="417" text-anchor="middle" fill="#0d253d">11</text>
+<rect x="547" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.39"/>
+<text x="569.0" y="417" text-anchor="middle" fill="#0d253d">4</text>
+<rect x="593" y="403" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="417" text-anchor="middle">0</text>
+<rect x="639" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.25"/>
+<text x="661.0" y="417" text-anchor="middle" fill="#0d253d">1</text>
+<rect x="685" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.25"/>
+<text x="707.0" y="417" text-anchor="middle" fill="#0d253d">1</text>
+<rect x="731" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.46"/>
+<text x="753.0" y="417" text-anchor="middle" fill="#0d253d">7</text>
+<rect x="777" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.51"/>
+<text x="799.0" y="417" text-anchor="middle" fill="#0d253d">10</text>
+<rect x="823" y="403" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="845.0" y="417" text-anchor="middle">0</text>
+<rect x="869" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.54"/>
+<text x="891.0" y="417" text-anchor="middle" fill="#0d253d">13</text>
+<rect x="915" y="403" width="44" height="20" fill="#533afd" fill-opacity="0.39"/>
+<text x="937.0" y="417" text-anchor="middle" fill="#0d253d">4</text>
+<text class="t" x="264" y="439" text-anchor="end">period_cutoff/utc_trap</text>
+<rect x="271" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.80"/>
+<text x="293.0" y="439" text-anchor="middle" fill="#fff">80</text>
+<rect x="317" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.64"/>
+<text x="339.0" y="439" text-anchor="middle" fill="#fff">26</text>
+<rect x="363" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.51"/>
+<text x="385.0" y="439" text-anchor="middle" fill="#0d253d">10</text>
+<rect x="409" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.80"/>
+<text x="431.0" y="439" text-anchor="middle" fill="#fff">76</text>
+<rect x="455" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.60"/>
+<text x="477.0" y="439" text-anchor="middle" fill="#fff">20</text>
+<rect x="501" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.77"/>
+<text x="523.0" y="439" text-anchor="middle" fill="#fff">64</text>
+<rect x="547" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.55"/>
+<text x="569.0" y="439" text-anchor="middle" fill="#fff">14</text>
+<rect x="593" y="425" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="439" text-anchor="middle">0</text>
+<rect x="639" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.54"/>
+<text x="661.0" y="439" text-anchor="middle" fill="#0d253d">13</text>
+<rect x="685" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.56"/>
+<text x="707.0" y="439" text-anchor="middle" fill="#fff">15</text>
+<rect x="731" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.85"/>
+<text x="753.0" y="439" text-anchor="middle" fill="#fff">106</text>
+<rect x="777" y="425" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="799.0" y="439" text-anchor="middle">0</text>
+<rect x="823" y="425" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="845.0" y="439" text-anchor="middle">0</text>
+<rect x="869" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.76"/>
+<text x="891.0" y="439" text-anchor="middle" fill="#fff">58</text>
+<rect x="915" y="425" width="44" height="20" fill="#533afd" fill-opacity="0.73"/>
+<text x="937.0" y="439" text-anchor="middle" fill="#fff">48</text>
+<text class="t" x="264" y="461" text-anchor="end">period_cutoff/backdated_posting</text>
+<rect x="271" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.64"/>
+<text x="293.0" y="461" text-anchor="middle" fill="#fff">26</text>
+<rect x="317" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="339.0" y="461" text-anchor="middle" fill="#0d253d">5</text>
+<rect x="363" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.42"/>
+<text x="385.0" y="461" text-anchor="middle" fill="#0d253d">5</text>
+<rect x="409" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.59"/>
+<text x="431.0" y="461" text-anchor="middle" fill="#fff">18</text>
+<rect x="455" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.48"/>
+<text x="477.0" y="461" text-anchor="middle" fill="#0d253d">8</text>
+<rect x="501" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.56"/>
+<text x="523.0" y="461" text-anchor="middle" fill="#fff">15</text>
+<rect x="547" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.36"/>
+<text x="569.0" y="461" text-anchor="middle" fill="#0d253d">3</text>
+<rect x="593" y="447" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="461" text-anchor="middle">0</text>
+<rect x="639" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.44"/>
+<text x="661.0" y="461" text-anchor="middle" fill="#0d253d">6</text>
+<rect x="685" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.46"/>
+<text x="707.0" y="461" text-anchor="middle" fill="#0d253d">7</text>
+<rect x="731" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.67"/>
+<text x="753.0" y="461" text-anchor="middle" fill="#fff">31</text>
+<rect x="777" y="447" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="799.0" y="461" text-anchor="middle">0</text>
+<rect x="823" y="447" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="845.0" y="461" text-anchor="middle">0</text>
+<rect x="869" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.63"/>
+<text x="891.0" y="461" text-anchor="middle" fill="#fff">24</text>
+<rect x="915" y="447" width="44" height="20" fill="#533afd" fill-opacity="0.46"/>
+<text x="937.0" y="461" text-anchor="middle" fill="#0d253d">7</text>
+<text class="t" x="264" y="483" text-anchor="end">period_cutoff/prior_period</text>
+<rect x="271" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.89"/>
+<text x="293.0" y="483" text-anchor="middle" fill="#fff">139</text>
+<rect x="317" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.72"/>
+<text x="339.0" y="483" text-anchor="middle" fill="#fff">45</text>
+<rect x="363" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.62"/>
+<text x="385.0" y="483" text-anchor="middle" fill="#fff">23</text>
+<rect x="409" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.88"/>
+<text x="431.0" y="483" text-anchor="middle" fill="#fff">131</text>
+<rect x="455" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.66"/>
+<text x="477.0" y="483" text-anchor="middle" fill="#fff">30</text>
+<rect x="501" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.84"/>
+<text x="523.0" y="483" text-anchor="middle" fill="#fff">102</text>
+<rect x="547" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.64"/>
+<text x="569.0" y="483" text-anchor="middle" fill="#fff">26</text>
+<rect x="593" y="469" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="615.0" y="483" text-anchor="middle">0</text>
+<rect x="639" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.62"/>
+<text x="661.0" y="483" text-anchor="middle" fill="#fff">23</text>
+<rect x="685" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.68"/>
+<text x="707.0" y="483" text-anchor="middle" fill="#fff">33</text>
+<rect x="731" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.93"/>
+<text x="753.0" y="483" text-anchor="middle" fill="#fff">184</text>
+<rect x="777" y="469" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="799.0" y="483" text-anchor="middle">0</text>
+<rect x="823" y="469" width="44" height="20" fill="none" stroke="#ea2261" stroke-opacity="0.35"/>
+<text class="z" x="845.0" y="483" text-anchor="middle">0</text>
+<rect x="869" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.90"/>
+<text x="891.0" y="483" text-anchor="middle" fill="#fff">148</text>
+<rect x="915" y="469" width="44" height="20" fill="#533afd" fill-opacity="0.69"/>
+<text x="937.0" y="483" text-anchor="middle" fill="#fff">36</text>
+</svg>
