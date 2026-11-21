@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity ablation
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -17,6 +17,7 @@ help:
 	@echo "make exploit-search    automatic reward-exploit search (CEM) -> reports/exploit_search.md"
 	@echo "make mutation      hand-written grader mutations vs fast tests -> reports/mutation.md (not in check)"
 	@echo "make repro-cert    reproducibility certificate (20 episode hashes + deterministic selfcheck); repro-cert-check compares"
+	@echo "make ablation      the same answers graded with and without the evidence requirement -> reports/ablation_evidence.md"
 	@echo "make sensitivity   reward vs tolerance 0/1/2/5/100 and vs step cost -> reports/tolerance.md, reports/step_cost.md"
 	@echo "make exhaustive    all small grading cases (8 truths x 10626 answers): dominance, monotonicity, order, step cost"
 	@echo "make coverage-map  pairwise coverage of generator factors on 1000 seeds, SVG heat map, uncovered pairs with reasons"
@@ -92,6 +93,9 @@ repro-cert:
 
 repro-cert-check:
 	$(PYTHON) tools/repro_cert.py --check
+
+ablation:
+	$(PYTHON) tools/ablation_evidence.py --n 120
 
 sensitivity:
 	$(PYTHON) tools/sensitivity.py --n 120
