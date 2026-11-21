@@ -4,7 +4,7 @@ import re
 
 from auditenv.paths import ROOT
 
-ROUND4_DOCS = ["docs/SUBMISSION_FORM.md", "docs/AI_USAGE.md", "docs/DESIGN_SHORT.md"]  # ROUND4_IDEAS.md is a plan: it names files before they exist
+ROUND4_DOCS = ["docs/HOTFIX.md", "docs/SUBMISSION_FORM.md", "docs/AI_USAGE.md", "docs/DESIGN_SHORT.md"]  # ROUND4_IDEAS.md is a plan: it names files before they exist
 
 
 def test_submission_form_lengths():
