@@ -561,7 +561,13 @@ def main(argv=None) -> int:
     an.add_argument("--docs", action="store_true", help="update the generated tables in docs/")
     dc = sub.add_parser("docs-check")
     dc.add_argument("--fix", action="store_true")
+    vs = sub.add_parser("verify-sbom", help="check reports/sbom.json: wheel sha256, versions, licences, base image")
+    vs.add_argument("--write", action="store_true", help="regenerate reports/sbom.json first")
     a = ap.parse_args(argv)
+    if a.cmd == "verify-sbom":
+        from .supply import main_verify
+
+        return main_verify(["--write"] if a.write else [])
     if a.cmd == "docs-check":
         from .docs_check import main as docs_main
 

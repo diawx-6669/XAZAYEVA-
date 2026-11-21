@@ -1,0 +1,250 @@
+{
+ "bomFormat": "CycloneDX",
+ "components": [
+  {
+   "description": "base image of the Dockerfile, pinned by digest",
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535"
+    }
+   ],
+   "name": "python",
+   "purl": "pkg:docker/library/python@sha256:07d4824036af339fa1b6ef769cc99d9c10a141769538b52b3b597c84f7a7b535",
+   "scope": "required",
+   "type": "container",
+   "version": "3.11-slim"
+  },
+  {
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "9f634bdb1f9e9b8ab6ba09431cf2deedb750c96978125a6fb3c5a0f6c6db4131"
+    }
+   ],
+   "licenses": [
+    {
+     "expression": "MPL-2.0"
+    }
+   ],
+   "name": "hypothesis",
+   "properties": [
+    {
+     "name": "auditenv:wheel",
+     "value": "hypothesis-6.155.7-py3-none-any.whl"
+    },
+    {
+     "name": "auditenv:pinned",
+     "value": "true"
+    }
+   ],
+   "purl": "pkg:pypi/hypothesis@6.155.7",
+   "scope": "required",
+   "type": "library",
+   "version": "6.155.7"
+  },
+  {
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "9121e2c1fdb355232495be3194c8dfe87ccc2d5dee45947b78e68f499790d7a7"
+    }
+   ],
+   "licenses": [
+    {
+     "expression": "MIT"
+    }
+   ],
+   "name": "iniconfig",
+   "properties": [
+    {
+     "name": "auditenv:wheel",
+     "value": "iniconfig-2.3.1-py3-none-any.whl"
+    },
+    {
+     "name": "auditenv:pinned",
+     "value": "true"
+    }
+   ],
+   "purl": "pkg:pypi/iniconfig@2.3.1",
+   "scope": "required",
+   "type": "library",
+   "version": "2.3.1"
+  },
+  {
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+    }
+   ],
+   "licenses": [
+    {
+     "expression": "Apache-2.0 OR BSD-2-Clause"
+    }
+   ],
+   "name": "packaging",
+   "properties": [
+    {
+     "name": "auditenv:wheel",
+     "value": "packaging-26.3-py3-none-any.whl"
+    },
+    {
+     "name": "auditenv:pinned",
+     "value": "true"
+    }
+   ],
+   "purl": "pkg:pypi/packaging@26.3",
+   "scope": "required",
+   "type": "library",
+   "version": "26.3"
+  },
+  {
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "7dd7b0d8832ba3cb632c306926ded123429211b83641b35dc5c41ad2d34f9bec"
+    }
+   ],
+   "licenses": [
+    {
+     "expression": "MIT"
+    }
+   ],
+   "name": "pluggy",
+   "properties": [
+    {
+     "name": "auditenv:wheel",
+     "value": "pluggy-1.7.0-py3-none-any.whl"
+    },
+    {
+     "name": "auditenv:pinned",
+     "value": "true"
+    }
+   ],
+   "purl": "pkg:pypi/pluggy@1.7.0",
+   "scope": "required",
+   "type": "library",
+   "version": "1.7.0"
+  },
+  {
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9"
+    }
+   ],
+   "licenses": [
+    {
+     "expression": "BSD-2-Clause"
+    }
+   ],
+   "name": "Pygments",
+   "properties": [
+    {
+     "name": "auditenv:wheel",
+     "value": "pygments-2.21.0-py3-none-any.whl"
+    },
+    {
+     "name": "auditenv:pinned",
+     "value": "true"
+    }
+   ],
+   "purl": "pkg:pypi/pygments@2.21.0",
+   "scope": "required",
+   "type": "library",
+   "version": "2.21.0"
+  },
+  {
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c"
+    }
+   ],
+   "licenses": [
+    {
+     "expression": "MIT"
+    }
+   ],
+   "name": "pytest",
+   "properties": [
+    {
+     "name": "auditenv:wheel",
+     "value": "pytest-9.1.1-py3-none-any.whl"
+    },
+    {
+     "name": "auditenv:pinned",
+     "value": "true"
+    }
+   ],
+   "purl": "pkg:pypi/pytest@9.1.1",
+   "scope": "required",
+   "type": "library",
+   "version": "9.1.1"
+  },
+  {
+   "hashes": [
+    {
+     "alg": "SHA-256",
+     "content": "a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0"
+    }
+   ],
+   "licenses": [
+    {
+     "expression": "Apache 2.0"
+    }
+   ],
+   "name": "sortedcontainers",
+   "properties": [
+    {
+     "name": "auditenv:wheel",
+     "value": "sortedcontainers-2.4.0-py2.py3-none-any.whl"
+    },
+    {
+     "name": "auditenv:pinned",
+     "value": "true"
+    }
+   ],
+   "purl": "pkg:pypi/sortedcontainers@2.4.0",
+   "scope": "required",
+   "type": "library",
+   "version": "2.4.0"
+  }
+ ],
+ "dependencies": [
+  {
+   "dependsOn": [
+    "pkg:pypi/hypothesis@6.155.7",
+    "pkg:pypi/iniconfig@2.3.1",
+    "pkg:pypi/packaging@26.3",
+    "pkg:pypi/pluggy@1.7.0",
+    "pkg:pypi/pygments@2.21.0",
+    "pkg:pypi/pytest@9.1.1",
+    "pkg:pypi/sortedcontainers@2.4.0"
+   ],
+   "ref": "auditenv"
+  }
+ ],
+ "metadata": {
+  "component": {
+   "licenses": [
+    {
+     "expression": "MIT"
+    }
+   ],
+   "name": "auditenv",
+   "type": "application",
+   "version": "0.1.0"
+  },
+  "note": "deterministic (no clock or random fields); regenerate with python -m auditenv verify-sbom --write",
+  "tools": [
+   {
+    "name": "auditenv.supply",
+    "version": "0.1.0"
+   }
+  ]
+ },
+ "specVersion": "1.5",
+ "version": 1
+}
