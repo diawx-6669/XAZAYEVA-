@@ -125,6 +125,9 @@ def test_vat_rehearsal_patch_applies_cleanly():
     if not (ROOT / ".git").exists() or not shutil.which("git"):
         pytest.skip("no git checkout (e.g. inside the image): git apply --check needs the work tree")
     out = subprocess.run(["git", "apply", "--check", str(patch)], cwd=ROOT, capture_output=True, text=True, timeout=60)
-    assert out.returncode == 0, out.stderr
+    if out.returncode != 0:  # on branch final-rehearsal the patch is already in: then it must reverse cleanly
+        rev = subprocess.run(["git", "apply", "--check", "--reverse", str(patch)], cwd=ROOT, capture_output=True,
+                             text=True, timeout=60)
+        assert rev.returncode == 0, out.stderr
     text = patch.read_text("utf-8")
     assert "auditenv/generator/errors/vat_error.py" in text and text.count("diff --git") >= 20
