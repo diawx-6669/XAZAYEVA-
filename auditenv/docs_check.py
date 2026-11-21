@@ -22,7 +22,7 @@ from .paths import CONFIGS_DIR, EPISODES_DIR, ROOT
 DOCS = ["README.md", "docs/DESIGN.md", "docs/LIMITATIONS.md", "docs/FAILURES.md", "docs/CONTRACT.md",
         "docs/ADAPTER.md", "docs/SUBMISSION.md", "docs/HOWTO_EXTEND.md", "docs/MANUAL_AUDIT.md",
         "docs/PROJECT.md", "docs/ATTACKS.md", "docs/EXPERIMENT.md", "README.en.md", "docs/DESIGN_SHORT.md",
-        "docs/SAFETY.md", "docs/SUBMISSION_FORM.md", "docs/JURY.md"]
+        "docs/SAFETY.md", "docs/SUBMISSION_FORM.md", "docs/JURY.md", "docs/DATASHEET.md"]
 FACT_RE = re.compile(r"<!--fact:([a-z0-9_]+)-->(.*?)<!--/fact-->", re.S)
 
 
@@ -129,11 +129,59 @@ def compute_facts(need: set) -> dict:
             facts[name] = str(sum(1 for x in layers if callable(x)))
         elif name == "n_wheels":
             facts[name] = str(len(list((ROOT / "vendor" / "wheels").glob("*.whl"))))
+        elif name.startswith("ds_"):
+            facts[name] = get("datasheet", _datasheet).get(name)
         elif name == "n_configs":
             facts[name] = str(sum(1 for p in CONFIGS_DIR.glob("*.json") if _is_cfg(p)))
         else:
             facts[name] = None
     return facts
+
+
+def _datasheet() -> dict:
+    """Numbers of docs/DATASHEET.md, all from the committed open episodes and their index files."""
+    from collections import Counter
+
+    eps = []
+    for split in ("train", "dev"):
+        for e in json.loads((EPISODES_DIR / split / "index.json").read_text("utf-8")):
+            d = EPISODES_DIR / split / e["episode_id"]
+            m = json.loads((d / "public" / "manifest.json").read_text("utf-8"))
+            tr = json.loads((d / "grader" / "truth.json").read_text("utf-8"))
+            pv = json.loads((d / "grader" / "provenance.json").read_text("utf-8"))
+            size = sum(p.stat().st_size for p in (d / "public").iterdir())
+            eps.append((split, e, m, tr, pv, size))
+
+    def cnt(c):
+        return ", ".join(f"{k} {v}" for k, v in sorted(c.items(), key=lambda kv: (-kv[1], kv[0])))
+
+    types = Counter(i["type"] for *_, tr, _, _ in eps for i in tr["issues"])
+    variants = Counter(f"{mu['type']}/{mu.get('variant', '?')}" for *_, pv, _ in eps for mu in pv["mutations"])
+    sets = [len(i["evidence_sets"]) for *_, tr, _, _ in eps for i in tr["issues"]]
+    set_sizes = [len(s) for *_, tr, _, _ in eps for i in tr["issues"] for s in i["evidence_sets"]]
+    amounts = [i["expected_amount_minor"] for *_, tr, _, _ in eps for i in tr["issues"]]
+    starts = sorted(m["period_start"][:10] for _, _, m, *_ in eps)
+    ends = sorted(m["period_end"][:10] for _, _, m, *_ in eps)
+    return {
+        "ds_n_episodes": str(len(eps)),
+        "ds_n_train": str(sum(1 for x in eps if x[0] == "train")),
+        "ds_n_dev": str(sum(1 for x in eps if x[0] == "dev")),
+        "ds_configs": cnt(Counter(e["config"] for _, e, *_ in eps)),
+        "ds_ledger_total": str(sum(m["counts"]["ledger"] for _, _, m, *_ in eps)),
+        "ds_invoices_total": str(sum(m["counts"]["invoices"] for _, _, m, *_ in eps)),
+        "ds_payments_total": str(sum(m["counts"]["payments"] for _, _, m, *_ in eps)),
+        "ds_fx_total": str(sum(m["counts"]["fx"] for _, _, m, *_ in eps)),
+        "ds_public_mb": f"{sum(x[5] for x in eps) / 1e6:.1f}",
+        "ds_issues_total": str(sum(types.values())),
+        "ds_issue_types": cnt(types),
+        "ds_variants": str(len(variants)),
+        "ds_base_currencies": cnt(Counter(m["base_currency"] for _, _, m, *_ in eps)),
+        "ds_timezones": cnt(Counter(m["timezone"] for _, _, m, *_ in eps)),
+        "ds_period_span": f"{starts[0]} … {ends[-1]}",
+        "ds_evidence_sets_range": _rng(sets) if sets else "—",
+        "ds_evidence_size_range": _rng(set_sizes) if set_sizes else "—",
+        "ds_amount_range": f"{min(amounts)}–{max(amounts)}" if amounts else "—",
+    }
 
 
 def _check_seeds() -> int:
