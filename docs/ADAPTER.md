@@ -44,6 +44,7 @@ python -m auditenv run --policy-cmd "python my_agent.py" --episode-dir episodes/
 | код политики | импортируется из копии пакета только для чтения (`chmod -R a-w`) |
 | cwd, `HOME`, `TMPDIR` | пустой временный каталог, удаляется после прогона |
 | окружение | ровно `AGENT_ENV` = `PATH`, `TZ`, `LANG`: без `AUDITENV_SEED_SALT`, seed и путей к эпизоду |
+| командная строка и окружение оценщика | `python -m auditenv run …` сразу перезапускает себя (`exec`) как `python -m auditenv __run_concealed <fd>`: аргументы и соль передаются через анонимный pipe, в окружении нового процесса соли нет. `ps`, `ps -E`, `/proc/<ppid>/cmdline` и `environ` показывают только эту строку (`tests/test_conceal.py`) |
 | после прогона | (под root) все процессы `nobody` убиваются, его файлы в `/tmp`, `/var/tmp`, `/dev/shm` удаляются |
 
 Проверено тестами: `tests/test_batch_c.py::test_child_limits_are_applied_and_python_still_starts`

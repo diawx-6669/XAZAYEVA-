@@ -435,7 +435,64 @@ def cmd_golden(a):
     print(f"wrote {p}")
 
 
+CONCEALED_CMD = "__run_concealed"
+NO_CONCEAL_ENV = "AUDITENV_NO_CONCEAL"  # only for the leak test's positive control
+
+
+def conceal_run_args(argv: list) -> None:
+    """Re-exec `python -m auditenv run ...` so that the agent cannot read the seed, the config, data
+    paths or the salt from the evaluator's process information.
+
+    The agent runs under the same uid as a non-root evaluator, so it can read the evaluator's command
+    line (`ps`, /proc/<pid>/cmdline on every OS) and, on macOS, its initial environment (`ps -E`,
+    which prctl cannot hide). We hand the real arguments and the salt over an anonymous pipe and exec
+    ourselves with a neutral argv and an environment without AUDITENV_SEED_SALT. Both `ps` and /proc
+    show the strings captured at exec time, so restoring the salt into os.environ afterwards
+    (putenv) is invisible to them. Never returns on success."""
+    import os
+
+    from .ids import SALT_ENV
+
+    if os.name != "posix" or os.environ.get(NO_CONCEAL_ENV) == "1":
+        return
+    payload = json.dumps({"argv": argv, "salt": os.environ.get(SALT_ENV)}).encode("utf-8")
+    if len(payload) > 16384:  # must fit the pipe buffer: we write before exec, nobody reads yet
+        return
+    r, w = os.pipe()
+    os.write(w, payload)
+    os.close(w)
+    os.set_inheritable(r, True)
+    env = {k: v for k, v in os.environ.items() if k != SALT_ENV}
+    orig = list(getattr(sys, "orig_argv", []) or [])
+    flags = orig[1:orig.index("-m")] if "-m" in orig else []
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os.execve(sys.executable, [sys.executable, *flags, "-m", "auditenv", CONCEALED_CMD, str(r)], env)
+
+
+def _read_concealed(fd: str) -> list:
+    import os
+
+    from .ids import SALT_ENV
+
+    chunks, fd = [], int(fd)
+    while True:
+        b = os.read(fd, 65536)
+        if not b:
+            break
+        chunks.append(b)
+    os.close(fd)
+    payload = json.loads(b"".join(chunks).decode("utf-8"))
+    if payload.get("salt"):
+        os.environ[SALT_ENV] = payload["salt"]  # putenv after exec: not in the exec-time env block
+    return payload["argv"]
+
+
 def main(argv=None) -> int:
+    if argv is None and sys.argv[1:2] == [CONCEALED_CMD] and len(sys.argv) == 3:
+        argv = _read_concealed(sys.argv[2])
+    elif argv is None and sys.argv[1:2] == ["run"]:
+        conceal_run_args(sys.argv[1:])
     ap = argparse.ArgumentParser(prog="python -m auditenv")
     sub = ap.add_subparsers(dest="cmd", required=True)
     g = sub.add_parser("generate")
