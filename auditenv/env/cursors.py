@@ -31,6 +31,10 @@ class CursorCodec:
             return None
         if len(raw) != 16:
             return None
+        # canonical form only: b64decode ignores the unused low bits of the last character and drops
+        # characters outside the alphabet, so other spellings of the same bytes must not verify
+        if base64.urlsafe_b64encode(raw).decode().rstrip("=") != token:
+            return None
         offset = int.from_bytes(raw[:4], "big")
         if not hmac.compare_digest(raw[4:], self._mac(table, offset)):
             return None

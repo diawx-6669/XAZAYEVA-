@@ -112,11 +112,11 @@ commands: [`docs/JURY.md`](docs/JURY.md).
 | What was checked | Result | Where |
 |---|---|---|
 | Jury-style scoreboard | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
-| Tests (pytest + hypothesis) | <!--fact:n_tests-->656<!--/fact--> | `make check` |
+| Tests (pytest + hypothesis) | <!--fact:n_tests-->659<!--/fact--> | `make check` |
 | Deliberate grader bugs caught by the tests | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` |
 | Independent verifier (no `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> episodes, 0 disagreements | `make check` |
 | Black-box jury simulation (own policies and grader) | <!--fact:jury_sim_open-->0<!--/fact--> open findings | `reports/jury_sim.md` |
-| Vulnerabilities found and closed, each with a guard test | <!--fact:failures_closed-->17<!--/fact--> | `docs/FAILURES.md` |
+| Vulnerabilities found and closed, each with a guard test | <!--fact:failures_closed-->18<!--/fact--> | `docs/FAILURES.md` |
 | Exhaustive small-case enumeration of the grader | 85 008 cases, 0 violations | `make exhaustive` |
 | Same hashes on Python 3.11 / 3.12 / 3.13, different hash seeds, time zones, locales | 9/9 runs | `make repro-cross` |
 | No real personal or financial data (cards, IBAN, KZ BIN/IIN, e-mail, phones, URLs) | 0 hits on 520 episodes | `make pii-scan`, `docs/SAFETY.md` |

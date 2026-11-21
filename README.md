@@ -30,12 +30,12 @@ make check
 | Что проверено | Результат | Где смотреть / как повторить |
 |---|---|---|
 | Табло самопроверки в духе жюри (контракт, данные, награда, воспроизводимость) | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
-| Тестов (pytest + hypothesis) | <!--fact:n_tests-->656<!--/fact--> | `make check` |
+| Тестов (pytest + hypothesis) | <!--fact:n_tests-->659<!--/fact--> | `make check` |
 | Намеренные ошибки в оценщике, пойманные тестами | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` → `reports/mutation.md` |
 | Независимый проверяльщик эталона и доказательств (без `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> эпизодов, 0 расхождений | шаг `verify-independent` в `make check` |
 | Симуляция жюри чёрным ящиком (свои политики и оценщик) | <!--fact:jury_sim_open-->0<!--/fact--> открытых находок | [`reports/jury_sim.md`](reports/jury_sim.md) |
 | Слои изоляции агента от оценщика | <!--fact:isolation_layers-->3<!--/fact--> (non-dumpable оценщик, `nobody`, скрытая командная строка) | `tests/test_isolation.py`, `tests/test_conceal.py` |
-| Найденные и закрытые уязвимости среды, у каждой — тест‑сторож | <!--fact:failures_closed-->17<!--/fact--> | [`docs/FAILURES.md`](docs/FAILURES.md) |
+| Найденные и закрытые уязвимости среды, у каждой — тест‑сторож | <!--fact:failures_closed-->18<!--/fact--> | [`docs/FAILURES.md`](docs/FAILURES.md) |
 | Воспроизводимость между машинами и интерпретаторами | 20/20 эпизодов; хеши совпадают на Python 3.11, 3.12 и 3.13 при разных `PYTHONHASHSEED`, `TZ`, `LANG` (9/9) | `make repro-cert-check`, `make repro-cross` → `reports/repro_cross_python.md` |
 | Реальных данных нет | 0 срабатываний (карты, IBAN, БИН/ИИН, e‑mail, телефоны, URL) | `make pii-scan`, [`docs/SAFETY.md`](docs/SAFETY.md) |
 
@@ -98,7 +98,7 @@ the answer key and computes F1 and the reward; everything runs offline with one 
 | Запуск одной командой | `Makefile`, `scripts/check.sh`, `Dockerfile` (образ по дайджесту), `.github/workflows/check.yml` | `make quick` (полная: `make check` / `make docker-check`) | `quick smoke: …s`; у полной — табло `<!--fact:selfcheck_total-->90/90<!--/fact-->` и `check: ALL GREEN` |
 | Версии конфигураций | `configs/*.json` (`version`), `configs/LOCK.json`, `configs/CHANGELOG.md`, `config_version` + `config_hash` в каждом `manifest.json` | `python -m pytest -q tests/test_configs_lock.py` | `5 passed`: содержимое без смены версии не пройдёт |
 | Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1195<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
-| Измеренный разбор сбоев | [`docs/FAILURES.md`](docs/FAILURES.md): 17 закрытых уязвимостей с тестами‑сторожами, полнота по вариантам с интервалами Уилсона, seed каждого примера | `python -m auditenv analyze --n 60` | таблицы признаков и вариантов; oracle и независимый проверяльщик решают 100 % |
+| Измеренный разбор сбоев | [`docs/FAILURES.md`](docs/FAILURES.md): <!--fact:failures_closed-->18<!--/fact--> закрытых уязвимостей с тестами‑сторожами, полнота по вариантам с интервалами Уилсона, seed каждого примера | `python -m auditenv analyze --n 60` | таблицы признаков и вариантов; oracle и независимый проверяльщик решают 100 % |
 | Честные ограничения | [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) | `python -m auditenv docs-check` | `0 mismatches`: числа в документах совпадают с реальностью |
 
 ---
@@ -132,7 +132,7 @@ make check
 
 `make check` — это по порядку:
 
-1. весь pytest (<!--fact:n_tests-->656<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
+1. весь pytest (<!--fact:n_tests-->659<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
    поверхностных признаков, атаки на песочницу агента);
 2. табло self‑check в духе жюри: 4 блока × 20 проверок на 20 эпизодах и 20 парных преобразованиях,
    диагностика P/R/F1 (макро и микро), возврат на чистых и ошибочных книгах, шаги, время p50/p95;
