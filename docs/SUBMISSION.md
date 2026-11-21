@@ -4,7 +4,7 @@
 
 | Что требует кейс | Где лежит | Чем проверено |
 |---|---|---|
-| Исходный код с лицензией и зафиксированными зависимостями: генератор и среда | `auditenv/`, `LICENSE` (MIT), `requirements.txt` (все 13 зависимостей `==`), `Dockerfile` (база по sha256) | `tests/test_guards.py::test_every_dependency_is_pinned_and_installed_as_pinned` |
+| Исходный код с лицензией и зафиксированными зависимостями: генератор и среда | `auditenv/`, `LICENSE` (MIT), `requirements.txt` (все <!--fact:n_wheels-->7<!--/fact--> зависимостей `==`, колёса в `vendor/wheels/`; лицензии — `THIRD_PARTY_NOTICES.md`, хеши — `reports/sbom.json`), `Dockerfile` (база по sha256) | `tests/test_guards.py::test_every_dependency_is_pinned_and_installed_as_pinned` |
 | README: инструкции контейнера и единая команда проверки | `README.md` (блок критериев в начале), `make docker-check`, `make check`, `scripts/check.sh` | CI `.github/workflows/check.yml` (тот же `docker run --network none --cpus 2 --memory 4g`); локальный прогон образа: табло <!--fact:selfcheck_total-->90/90<!--/fact-->, `check: ALL GREEN` |
 | Matcher и награда: общий код сопоставления и награды, схемы и политики | `auditenv/grader/` (normalize, matcher, reward), `schemas/` (15 схем), `auditenv/policies/` | `tests/test_reward.py`, `tests/test_batch_c.py::test_jury_oracles_score_max`, блок «Надёжность награды» табло |
 | Эпизоды: 10 train + 10 dev | `episodes/train/`, `episodes/dev/` (+ `index.json` с дайджестами public и grader) | `tests/test_repro.py::test_exported_episodes_match_generator`, `check-schemas`, `verify-independent`, `verify-provenance` |
