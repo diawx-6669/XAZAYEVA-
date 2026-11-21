@@ -347,8 +347,9 @@ def cmd_exploit_search(a):
 def cmd_experiment(a):
     from .experiment import main as ex_main
 
-    r = ex_main()
-    print(json.dumps({k: r[k] for k in ("chosen_rules", "test", "verdict", "train_evaluations")}, indent=1, sort_keys=True))
+    r = ex_main(protocol=a.protocol)
+    keys = ("chosen_rules", "test", "verdict", "train_evaluations") + (("unseen_configs",) if a.protocol != "E6" else ())
+    print(json.dumps({k: r[k] for k in keys}, indent=1, sort_keys=True))
 
 
 def cmd_lock_configs(a):
@@ -435,7 +436,8 @@ def main(argv=None) -> int:
     sub.add_parser("verify-provenance")
     sub.add_parser("lock-configs")
     sub.add_parser("exploit-search")
-    sub.add_parser("experiment")
+    ex = sub.add_parser("experiment")
+    ex.add_argument("--protocol", default="E6", choices=["E6", "E6v2"])
     ea = sub.add_parser("export-audit")
     ea.add_argument("--out", default=str(ROOT / "audit"))
     cs = sub.add_parser("check-schemas")

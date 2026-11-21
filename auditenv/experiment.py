@@ -26,6 +26,18 @@ TEST_SEEDS = range(700000, 700050)
 HELDOUT_SALT = "auditenv-E6-heldout-2026-11-20"
 BOOT_B, BOOT_SEED = 10000, 12345
 
+# E6 above stays frozen (its run is done). E6 v2 is a NEW experiment with its own pre-registered protocol
+# (docs/EXPERIMENT_v2.md): selection on 4 configs only, held-out on all 6 (2 never seen in selection),
+# new seed ranges and a salt never used before.
+PROTOCOLS = {
+    "E6": {"train_configs": CONFIGS, "train_seeds": TRAIN_SEEDS, "test_configs": CONFIGS, "test_seeds": TEST_SEEDS,
+           "salt": HELDOUT_SALT, "out": "experiment.json"},
+    "E6v2": {"train_configs": ["train-easy", "train-global", "dev-mixed", "interaction-heavy"],
+             "train_seeds": range(610000, 610030), "test_configs": CONFIGS, "test_seeds": range(710000, 710050),
+             "salt": "auditenv-E6v2-heldout-2026-11-21", "out": "experiment_v2.json",
+             "unseen_configs": ["dev-global", "clean-only"]},
+}
+
 
 def arms() -> list:
     base = sorted(BASE_RULES)
@@ -71,7 +83,7 @@ def paired_bootstrap(diffs, b=BOOT_B, seed=BOOT_SEED):
     return means[int(0.025 * b)], means[int(0.975 * b) - 1]
 
 
-def main(out_dir=None) -> dict:
+def main(out_dir=None, protocol: str = "E6") -> dict:
     from pathlib import Path
 
     from .analysis import generate_many
@@ -81,12 +93,14 @@ def main(out_dir=None) -> dict:
     def eps(items):
         return [Episode(t["episode_id"], f, t, {}) for _, _, f, t, _ in generate_many(items)]
 
-    train = eps([(c, s) for s in TRAIN_SEEDS for c in CONFIGS])
+    pr = PROTOCOLS[protocol]
+    train = eps([(c, s) for s in pr["train_seeds"] for c in pr["train_configs"]])
     chosen, rounds, n_eval = successive_halving(train, arms())
     old = os.environ.get("AUDITENV_SEED_SALT")
-    os.environ["AUDITENV_SEED_SALT"] = HELDOUT_SALT  # inherited by the generator worker processes
+    os.environ["AUDITENV_SEED_SALT"] = pr["salt"]  # inherited by the generator worker processes
     try:
-        test = eps([(c, s) for s in TEST_SEEDS for c in CONFIGS])
+        test_items = [(c, s) for s in pr["test_seeds"] for c in pr["test_configs"]]
+        test = eps(test_items)
     finally:
         if old is None:
             os.environ.pop("AUDITENV_SEED_SALT", None)
@@ -108,7 +122,23 @@ def main(out_dir=None) -> dict:
                     "placebo_diff_mean": statistics.mean(dp), "placebo_ci95": [plo, phi]},
            "verdict": ("learnable signal: CI of the paired difference excludes 0" if lo > 0
                        else "no evidence of a learnable signal at this budget (CI includes 0 or is negative)")}
+    if protocol != "E6":
+        res["protocol"] = protocol
+        res["salt"] = pr["salt"]
+        cfg_of = [c for c, _ in test_items]
+        per = {}
+        for c in pr["test_configs"]:
+            idx = [k for k, x in enumerate(cfg_of) if x == c]
+            per[c] = {"n": len(idx), "baseline_mean": statistics.mean(r_base[k] for k in idx),
+                      "chosen_mean": statistics.mean(r_chosen[k] for k in idx),
+                      "diff_mean": statistics.mean(d[k] for k in idx)}
+        res["per_config"] = per
+        un = [k for k, x in enumerate(cfg_of) if x in pr["unseen_configs"]]
+        du = [d[k] for k in un]
+        ulo, uhi = paired_bootstrap(du)
+        res["unseen_configs"] = {"configs": pr["unseen_configs"], "n": len(un), "diff_mean": statistics.mean(du),
+                                 "diff_ci95": [ulo, uhi]}
     out = Path(out_dir or ROOT / "reports")
     out.mkdir(parents=True, exist_ok=True)
-    (out / "experiment.json").write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", "utf-8")
+    (out / pr["out"]).write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", "utf-8")
     return res
