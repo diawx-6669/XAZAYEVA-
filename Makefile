@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity ablation verify-release
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check repro-cross prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity ablation verify-release
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -40,6 +40,7 @@ help:
 	@echo "make docker-build  build the image only; make version writes VERSION (commit for the report header)"
 	@echo "make version       write VERSION = short commit id"
 	@echo "make clean         remove caches and the local grader log"
+	@echo "make repro-cross   the certificate under every Python 3.11+ on PATH x 3 environments -> reports/repro_cross_python.md"
 	@echo "make docker-check  build image and run 'make check' with --network none --cpus 2 --memory 4g"
 
 venv:
@@ -91,6 +92,9 @@ verify-independent:
 
 repro-cert:
 	$(PYTHON) tools/repro_cert.py
+
+repro-cross:
+	$(PYTHON) tools/repro_cross.py
 
 repro-cert-check:
 	$(PYTHON) tools/repro_cert.py --check

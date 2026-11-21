@@ -36,7 +36,7 @@ make check
 | Симуляция жюри чёрным ящиком (свои политики и оценщик) | <!--fact:jury_sim_open-->0<!--/fact--> открытых находок | [`reports/jury_sim.md`](reports/jury_sim.md) |
 | Слои изоляции агента от оценщика | <!--fact:isolation_layers-->3<!--/fact--> (non-dumpable оценщик, `nobody`, скрытая командная строка) | `tests/test_isolation.py`, `tests/test_conceal.py` |
 | Найденные и закрытые уязвимости среды, у каждой — тест‑сторож | <!--fact:failures_closed-->17<!--/fact--> | [`docs/FAILURES.md`](docs/FAILURES.md) |
-| Воспроизводимость между машинами | 20/20 эпизодов, хеши совпадают на Python 3.11 и 3.13 | `make repro-cert-check` → `reports/repro_certificate.md` |
+| Воспроизводимость между машинами и интерпретаторами | 20/20 эпизодов; хеши совпадают на Python 3.11, 3.12 и 3.13 при разных `PYTHONHASHSEED`, `TZ`, `LANG` (9/9) | `make repro-cert-check`, `make repro-cross` → `reports/repro_cross_python.md` |
 | Реальных данных нет | 0 срабатываний (карты, IBAN, БИН/ИИН, e‑mail, телефоны, URL) | `make pii-scan`, [`docs/SAFETY.md`](docs/SAFETY.md) |
 
 ### Мы проверили себя как жюри
@@ -236,6 +236,7 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12
 | Команда | Что делает | Результат |
 |---|---|---|
 | `make repro-cert` / `make repro-cert-check` | сертификат воспроизводимости: 20 эпизодов в памяти, golden, конфиги, детерминированная часть self‑check; сравнение с другой машиной | `reports/repro_certificate.md` |
+| `make repro-cross` | тот же сертификат под каждым Python 3.11+ на машине и в трёх окружениях | `reports/repro_cross_python.md` |
 | `make prepublish` | только отчёт: ветки кроме main, секреты во всей истории git, `.gitignore`, файлы > 5 МБ | вывод в консоль |
 | `make pii-scan` | нет реальных данных (карты по Луну, IBAN, БИН/ИИН, e‑mail, телефоны, URL) на 500 эпизодах и траекториях | `docs/SAFETY.md` |
 | `make min-budget` | точный минимум вызовов инструментов, чтобы увидеть набор доказательств, против лимита 100 | `reports/min_budget.md` |
