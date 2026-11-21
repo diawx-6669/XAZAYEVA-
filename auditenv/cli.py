@@ -323,6 +323,16 @@ def cmd_jury_pairs(a):
     return 1 if bad else 0
 
 
+def cmd_import_csv(a):
+    """A hand-made company (CSV sheets in the manual-audit layout, tests/fixtures/README.md) -> episode dir."""
+    from .fixtures import load_fixture
+    from .generator.export import write_episode
+
+    ep = load_fixture(a.src)
+    out = write_episode(ep, a.out)
+    print(f"{ep.episode_id}: {len(ep.truth['issues'])} issues (author's answer) -> {out}")
+
+
 def cmd_verify_independent(a):
     """Committed train/dev episodes + the 20 self-check episodes + N fresh seeds, all checked by
     tools/verify_independent.py in an ISOLATED interpreter (python -I): it cannot import auditenv."""
@@ -470,6 +480,9 @@ def main(argv=None) -> int:
     jp.add_argument("--seed-start", type=int, default=880000)
     jp.add_argument("--transform-seed", type=int, default=5)
     jp.add_argument("--json", help="write the per-pair table here")
+    ic = sub.add_parser("import-csv", help="hand-made company from CSV sheets -> episode dir")
+    ic.add_argument("--src", required=True)
+    ic.add_argument("--out", required=True)
     vi = sub.add_parser("verify-independent")
     vi.add_argument("--seeds", type=int, default=500)
     sub.add_parser("verify-provenance")
