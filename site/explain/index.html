@@ -1,0 +1,14 @@
+<!doctype html><html lang='ru'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Explain examples</title><style>
+:root{--paper:#f6f9fc;--sheet:#fff;--rule:#e3e8ee;--ink:#0d253d;--soft:#64748d;--pen:#ea2261;--ok:#4434d4;--mark:#fff3b0;--add:#e3f7e8;--del:#fde4ea}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0b1430;--sheet:#121c44;--rule:#232f5c;--ink:#e8ecf8;--soft:#9aa6c8;--pen:#ff5c8e;--ok:#9c94ff;--mark:#5a4a12;--add:#123d24;--del:#4a1426;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0b1430;--sheet:#121c44;--rule:#232f5c;--ink:#e8ecf8;--soft:#9aa6c8;--pen:#ff5c8e;--ok:#9c94ff;--mark:#5a4a12;--add:#123d24;--del:#4a1426;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}h1{font-size:26px;margin:0 0 4px}h2{margin:36px 0 8px;font-size:20px}
+.warn{border-left:4px solid var(--pen);background:var(--sheet);padding:10px 14px;margin:16px 0}.muted{color:var(--soft)}
+section{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:16px;margin:18px 0}
+table{border-collapse:collapse;width:100%;font:12.5px/1.4 ui-monospace,Menlo,Consolas,monospace;margin:8px 0}
+.scroll{overflow-x:auto}th,td{border-bottom:1px solid var(--rule);padding:4px 6px;text-align:left;vertical-align:top;white-space:nowrap}
+table.doc td{white-space:normal;word-break:break-word}td.chg{background:var(--mark)}td.add{background:var(--add)}td.del{background:var(--del)}
+td.st{color:var(--soft)}.ok{color:var(--ok);font-weight:600}.bad{color:var(--pen);font-weight:600}code{font-family:ui-monospace,Menlo,monospace}
+ul.ev li{margin:2px 0}.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:0 8px;font-size:12px;margin-left:6px}
+</style></head><body><main><h1>Разбор ошибок «до/после»</h1><p>Три открытых dev‑эпизода. Для каждой внесённой ошибки — документы и проводки до и после мутации, подсвеченные изменения, наборы доказательств и сумма, пересчитанная по снимкам и сверенная с эталоном.</p><div class='warn'><b>Инструмент оценщика</b> (читает <code>grader/</code>); только для открытых эпизодов.</div><section><ul><li><a href='ep-htfdvq2mvr.html'><code>ep-htfdvq2mvr</code></a> — 4 ошибок: fx_rate, duplicate_invoice, fx_rate, payment_allocation</li><li><a href='ep-ghqjfb86vj.html'><code>ep-ghqjfb86vj</code></a> — 4 ошибок: fx_rate, payment_allocation, duplicate_invoice, payment_allocation</li><li><a href='ep-vw9vceq4qf.html'><code>ep-vw9vceq4qf</code></a> — 2 ошибок: fx_rate, payment_allocation</li></ul></section><p class='muted'>Собрать заново: <code>python -m auditenv explain --examples</code>. Любой эпизод: <code>python -m auditenv explain episodes/dev/&lt;id&gt; [ISS-001] --out page.html</code>. <a href='../index.html'>← на главную</a></p></main></body></html>

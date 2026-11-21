@@ -566,7 +566,21 @@ def main(argv=None) -> int:
     vc = sub.add_parser("validate-config", help="check a config file, list every problem in plain words")
     vc.add_argument("files", nargs="*")
     vc.add_argument("--write-reference", action="store_true", help="regenerate docs/CONFIG_REFERENCE.md")
+    xp = sub.add_parser("explain", help="GRADER TOOL: before/after HTML of every injected error of an OPEN episode")
+    xp.add_argument("episode_dir", nargs="?")
+    xp.add_argument("issue_id", nargs="?")
+    xp.add_argument("--out")
+    xp.add_argument("--examples", action="store_true", help="regenerate site/explain/ (3 dev episodes + index)")
     a = ap.parse_args(argv)
+    if a.cmd == "explain":
+        from .explain import main as explain_main, write_examples
+
+        if a.examples:
+            print("explain: " + ", ".join(str(p.relative_to(ROOT)) for p in write_examples(ROOT)))
+            return 0
+        if not a.episode_dir:
+            raise SystemExit("explain: give an episode directory (or --examples)")
+        return explain_main(a.episode_dir, a.issue_id, a.out)
     if a.cmd == "validate-config":
         from .config_doc import main as vc_main
 
