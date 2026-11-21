@@ -243,6 +243,7 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12
 | `make difficulty` | сложность вариантов ошибок по модели Раша на панели из 10 вариантов simple_reconcile | `reports/difficulty.md` |
 | `make coverage-map` | попарное покрытие факторов генератора на 1000 seed + SVG и причины пробелов | `reports/coverage_map.md` |
 | `make exhaustive` | полный перебор малых случаев награды (в `make check` — урезанный) | `reports/reward_exhaustive.md` |
+| `make sensitivity` | награда при допуске 0/1/2/5/100 и при цене шага 0…0.01 — обоснование ±1 и 0.002 | `reports/tolerance.md`, `reports/step_cost.md` |
 | `make bench` | пул сред на multiprocessing: шагов/с, эпизодов/с, память, 1 и 2 воркера | `reports/bench.md` |
 | `python -m auditenv validate-config <file>` | проверка своего конфига, все проблемы сразу с диапазоном и значением по умолчанию | `docs/CONFIG_REFERENCE.md` |
 | `python -m auditenv verify-sbom` | хеши колёс, версии, лицензии, дайджест базового образа | `reports/sbom.json`, `THIRD_PARTY_NOTICES.md` |
