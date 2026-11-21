@@ -26,9 +26,14 @@ from policy_runs import BASELINES, ROOT, episodes, grade  # noqa: E402
 N, HIDDEN, REPS = 300, 20, 4000
 
 
+STRATA = (("clean-only", 5), ("interaction-heavy", 5), ("other", 10))  # case section 06: 5 clean + 5 interaction of 20
+
+
 def boot_interval(xs, n=HIDDEN, reps=REPS, seed=11):
+    """xs: list of (config, value). Each bootstrap hidden set = 5 clean-only + 5 interaction-heavy + 10 others."""
     rng = random.Random(seed)
-    means = sorted(statistics.fmean(rng.choice(xs) for _ in range(n)) for _ in range(reps))
+    pools = {s: [v for c, v in xs if (c == s if s != "other" else c not in ("clean-only", "interaction-heavy"))] for s, _ in STRATA}
+    means = sorted(statistics.fmean([rng.choice(pools[s]) for s, k in STRATA for _ in range(k)]) for _ in range(reps))
     return means[int(0.05 * reps)], means[int(0.95 * reps) - 1]
 
 
@@ -39,7 +44,7 @@ def collect():
         for cfg, seed, ep in episodes(N, 640000):
             for p in BASELINES:
                 g = grade(p, ep)
-                rows[p].append((g["reward"], g["f1"], g["steps"], len(ep.truth["issues"]) == 0))
+                rows[p].append((g["reward"], g["f1"], g["steps"], len(ep.truth["issues"]) == 0, cfg))
         return rows
     finally:
         os.environ.pop("AUDITENV_SEED_SALT", None)
@@ -59,18 +64,20 @@ def render(rows, js) -> str:
            f"> Основан на коммите `{sha}` ({date}). Сгенерирован `python tools/prediction.py`.", "",
            "## Как считали", "",
            f"* Наши реализации 4 политик на {N} свежих **солёных** эпизодах (все 6 открытых конфигов поровну), режим train.",
-           f"* Интервал — 90 % bootstrap для **среднего по {HIDDEN} эпизодам** (предполагаем 20 скрытых эпизодов):",
-           f"  {REPS} раз выбираем {HIDDEN} эпизодов с возвращением и берём 5‑й и 95‑й процентили среднего.",
+           f"* Интервал — 90 % bootstrap для **среднего по {HIDDEN} скрытым эпизодам** с составом из раздела 06 кейса:",
+           f"  5 чистых (`clean-only`) + 5 с взаимодействующими ошибками (`interaction-heavy`) + 10 прочих; {REPS} раз",
+           "  собираем такой набор с возвращением и берём 5‑й и 95‑й процентили среднего.",
            "* Независимая проверка — симуляция жюри `jury_sim/` (Бекназар, 20 закрытых эпизодов на своих конфигах,",
            "  свои политики без `import auditenv`), см. `reports/jury_sim.md`.",
-           "* Состав скрытых конфигов нам неизвестен: доля чистых книг и число ошибок сдвигают средние сильнее всего.", "",
+           "* Точные скрытые конфиги нам неизвестны (известен только состав 5 + 5 + 10): параметры прочих 10 эпизодов",
+           "  сдвигают средние сильнее всего.", "",
            "## Прогноз (среднее по 20 скрытым эпизодам, 90 % интервал)", "",
            "| Политика | Награда | F1 (макро) | Шагов | Наши: среднее награды на чистых / ошибочных | jury_sim: награда, F1 микро, шаги |",
            "|---|---|---|---|---|---|"]
     for p in BASELINES:
-        rw = [r[0] for r in rows[p]]
-        f1 = [r[1] for r in rows[p]]
-        st = [r[2] for r in rows[p]]
+        rw = [(r[4], r[0]) for r in rows[p]]
+        f1 = [(r[4], r[1]) for r in rows[p]]
+        st = [(r[4], r[2]) for r in rows[p]]
         lo, hi = boot_interval(rw)
         if p == "simple_reconcile" and js:
             hi = max(hi, js[p]["return_mean"])
