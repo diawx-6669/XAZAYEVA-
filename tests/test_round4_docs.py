@@ -4,7 +4,7 @@ import re
 
 from auditenv.paths import ROOT
 
-ROUND4_DOCS = ["docs/HOTFIX.md", "docs/SAFETY.md", "docs/DATASHEET.md", "docs/SUBMISSION_FORM.md", "docs/AI_USAGE.md", "docs/DESIGN_SHORT.md"]  # ROUND4_IDEAS.md is a plan: it names files before they exist
+ROUND4_DOCS = ["docs/HOTFIX.md", "docs/SAFETY.md", "docs/DATASHEET.md", "docs/PREDICTION.md", "docs/SUBMISSION_FORM.md", "docs/AI_USAGE.md", "docs/DESIGN_SHORT.md"]  # ROUND4_IDEAS.md is a plan: it names files before they exist
 
 
 def test_submission_form_lengths():
@@ -29,3 +29,11 @@ def test_design_short_is_short():
     t = (ROOT / "docs" / "DESIGN_SHORT.md").read_text("utf-8")
     assert len(t.split()) < 1100, "1-2 pages"
     assert "DESIGN.md" in t
+
+
+def test_prediction_is_marked_as_forecast_with_date_and_sha():
+    t = (ROOT / "docs" / "PREDICTION.md").read_text("utf-8")
+    assert "Это прогноз, а не результат" in t
+    assert re.search(r"коммите `[0-9a-f]{40}` \(\d{4}-\d{2}-\d{2} ", t)
+    for p in ("random_explorer", "simple_reconcile", "flag_all", "oracle"):
+        assert re.search(rf"\| `{p}` \| \[[-+]\d\.\d\d; [-+]\d\.\d\d\]", t), p
