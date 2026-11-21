@@ -5,3 +5,6 @@ __pycache__/
 .hypothesis/
 /tmp/
 VERSION
+reports/repro_certificate_ci.json
+reports/tmp/
+jury_sim/work/

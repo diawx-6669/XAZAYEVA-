@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check prepublish
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -17,6 +17,7 @@ help:
 	@echo "make exploit-search    automatic reward-exploit search (CEM) -> reports/exploit_search.md"
 	@echo "make mutation      hand-written grader mutations vs fast tests -> reports/mutation.md (not in check)"
 	@echo "make repro-cert    reproducibility certificate (20 episode hashes + deterministic selfcheck); repro-cert-check compares"
+	@echo "make prepublish    read-only report: other branches, secrets in the whole git history, .gitignore, big files"
 	@echo "make docker-check  build image and run 'make check' with --network none --cpus 2 --memory 4g"
 
 venv:
@@ -71,6 +72,9 @@ repro-cert:
 
 repro-cert-check:
 	$(PYTHON) tools/repro_cert.py --check
+
+prepublish:
+	PYTHON=$(PYTHON) sh scripts/prepublish_check.sh
 
 submission-tag:
 	@echo "Run on 22.11 after the final make check (docs/SUBMISSION.md):"
