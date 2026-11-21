@@ -563,7 +563,14 @@ def main(argv=None) -> int:
     dc.add_argument("--fix", action="store_true")
     vs = sub.add_parser("verify-sbom", help="check reports/sbom.json: wheel sha256, versions, licences, base image")
     vs.add_argument("--write", action="store_true", help="regenerate reports/sbom.json first")
+    vc = sub.add_parser("validate-config", help="check a config file, list every problem in plain words")
+    vc.add_argument("files", nargs="*")
+    vc.add_argument("--write-reference", action="store_true", help="regenerate docs/CONFIG_REFERENCE.md")
     a = ap.parse_args(argv)
+    if a.cmd == "validate-config":
+        from .config_doc import main as vc_main
+
+        return vc_main(a.files + (["--write-reference"] if a.write_reference else []))
     if a.cmd == "verify-sbom":
         from .supply import main_verify
 
