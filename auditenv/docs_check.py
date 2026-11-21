@@ -21,7 +21,8 @@ from .paths import CONFIGS_DIR, EPISODES_DIR, ROOT
 
 DOCS = ["README.md", "docs/DESIGN.md", "docs/LIMITATIONS.md", "docs/FAILURES.md", "docs/CONTRACT.md",
         "docs/ADAPTER.md", "docs/SUBMISSION.md", "docs/HOWTO_EXTEND.md", "docs/MANUAL_AUDIT.md",
-        "docs/PROJECT.md", "docs/ATTACKS.md", "docs/EXPERIMENT.md"]
+        "docs/PROJECT.md", "docs/ATTACKS.md", "docs/EXPERIMENT.md", "README.en.md", "docs/DESIGN_SHORT.md",
+        "docs/SAFETY.md", "docs/SUBMISSION_FORM.md", "docs/JURY.md"]
 FACT_RE = re.compile(r"<!--fact:([a-z0-9_]+)-->(.*?)<!--/fact-->", re.S)
 
 
@@ -107,11 +108,47 @@ def compute_facts(need: set) -> dict:
                     pm = load_config(p)["period_months"]
                     ms += pm if isinstance(pm, list) else [pm]
             facts[name] = str(ms[0]) if min(ms) == max(ms) else _rng(ms)
+        elif name == "mutation_killed":
+            rep = json.loads((ROOT / "reports" / "mutation.json").read_text("utf-8"))
+            facts[name] = f"{rep['killed']}/{rep['total']}"
+        elif name == "verify_independent_episodes":
+            from .cli import episode_dirs
+            from .selfcheck import load_split
+
+            facts[name] = str(len(episode_dirs()) + len(load_split("selfcheck")) + _check_seeds())
+        elif name == "failures_closed":
+            t = (ROOT / "docs" / "FAILURES.md").read_text("utf-8").split("## 2.", 1)[0]
+            facts[name] = str(len(re.findall(r"^\| \d+ \|", t, re.M)))
+        elif name == "jury_sim_open":
+            facts[name] = str(len(_jury_sim_open()))
+        elif name == "isolation_layers":
+            from . import cli, runner
+
+            layers = [getattr(runner, "harden_evaluator", None), getattr(runner, "_can_drop_privileges", None),
+                      getattr(cli, "conceal_run_args", None)]
+            facts[name] = str(sum(1 for x in layers if callable(x)))
+        elif name == "n_wheels":
+            facts[name] = str(len(list((ROOT / "vendor" / "wheels").glob("*.whl"))))
         elif name == "n_configs":
             facts[name] = str(sum(1 for p in CONFIGS_DIR.glob("*.json") if _is_cfg(p)))
         else:
             facts[name] = None
     return facts
+
+
+def _check_seeds() -> int:
+    """Fresh seeds that `make check` gives verify-independent (cmd_check: class V)."""
+    src = (ROOT / "auditenv" / "cli.py").read_text("utf-8")
+    return int(re.search(r'seeds = getattr\(a, "seeds", (\d+)\)', src).group(1))
+
+
+def _jury_sim_open() -> list:
+    """Rows of the status table in reports/jury_sim.md that are neither closed, verified nor a recorded decision."""
+    t = (ROOT / "reports" / "jury_sim.md").read_text("utf-8")
+    sec = t.split("## Статус после исправлений", 1)[1].split("\n## ", 1)[0]
+    rows = [r for r in sec.splitlines() if re.match(r"^\| \d+ \|", r)]
+    done = ("закрыто", "проверено", "осознанно", "оставлено")
+    return [r for r in rows if not any(w in r.split("|")[3] for w in done)]
 
 
 def _is_cfg(p) -> bool:

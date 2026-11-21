@@ -2,6 +2,95 @@
 
 [![check](https://github.com/diawx-6669/XAZAYEVA-/actions/workflows/check.yml/badge.svg)](https://github.com/diawx-6669/XAZAYEVA-/actions/workflows/check.yml)
 
+## Проверка за 5 минут
+
+Три команды из корня репозитория (Python 3.11, без сети; с Docker — `make docker-check`, там то же самое):
+
+```bash
+make venv && make quick
+```
+
+Ожидаемо (~1 мин): строка pytest без `failed`, таблица `3 эпизода × 4 политики` и `quick smoke: …s`.
+
+```bash
+python -m auditenv run --policy simple_reconcile --seed 12 --config dev-mixed
+```
+
+Ожидаемо (~2 с): `{"episode_id": "ep-y2r4r23pqg", "tp": 2, "fp": 0, "fn": 1, "f1": 0.8, "reward": 0.574, "steps": 14}` —
+честный скриптовый аудитор нашёл 2 из 3 ошибок без ложных обвинений за 14 шагов из 100.
+
+```bash
+make check
+```
+
+Ожидаемо (~2 мин): табло `<!--fact:selfcheck_total-->90/90<!--/fact-->`, `check: ALL GREEN`, `docs-check: … 0 mismatches`; отчёт — `reports/selfcheck.md`.
+
+## Карточка доверия
+
+| Что проверено | Результат | Где смотреть / как повторить |
+|---|---|---|
+| Табло самопроверки в духе жюри (контракт, данные, награда, воспроизводимость) | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
+| Тестов (pytest + hypothesis) | <!--fact:n_tests-->512<!--/fact--> | `make check` |
+| Намеренные ошибки в оценщике, пойманные тестами | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` → `reports/mutation.md` |
+| Независимый проверяльщик эталона и доказательств (без `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> эпизодов, 0 расхождений | шаг `verify-independent` в `make check` |
+| Симуляция жюри чёрным ящиком (свои политики и оценщик) | <!--fact:jury_sim_open-->0<!--/fact--> открытых находок | [`reports/jury_sim.md`](reports/jury_sim.md) |
+| Слои изоляции агента от оценщика | <!--fact:isolation_layers-->3<!--/fact--> (non-dumpable оценщик, `nobody`, скрытая командная строка) | `tests/test_isolation.py`, `tests/test_conceal.py` |
+| Найденные и закрытые уязвимости среды, у каждой — тест‑сторож | <!--fact:failures_closed-->17<!--/fact--> | [`docs/FAILURES.md`](docs/FAILURES.md) |
+| Воспроизводимость между машинами | 20/20 эпизодов, хеши совпадают на Python 3.11 и 3.13 | `make repro-cert-check` → `reports/repro_certificate.md` |
+| Реальных данных нет | 0 срабатываний (карты, IBAN, БИН/ИИН, e‑mail, телефоны, URL) | `make pii-scan`, [`docs/SAFETY.md`](docs/SAFETY.md) |
+
+### Мы проверили себя как жюри
+
+Бекназар написал с нуля свои 4 политики и свой оценщик по тексту кейса, **не импортируя
+`auditenv`**, и прогнал среду чёрным ящиком: закрытые эпизоды с солью, 20 парных преобразований,
+атаки на награду и изоляцию. Его оценщик совпал с нашим в 80/80 прогонах и 210/210 атакующих
+ответах; найденная им утечка seed через `ps` закрыта (было 15/15 эпизодов с наградой 1.0, стало 0/20).
+Отчёт и статус каждой находки — [`reports/jury_sim.md`](reports/jury_sim.md), повторить:
+`cd jury_sim && ./run_all.sh`.
+
+### Архитектура
+
+```mermaid
+flowchart LR
+  subgraph GEN["Генератор (seed, config)"]
+    S[story: скрытые события, курсы] --> B[books: документы + двойная запись]
+    B --> SC{сканер совпадений:<br/>решатель на чистой книге}
+    SC -- нашёл --> S
+    SC -- пусто --> E[errors/* + interactions:<br/>мутации до/после]
+  end
+  E --> PUB["public/: manifest, ledger.csv,<br/>invoices, payments, fx, policy"]
+  E --> GR["grader/: truth.json, provenance.json"]
+  subgraph EVAL["Процесс оценщика"]
+    ENV[AuditEnv: 5 инструментов,<br/>≤ 100 шагов, 60 с]
+    G[оценщик: схема → нормализация →<br/>паросочетание → F1 → награда]
+    LOG[(grader_log.jsonl,<br/>цепочка хешей)]
+  end
+  PUB --> ENV
+  GR --> G
+  ENV <-- "JSON-строки (stdin/stdout)" --> AG["Агент: отдельный процесс<br/>python -I -S, пустой cwd, rlimits"]
+  ENV -- submit --> G --> LOG
+```
+
+### Қысқаша (қазақша)
+
+AuditEnv — жасанды интеллект-аудиторды күшейтілген оқыту (RL) арқылы үйретуге арналған орта.
+Seed пен конфиг бойынша бір есепті кезеңге ойдан шығарылған компания жасалады: оқиғалар,
+шот-фактуралар, төлемдер, валюта бағамдары және бухгалтерлік жазбалар. Кітапқа төрт түрлі қате
+әдейі енгізіледі, ал дұрыс жауап (эталон) агенттен жасырылады. Агент бес құрал арқылы 100
+қадамнан аспай жазбаларды оқиды және әр қатені дәлелдерімен бірге жібереді. Бағалаушы агенттің
+процесінен тыс жұмыс істейді: жауапты эталонмен салыстырып, F1 мен сыйақыны есептейді. Бәрі
+желісіз, бір командамен тексеріледі: `make docker-check`.
+
+### In short (English)
+
+AuditEnv is a reinforcement-learning environment for training an AI auditor. From a seed and a
+config it generates a fictional company for one reporting period: events, invoices, payments, FX
+rates and a double-entry ledger. Four kinds of errors are injected on purpose, and the answer key
+is hidden from the agent. The agent reads records through five narrow tools within 100 steps and
+submits each finding with evidence. A grader outside the agent's process matches the findings to
+the answer key and computes F1 and the reward; everything runs offline with one command,
+`make docker-check`. Full English summary: [`README.en.md`](README.en.md).
+
 ## Критерии «Инженерия и объяснение» — где смотреть
 
 | Критерий | Где смотреть | Команда на 1 минуту | Ожидаемый вывод |
@@ -43,7 +132,7 @@ make check
 
 `make check` — это по порядку:
 
-1. весь pytest (<!--fact:n_tests-->484<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
+1. весь pytest (<!--fact:n_tests-->512<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
    поверхностных признаков, атаки на песочницу агента);
 2. табло self‑check в духе жюри: 4 блока × 20 проверок на 20 эпизодах и 20 парных преобразованиях,
    диагностика P/R/F1 (макро и микро), возврат на чистых и ошибочных книгах, шаги, время p50/p95;
