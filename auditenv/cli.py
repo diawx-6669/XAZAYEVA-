@@ -571,7 +571,16 @@ def main(argv=None) -> int:
     xp.add_argument("issue_id", nargs="?")
     xp.add_argument("--out")
     xp.add_argument("--examples", action="store_true", help="regenerate site/explain/ (3 dev episodes + index)")
+    gr = sub.add_parser("grade", help="GRADER TOOL: grade a findings JSON file against an open episode, reason per finding")
+    gr.add_argument("episode_dir")
+    gr.add_argument("findings")
+    gr.add_argument("--steps", type=int, default=0, help="inspection steps to charge (default 0)")
+    gr.add_argument("--json", action="store_true")
     a = ap.parse_args(argv)
+    if a.cmd == "grade":
+        from .grade_cli import main as grade_main
+
+        return grade_main(a.episode_dir, a.findings, a.steps, a.json)
     if a.cmd == "explain":
         from .explain import main as explain_main, write_examples
 

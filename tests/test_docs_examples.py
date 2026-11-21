@@ -83,6 +83,8 @@ def test_runnable_blocks_work(tmp_path):
             continue
         seen.add(key)
         work.mkdir()
+        if rule.get("setup"):  # a file the example expects to exist: an empty answer
+            (work / rule["setup"].replace("{TMP}/", "")).write_text("[]", "utf-8")
         jobs.append((doc, lang, sub, rule, work))
     assert len(jobs) >= 8
     # as root every closed run ends by killing ALL processes of `nobody` (runner._sweep_uid), which would kill

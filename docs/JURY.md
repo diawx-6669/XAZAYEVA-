@@ -102,6 +102,17 @@ python -m auditenv run --policy-cmd "python my_policy.py" --episode-dir episodes
 python -m auditenv run --policy-cmd "python my_policy.py" --episode-dir /tmp/twin
 ```
 
+## 3а. Проверить оценщик своим ответом, набранным вручную
+
+Инструмент оценщика (читает `grader/` открытого эпизода): для каждого вывода показывает, с каким
+issue он сопоставлен или код причины несовпадения, затем TP/FP/FN, P/R/F1 и награду за N шагов. Файл —
+`{"episode_id", "findings": [...]}` или просто список выводов. Разбор ошибок эпизода «до/после» —
+`python -m auditenv explain episodes/dev/<episode_id>` (HTML).
+
+```bash
+python -m auditenv grade episodes/dev/<episode_id> /tmp/my_findings.json --steps 10
+```
+
 ## 4. Обязательные проверки раздела 10 → наша команда → где смотреть
 
 Одна команда покрывает всё: `make check` (или `make docker-check`); табло — `reports/selfcheck.md`.

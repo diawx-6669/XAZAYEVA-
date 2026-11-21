@@ -4,7 +4,7 @@
   "<episode_id>": "{EPISODE}", "<id>": "{EPISODE}",
   "python my_policy.py": "python examples/minimal_agent.py", "python my_agent.py": "python examples/minimal_agent.py",
   "<ваш секрет>": "docs-example-salt", "/secret/ep1": "{TMP}/ep1", "/tmp/grader_log.jsonl": "{TMP}/grader_log.jsonl",
-  "--log log.jsonl": "--log {TMP}/log.jsonl", "/tmp/twin": "{TMP}/twin", "/tmp/pairs.json": "{TMP}/pairs.json"
+  "--log log.jsonl": "--log {TMP}/log.jsonl", "/tmp/twin": "{TMP}/twin", "/tmp/pairs.json": "{TMP}/pairs.json", "/tmp/my_findings.json": "{TMP}/my_findings.json"
  },
  "rules": [
   {"first_line": "python -m auditenv run --policy simple_reconcile --seed 12", "action": "run", "expect": "\"f1\": 0.8, \"reward\": 0.574, \"steps\": 14"},
@@ -15,6 +15,7 @@
   {"first_line": "python -m auditenv transform --episode-dir", "action": "run", "expect": "\"f1\""},
   {"first_line": "python -m auditenv serve --mode train", "action": "run", "stdin": "{\"cmd\":\"reset\",\"seed\":7,\"config\":\"dev-mixed\"}\n{\"cmd\":\"close\"}\n", "expect": "\"closed\":true"},
   {"first_line": "import auditenv", "action": "run", "expect": ""},
+  {"first_line": "python -m auditenv grade episodes/dev/", "action": "run", "setup": "{TMP}/my_findings.json", "expect": "TP=0 FP=0"},
   {"first_line": "from auditenv.serve import AuditEnvClient", "action": "run", "expect": ""},
   {"first_line": "make venv && make quick", "action": "skip", "reason": "make quick is itself a subset of make check; running it from inside pytest would recurse"},
   {"first_line": "make venv", "action": "skip", "reason": "creates .venv with pip from vendor/wheels; the Docker image and CI do exactly this (Dockerfile pip install --no-index)"},
