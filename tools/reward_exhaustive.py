@@ -36,7 +36,7 @@ POOL = [
     {"type": "payment_allocation", "affected_ids": ["PAY-C"], "expected_amount_minor": 400,
      "evidence_sets": [["DOC-C", "DOC-C2", "JE-C"]]},
 ]
-LEVELS = {"small": {"pool": 2, "k": 3}, "full": {"pool": 3, "k": 4}}
+LEVELS = {"tiny": {"pool": 2, "k": 2}, "small": {"pool": 2, "k": 3}, "full": {"pool": 3, "k": 4}}
 
 
 def correct(iss: dict) -> dict:

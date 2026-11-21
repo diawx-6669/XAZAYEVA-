@@ -67,7 +67,7 @@ HMAC‑курсоры), `get_record`, `get_document`, `calculator` (AST + `Decim
 
 ## Как проверено
 
-`make check`: <!--fact:n_tests-->529<!--/fact--> тестов, табло <!--fact:selfcheck_total-->90/90<!--/fact-->
+`make check`: <!--fact:n_tests-->593<!--/fact--> тестов, табло <!--fact:selfcheck_total-->90/90<!--/fact-->
 (контракт, данные, награда, воспроизводимость), leakscan, побайтовый replay, независимый
 проверяльщик, откат мутаций по provenance, docs‑check. Вне `make check`: 23/23 мутаций оценщика
 пойманы (`make mutation`), автопоиск эксплойтов, симуляция жюри чёрным ящиком (`reports/jury_sim.md`).

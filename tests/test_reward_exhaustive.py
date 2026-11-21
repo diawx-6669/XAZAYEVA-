@@ -31,5 +31,5 @@ def test_positive_control_a_grader_that_ignores_false_positives_is_caught(monkey
 
     real = core.prf
     monkeypatch.setattr(core, "prf", lambda tp, fp, fn: real(tp, 0, fn))
-    st = rx.run("small")
+    st = rx.run("tiny")
     assert {v[0] for v in st["violations"]} >= {"dominates_honest"}

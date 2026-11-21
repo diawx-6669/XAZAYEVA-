@@ -345,15 +345,18 @@ def test_long_loop_memory_bounded_and_abandoned_logged(eps, tmp_path):
             if i % 2:
                 env.step(jury_action("first_set", ep.truth))  # finished; even cycles are abandoned by the next reset
 
+    # 1000 cycles (4x the in-memory window of 256 records). The first 400 run untraced (tracemalloc makes every
+    # cycle ~4x slower); then 280 traced cycles replace the whole window with traced records, and the bound is
+    # measured over the last 320: a leak of more than ~2.3 KB per cycle fails - the same sensitivity per cycle
+    # as the former 2 MB over 900 traced cycles.
+    cycle(400)
     tracemalloc.start()
-    # 1000 cycles (4x the in-memory window of 256 records) keep make check under 2 minutes; the memory
-    # bound is checked over the last 900 cycles after a warm-up of 100
-    cycle(100)
+    cycle(280)
     base = tracemalloc.get_traced_memory()[0]
-    cycle(900)
+    cycle(320)
     grown = tracemalloc.get_traced_memory()[0] - base
     tracemalloc.stop()
-    assert grown < 2_000_000, grown
+    assert grown < 740_000, grown
     assert len(log.records) <= 256 and log.count == 1000  # 500 graded + 500 abandoned by the next reset
     recs = [json.loads(x) for x in (tmp_path / "log.jsonl").read_text().splitlines()]
     assert sum(1 for r in recs if r.get("abandoned")) == 500 and verify_chain(tmp_path / "log.jsonl")["ok"]

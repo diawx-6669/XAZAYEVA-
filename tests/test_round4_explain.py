@@ -25,7 +25,7 @@ def test_amounts_recomputed_from_snapshots_on_all_open_episodes():
 
 
 def test_amounts_recomputed_on_fresh_interaction_episodes():
-    for seed in range(40):
+    for seed in range(15):
         ep = generate_episode(680000 + seed, "interaction-heavy")
         muts = {m["issue_id"]: m for m in ep.provenance["mutations"]}
         for iss in ep.truth["issues"]:

@@ -30,7 +30,7 @@ make check
 | Что проверено | Результат | Где смотреть / как повторить |
 |---|---|---|
 | Табло самопроверки в духе жюри (контракт, данные, награда, воспроизводимость) | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
-| Тестов (pytest + hypothesis) | <!--fact:n_tests-->529<!--/fact--> | `make check` |
+| Тестов (pytest + hypothesis) | <!--fact:n_tests-->593<!--/fact--> | `make check` |
 | Намеренные ошибки в оценщике, пойманные тестами | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` → `reports/mutation.md` |
 | Независимый проверяльщик эталона и доказательств (без `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> эпизодов, 0 расхождений | шаг `verify-independent` в `make check` |
 | Симуляция жюри чёрным ящиком (свои политики и оценщик) | <!--fact:jury_sim_open-->0<!--/fact--> открытых находок | [`reports/jury_sim.md`](reports/jury_sim.md) |
@@ -132,7 +132,7 @@ make check
 
 `make check` — это по порядку:
 
-1. весь pytest (<!--fact:n_tests-->529<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
+1. весь pytest (<!--fact:n_tests-->593<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
    поверхностных признаков, атаки на песочницу агента);
 2. табло self‑check в духе жюри: 4 блока × 20 проверок на 20 эпизодах и 20 парных преобразованиях,
    диагностика P/R/F1 (макро и микро), возврат на чистых и ошибочных книгах, шаги, время p50/p95;
