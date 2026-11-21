@@ -18,7 +18,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TAG = "v1.0-submission"
-ALLOWED_AFTER_CHECK = ("reports/", "README.md", "docs/")  # make check output + docs-check --fix of fact numbers
+ALLOWED_AFTER_CHECK = ("reports/", "README", "docs/")  # make check output + docs-check --fix of fact numbers
 
 
 def sh(*args, check=False):
