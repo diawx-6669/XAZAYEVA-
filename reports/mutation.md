@@ -7,7 +7,7 @@
 отдельно проходит, считается флейком от нагрузки, исключается, и прогон продолжается).
 Выжившая мутация означает, что тесты не отличают баг от правильного оценщика.
 
-**Итог: 23/23 мутаций убито** (100 %). Базовый прогон без мутаций зелёный (84 с); всё вместе — 101 с.
+**Итог: 23/23 мутаций убито** (100 %). Базовый прогон без мутаций зелёный (64 с); всё вместе — 83 с.
 
 ## История
 
@@ -37,7 +37,7 @@
 | M17 | `auditenv/grader/reward.py` | reward is not clipped to [-1, 1] | убита | `tests/test_reward.py::test_property_reward_bounded` |
 | M18 | `auditenv/grader/schema.py` | float amounts (5.0) are accepted | убита | `tests/test_mutation_kills.py::test_grader_int_check_works_even_if_the_schema_validator_accepted_floats` |
 | M19 | `auditenv/grader/schema.py` | a foreign episode_id is accepted | убита | `tests/test_contract.py::test_invalid_structure_minus_one[findings3]` |
-| M20 | `auditenv/grader/core.py` | a truncated episode is graded on the agent's findings instead of the empty answer | убита | `tests/test_contract_json.py::test_behaviour_matches_interpretations` |
+| M20 | `auditenv/grader/core.py` | a truncated episode is graded on the agent's findings instead of the empty answer | убита | `tests/test_contract.py::test_timeout_on_clean_book_is_charged_full_budget` |
 | M21 | `schemas/findings.schema.json` | the 30-findings cap is lifted | убита | `tests/test_reward.py::test_bad_json_is_minus_one` |
 | M23 | `auditenv/jsonschema_lite.py` | schema validator: "integer" accepts 5.0 and True | убита | `tests/test_jsonschema_lite.py::test_invalid[value2-type]` |
 | M22 | `auditenv/grader/core.py` | experimental reward: evidence the agent never saw still counts | убита | `tests/test_reward.py::test_experimental_reward_requires_seen_evidence` |
@@ -45,4 +45,4 @@
 Флейки, исключённые при перепроверке: нет
 
 
-Время по мутациям (с): M01 1, M02 2, M03 2, M04 2, M05 5, M06 5, M07 1, M08 6, M09 1, M10 1, M11 1, M12 1, M13 1, M14 1, M15 1, M16 1, M17 2, M18 6, M19 2, M20 6, M21 1, M23 6, M22 2
+Время по мутациям (с): M01 1, M02 2, M03 2, M04 2, M05 6, M06 6, M07 1, M08 5, M09 1, M10 1, M11 1, M12 2, M13 2, M14 1, M15 1, M16 2, M17 2, M18 6, M19 2, M20 2, M21 1, M23 6, M22 1

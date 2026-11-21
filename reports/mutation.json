@@ -7,7 +7,7 @@
    "id": "M01",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_tolerance_boundary",
-   "seconds": 1.2,
+   "seconds": 1.3,
    "what": "amount tolerance: <= becomes < (an exact-boundary claim is rejected)"
   },
   {
@@ -16,7 +16,7 @@
    "id": "M02",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_wrong_currency_is_fp",
-   "seconds": 1.5,
+   "seconds": 2.1,
    "what": "currency is not checked"
   },
   {
@@ -25,7 +25,7 @@
    "id": "M03",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_flag_all_is_bad",
-   "seconds": 1.7,
+   "seconds": 2.3,
    "what": "evidence is not checked"
   },
   {
@@ -34,7 +34,7 @@
    "id": "M04",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_partial_evidence_is_fp",
-   "seconds": 1.7,
+   "seconds": 2.5,
    "what": "one ID of an evidence set is enough (subset -> intersection)"
   },
   {
@@ -43,7 +43,7 @@
    "id": "M05",
    "killed": true,
    "killed_by": "tests/test_mutation_kills.py::test_lone_wrong_type_is_fp_with_reason_wrong_type",
-   "seconds": 5.2,
+   "seconds": 5.7,
    "what": "type is not checked"
   },
   {
@@ -52,7 +52,7 @@
    "id": "M06",
    "killed": true,
    "killed_by": "tests/test_mutation_kills.py::test_superset_of_affected_ids_is_fp",
-   "seconds": 5.3,
+   "seconds": 5.7,
    "what": "affected_ids: a superset is accepted instead of exact equality"
   },
   {
@@ -61,7 +61,7 @@
    "id": "M07",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_duplicates_give_no_gain",
-   "seconds": 1.3,
+   "seconds": 1.2,
    "what": "no one-to-one matching: every repeat of a correct finding is a TP"
   },
   {
@@ -70,7 +70,7 @@
    "id": "M08",
    "killed": true,
    "killed_by": "tests/test_mutation_kills.py::test_matching_is_maximum_not_greedy",
-   "seconds": 5.7,
+   "seconds": 5.2,
    "what": "greedy matching instead of maximum matching (no augmenting paths)"
   },
   {
@@ -79,7 +79,7 @@
    "id": "M09",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_tie_break_smallest_issue_then_index",
-   "seconds": 1.2,
+   "seconds": 1.4,
    "what": "tie-break: the LARGER issue_id wins instead of the smaller"
   },
   {
@@ -106,7 +106,7 @@
    "id": "M12",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_currency_and_ids_are_normalized",
-   "seconds": 1.1,
+   "seconds": 1.7,
    "what": "currency is not upper-cased"
   },
   {
@@ -115,7 +115,7 @@
    "id": "M13",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_duplicates_give_no_gain",
-   "seconds": 1.1,
+   "seconds": 1.6,
    "what": "IDs are case-folded (the contract says case is preserved)"
   },
   {
@@ -124,7 +124,7 @@
    "id": "M14",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_silence_beats_any_accusation_on_clean",
-   "seconds": 1.1,
+   "seconds": 1.2,
    "what": "F1 = 0 when truth and findings are both empty"
   },
   {
@@ -142,7 +142,7 @@
    "id": "M16",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_step_cost_10_vs_50_is_exactly_0_08",
-   "seconds": 1.0,
+   "seconds": 1.5,
    "what": "step cost 0.001 instead of 0.002"
   },
   {
@@ -151,7 +151,7 @@
    "id": "M17",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_property_reward_bounded",
-   "seconds": 1.5,
+   "seconds": 1.7,
    "what": "reward is not clipped to [-1, 1]"
   },
   {
@@ -160,7 +160,7 @@
    "id": "M18",
    "killed": true,
    "killed_by": "tests/test_mutation_kills.py::test_grader_int_check_works_even_if_the_schema_validator_accepted_floats",
-   "seconds": 6.1,
+   "seconds": 5.7,
    "what": "float amounts (5.0) are accepted"
   },
   {
@@ -169,7 +169,7 @@
    "id": "M19",
    "killed": true,
    "killed_by": "tests/test_contract.py::test_invalid_structure_minus_one[findings3]",
-   "seconds": 2.2,
+   "seconds": 2.1,
    "what": "a foreign episode_id is accepted"
   },
   {
@@ -177,8 +177,8 @@
    "flaky_deselected": [],
    "id": "M20",
    "killed": true,
-   "killed_by": "tests/test_contract_json.py::test_behaviour_matches_interpretations",
-   "seconds": 5.7,
+   "killed_by": "tests/test_contract.py::test_timeout_on_clean_book_is_charged_full_budget",
+   "seconds": 2.3,
    "what": "a truncated episode is graded on the agent's findings instead of the empty answer"
   },
   {
@@ -187,7 +187,7 @@
    "id": "M21",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_bad_json_is_minus_one",
-   "seconds": 1.1,
+   "seconds": 1.3,
    "what": "the 30-findings cap is lifted"
   },
   {
@@ -196,7 +196,7 @@
    "id": "M23",
    "killed": true,
    "killed_by": "tests/test_jsonschema_lite.py::test_invalid[value2-type]",
-   "seconds": 5.9,
+   "seconds": 6.5,
    "what": "schema validator: \"integer\" accepts 5.0 and True"
   },
   {
@@ -205,7 +205,7 @@
    "id": "M22",
    "killed": true,
    "killed_by": "tests/test_reward.py::test_experimental_reward_requires_seen_evidence",
-   "seconds": 1.8,
+   "seconds": 1.4,
    "what": "experimental reward: evidence the agent never saw still counts"
   }
  ],
