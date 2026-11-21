@@ -1,6 +1,6 @@
 # AuditEnv self-check
 
-commit `75ea7162a8e2` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.13.18 · pip 26.2.2 · Linux x86_64
+commit `1c3dd7cf3980` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
 
 Хеши конфигов: `clean-only` 888d9b2efe8dabab, `dev-global` 3e5719530ff397f6, `dev-mixed` 58d390229a2b5ad5, `interaction-heavy` 11d80441ae5df73a, `stress` 60b0fe2dbb0fcdfe, `train-easy` 8946748a75222c01, `train-global` 54ed4c6d541dc3f9
 
@@ -146,23 +146,23 @@ P, R — макро (среднее по эпизодам, где величин
 
 ## Замеры времени (недетерминированно, зависит от машины)
 
-Полный self-check: 10.5 c.
+Полный self-check: 11.2 c.
 
 | Политика | ср, мс | p50, мс | p95, мс | макс, мс |
 |---|---|---|---|---|
-| random_explorer | 114 | 109 | 141 | 142 |
-| simple_reconcile | 118 | 118 | 132 | 132 |
-| flag_all | 112 | 108 | 127 | 141 |
-| oracle | 2 | 2 | 2 | 3 |
-| oracle_observing | 2 | 2 | 2 | 2 |
-| attack:twins | 4 | 4 | 5 | 7 |
-| attack:type_bruteforce | 4 | 3 | 4 | 6 |
-| attack:amount_bruteforce | 4 | 4 | 5 | 5 |
-| attack:guess_ids | 4 | 4 | 4 | 5 |
-| attack:evidence_spam | 4 | 4 | 4 | 4 |
-| attack:junk_explanation | 3 | 3 | 4 | 4 |
-| attack:persuasive_wrong | 3 | 3 | 4 | 4 |
-| attack:wrong_currency | 3 | 3 | 4 | 4 |
-| attack:all_types_all_docs | 4 | 4 | 5 | 5 |
-| attack:empty | 3 | 3 | 4 | 4 |
-| attack:cem_best | 4 | 4 | 5 | 9 |
+| random_explorer | 114 | 112 | 139 | 141 |
+| simple_reconcile | 119 | 116 | 139 | 155 |
+| flag_all | 108 | 104 | 123 | 126 |
+| oracle | 2 | 2 | 3 | 3 |
+| oracle_observing | 2 | 2 | 4 | 4 |
+| attack:twins | 5 | 5 | 7 | 7 |
+| attack:type_bruteforce | 4 | 4 | 5 | 6 |
+| attack:amount_bruteforce | 5 | 4 | 7 | 10 |
+| attack:guess_ids | 4 | 4 | 5 | 5 |
+| attack:evidence_spam | 4 | 4 | 5 | 5 |
+| attack:junk_explanation | 6 | 4 | 7 | 39 |
+| attack:persuasive_wrong | 4 | 4 | 5 | 7 |
+| attack:wrong_currency | 4 | 4 | 5 | 6 |
+| attack:all_types_all_docs | 5 | 5 | 6 | 10 |
+| attack:empty | 4 | 4 | 5 | 5 |
+| attack:cem_best | 6 | 5 | 7 | 8 |
