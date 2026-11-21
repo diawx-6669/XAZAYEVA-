@@ -1,0 +1,16 @@
+{
+ "schema_version": "1.0",
+ "sha256": "c9a923f3bdddccc206b46b6b48e305845a2a35003159e05ba238d80a4dc56548",
+ "covers": [
+  "error_codes",
+  "get_tables",
+  "list_tables",
+  "max_steps",
+  "page_max",
+  "schemas",
+  "step_cost",
+  "task_text",
+  "time_limit_s",
+  "tools"
+ ]
+}
