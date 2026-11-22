@@ -1,6 +1,6 @@
 # AuditEnv self-check
 
-commit `3e036c27d5c4` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
+commit `725668908afd` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
 
 Хеши конфигов: `clean-only` 75364dea035f003d, `dev-global` 6758725924324bb2, `dev-mixed` 5e1f417bd366cf52, `interaction-heavy` 0b4a5ffba66d6c72, `stress` 0e3fc9f073c43cfd, `train-easy` d9c840b728596a92, `train-global` 3a25e26fa41cce5b
 
@@ -149,25 +149,25 @@ P, R — макро (среднее по эпизодам, где величин
 
 ## Замеры времени (недетерминированно, зависит от машины)
 
-Полный self-check: 18.3 c.
+Полный self-check: 17.3 c.
 
 | Политика | ср, мс | p50, мс | p95, мс | макс, мс |
 |---|---|---|---|---|
-| random_explorer | 130 | 127 | 150 | 151 |
-| simple_reconcile | 132 | 134 | 151 | 152 |
-| learned_reconcile | 133 | 133 | 146 | 148 |
-| careful_reconcile | 127 | 116 | 148 | 155 |
-| flag_all | 133 | 136 | 146 | 146 |
-| oracle | 2 | 2 | 3 | 3 |
-| oracle_observing | 2 | 2 | 3 | 6 |
-| attack:twins | 4 | 4 | 5 | 7 |
-| attack:type_bruteforce | 4 | 4 | 5 | 5 |
-| attack:amount_bruteforce | 4 | 4 | 5 | 5 |
-| attack:guess_ids | 4 | 4 | 5 | 9 |
-| attack:evidence_spam | 5 | 4 | 7 | 7 |
-| attack:junk_explanation | 6 | 6 | 7 | 8 |
-| attack:persuasive_wrong | 6 | 6 | 7 | 8 |
-| attack:wrong_currency | 7 | 6 | 8 | 8 |
-| attack:all_types_all_docs | 6 | 5 | 8 | 14 |
-| attack:empty | 5 | 5 | 6 | 8 |
-| attack:cem_best | 6 | 6 | 7 | 7 |
+| random_explorer | 120 | 115 | 137 | 157 |
+| simple_reconcile | 125 | 118 | 146 | 162 |
+| learned_reconcile | 121 | 119 | 137 | 147 |
+| careful_reconcile | 126 | 121 | 151 | 152 |
+| flag_all | 107 | 100 | 140 | 158 |
+| oracle | 4 | 4 | 4 | 5 |
+| oracle_observing | 4 | 4 | 4 | 5 |
+| attack:twins | 7 | 7 | 8 | 9 |
+| attack:type_bruteforce | 7 | 6 | 8 | 9 |
+| attack:amount_bruteforce | 7 | 7 | 8 | 9 |
+| attack:guess_ids | 6 | 6 | 9 | 14 |
+| attack:evidence_spam | 4 | 4 | 4 | 5 |
+| attack:junk_explanation | 4 | 4 | 4 | 5 |
+| attack:persuasive_wrong | 4 | 4 | 4 | 4 |
+| attack:wrong_currency | 4 | 3 | 4 | 5 |
+| attack:all_types_all_docs | 5 | 4 | 5 | 11 |
+| attack:empty | 4 | 4 | 6 | 10 |
+| attack:cem_best | 4 | 4 | 5 | 5 |
