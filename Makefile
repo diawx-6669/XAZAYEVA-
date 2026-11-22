@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check repro-cross prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity ablation verify-release offline-kit targets-timing jury-salts
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check repro-cross prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity ablation verify-release offline-kit targets-timing jury-salts shortcut-probe benford
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -39,6 +39,8 @@ help:
 	@echo "make jury-salts    black-box jury simulation (closed run + 20 contract checks) under 8 salts -> reports/jury_salts.md"
 	@echo "make targets-timing  run the round-4 targets once and record their wall time -> reports/targets_timing.md"
 	@echo "make offline-kit   dist/: zip of the repo at the tag + saved Docker image + SHA256SUMS for the offline finale"
+	@echo "make shortcut-probe  can format-only features (position, ID rank, seconds, UTC style) find the errors? + positive control"
+	@echo "make benford       first digits of amounts vs Benford (realism) and errors vs clean rows (no shortcut)"
 	@echo "make submission-tag    print the tag commands and the SHA for the form (docs/SUBMISSION.md)"
 	@echo "make docker-build  build the image only; make version writes VERSION (commit for the report header)"
 	@echo "make version       write VERSION = short commit id"
@@ -143,6 +145,12 @@ targets-timing:
 
 offline-kit:
 	sh scripts/offline_kit.sh
+
+benford:
+	$(PYTHON) tools/benford.py
+
+shortcut-probe:
+	$(PYTHON) tools/shortcut_probe.py
 
 submission-tag:
 	@echo "Run on 22.11 after the final make check (docs/SUBMISSION.md):"

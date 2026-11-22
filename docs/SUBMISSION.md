@@ -18,6 +18,41 @@
 `docs/FAILURES.md` (<!--fact:failures_closed-->18<!--/fact--> закрытых уязвимостей + разбор сбоев), `docs/LIMITATIONS.md`,
 `docs/MANUAL_AUDIT.md` + `audit/` (ручной аудит), `reports/exploit_search.md` (автопоиск эксплойтов).
 
+## Проверка 22.11 утром — что уже проверено и что осталось руками
+
+Дедлайн: 23:59 Астаны = **18:59 UTC**. Внутренний дедлайн: 22:00 Астаны = 17:00 UTC.
+
+| Риск | Статус | Как проверено / что сделать |
+|---|---|---|
+| Основная ветка на GitHub = `main` | **руками** | сейчас основная — `claude/inspiring-tesla-8qyaxh`. Settings → General → Default branch → `main`. Без этого бейдж CI показывает не ту ветку |
+| Старые ветки | **руками, после смены основной** | все ветки, кроме `main`, уже целиком в `main` (`git cherry` — 0 непринятых правок; сайт из `claude/funny-lovelace-7alc4p` перенесён и доработан). Команда ниже |
+| `make check` на свежем `main` | готово | ALL GREEN, 1 мин 49 с; `make verify-release` 7/7 |
+| Docker на финальном коммите | готово | CI `docker-check` зелёный: сборка и `--network none --cpus 2 --memory 4g` |
+| `make venv` без сети | исправлено | раньше ставил пакеты из PyPI, хотя README обещает «без сети»; теперь `--no-index --find-links vendor/wheels --no-deps`, как в Dockerfile; тест `tests/test_guards.py` |
+| Секреты в истории | готово | `make prepublish`: 0 находок |
+| Личная почта в коммитах | **решить** | в 5 коммитах — личный e‑mail участника; после открытия репозитория он станет виден. Историю **не переписывать** (меняются все SHA, ломаются заголовок self‑check, сертификат и цепочка журнала) — только согласовать с участником |
+| Подсказки в данных | найдено и описано | `reports/shortcut_probe.md`: одна слабая подсказка (секунды `00`), исправление — `docs/ROADMAP.md` R0 |
+
+Удалить старые ветки (после смены основной ветки):
+
+```bash
+git push origin --delete claude/inspiring-tesla-8qyaxh claude/funny-lovelace-7alc4p beka beka-jury beka-ps-leak round3 round4
+```
+
+Тег (после последнего коммита и зелёного CI на нём):
+
+```bash
+make verify-release && git tag -a v1.0-submission -m "Genesis Hackathon submission" && git push origin v1.0-submission
+```
+
+В форму — ссылку на тег, а не на репозиторий: `https://github.com/diawx-6669/XAZAYEVA-/tree/v1.0-submission` и полный SHA
+(`git rev-parse v1.0-submission^{commit}`).
+
+Проверка из инкогнито после открытия (20:00 Астаны = 15:00 UTC), с телефона на мобильном интернете:
+README отрисовался; бейдж CI зелёный; ссылка на тег открывается; `git clone` без входа; видео
+(YouTube «доступ по ссылке») играет без входа; Google Drive «доступ всем, у кого есть ссылка»;
+обложка репозитория (Settings → Social preview, `site/brand/social-preview.png`) видна в превью ссылки.
+
 ## План на 22.11 (время Астаны)
 
 | Время | Что | Кто | Готово, если |

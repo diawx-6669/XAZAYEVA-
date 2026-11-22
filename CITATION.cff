@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use AuditEnv, please cite it as below."
+title: "AuditEnv: a reproducible reinforcement-learning environment and grader for an AI auditor"
+type: software
+version: "v1.0-submission"
+date-released: "2026-11-22"
+license: MIT
+repository-code: "https://github.com/diawx-6669/XAZAYEVA-"
+authors:
+  - name: "AuditEnv team (Ералы, Бекназар, Ибрагим, Алдик)"
+keywords:
+  - reinforcement learning
+  - environment
+  - audit
+  - accounting
+  - reward hacking
+  - benchmark

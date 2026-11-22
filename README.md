@@ -91,6 +91,17 @@ submits each finding with evidence. A grader outside the agent's process matches
 the answer key and computes F1 and the reward; everything runs offline with one command,
 `make docker-check`. Full English summary: [`README.en.md`](README.en.md).
 
+## Финальная неделя: человек, подсказки в данных, реальный аудит
+
+| Команда / документ | Что делает | Результат |
+|---|---|---|
+| `python -m auditenv play --seed 41001 --config dev-mixed` | **сыграй за аудитора**: человек проходит эпизод через те же 5 инструментов, 100 шагов и тот же оценщик; черновик выводов бесплатный; после `submit` — разбор каждого вывода | `docs/HUMAN_BASELINE.md`, `tests/test_play.py` |
+| `make shortcut-probe` | можно ли найти ошибки по **форме** записей (позиция в файле, ранг ID, секунды, запись в UTC, круглость суммы) без бухгалтерии; с позитивным контролем | `reports/shortcut_probe.md` |
+| `make benford` | первые цифры сумм против закона Бенфорда (реалистичность) и строк с ошибками против чистых (не подсказка ли) | `reports/benford.md` |
+| `docs/AUDIT_STANDARDS.md` | ошибки ↔ предпосылки МСА 315, доказательства и МСА 500, цена ложной тревоги и МСА 320/450, IAS 21, IFRS 15, пользователи, почему среда, а не датасет | — |
+| `site/anatomy.html`, `site/cards.html`, `site/brand/` | плакат «Анатомия ошибки» и карточки «Ошибка или ловушка?» — из настоящих эпизодов и настоящего оценщика; логотип и обложка 1280×640 (`tools/brand.py`, `tools/cards.py`, сценарии видео — `docs/MEDIA_KIT.md`) | `tests/test_brand.py` |
+| `docs/ROADMAP.md`, `docs/CHALLENGE.md`, `CITATION.cff` | что дальше (выписка банка = предпосылка «полнота», несколько периодов, LLM‑протокол, бенчмарк), вызов «Сломай AuditEnv», цитирование | — |
+
 ## Критерии «Инженерия и объяснение» — где смотреть
 
 | Критерий | Где смотреть | Команда на 1 минуту | Ожидаемый вывод |

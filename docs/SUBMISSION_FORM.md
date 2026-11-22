@@ -46,6 +46,8 @@ AuditEnv — среда для обучения ИИ-аудитора с под�
 | Репозиторий | https://github.com/diawx-6669/XAZAYEVA- |
 | Тег | `v1.0-submission` |
 | SHA коммита | `<вставить вывод: git rev-parse v1.0-submission>` |
+| Ссылка на тег (её — в форму) | https://github.com/diawx-6669/XAZAYEVA-/tree/v1.0-submission |
+| Видео-демо | `<вставить ссылку YouTube, доступ «по ссылке»; сценарий — docs/MEDIA_KIT.md>` |
 | Единая команда проверки | `make docker-check` (без Docker: `make venv && make check`) |
 | Лицензия | MIT (`LICENSE`); сторонние пакеты — `THIRD_PARTY_NOTICES.md` |
 

@@ -1,6 +1,6 @@
 # AuditEnv self-check
 
-commit `840d2e130439` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
+commit `fd52816fe0a8` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
 
 Хеши конфигов: `clean-only` 888d9b2efe8dabab, `dev-global` 3e5719530ff397f6, `dev-mixed` 58d390229a2b5ad5, `interaction-heavy` 11d80441ae5df73a, `stress` 60b0fe2dbb0fcdfe, `train-easy` 8946748a75222c01, `train-global` 54ed4c6d541dc3f9
 
@@ -146,23 +146,23 @@ P, R — макро (среднее по эпизодам, где величин
 
 ## Замеры времени (недетерминированно, зависит от машины)
 
-Полный self-check: 11.3 c.
+Полный self-check: 11.5 c.
 
 | Политика | ср, мс | p50, мс | p95, мс | макс, мс |
 |---|---|---|---|---|
-| random_explorer | 119 | 118 | 133 | 140 |
-| simple_reconcile | 116 | 112 | 131 | 149 |
-| flag_all | 114 | 113 | 126 | 129 |
+| random_explorer | 123 | 114 | 145 | 148 |
+| simple_reconcile | 119 | 116 | 138 | 139 |
+| flag_all | 112 | 110 | 130 | 134 |
 | oracle | 3 | 3 | 4 | 4 |
 | oracle_observing | 3 | 3 | 4 | 4 |
 | attack:twins | 7 | 7 | 8 | 8 |
-| attack:type_bruteforce | 5 | 6 | 7 | 7 |
-| attack:amount_bruteforce | 4 | 4 | 5 | 9 |
-| attack:guess_ids | 4 | 4 | 4 | 5 |
+| attack:type_bruteforce | 7 | 7 | 8 | 8 |
+| attack:amount_bruteforce | 7 | 6 | 8 | 14 |
+| attack:guess_ids | 5 | 4 | 6 | 7 |
 | attack:evidence_spam | 4 | 4 | 4 | 5 |
-| attack:junk_explanation | 4 | 3 | 4 | 4 |
-| attack:persuasive_wrong | 4 | 3 | 4 | 4 |
-| attack:wrong_currency | 4 | 4 | 4 | 5 |
-| attack:all_types_all_docs | 5 | 4 | 5 | 9 |
-| attack:empty | 4 | 4 | 4 | 5 |
-| attack:cem_best | 4 | 4 | 5 | 5 |
+| attack:junk_explanation | 4 | 4 | 5 | 5 |
+| attack:persuasive_wrong | 4 | 4 | 5 | 5 |
+| attack:wrong_currency | 5 | 4 | 9 | 9 |
+| attack:all_types_all_docs | 8 | 7 | 10 | 14 |
+| attack:empty | 6 | 6 | 8 | 8 |
+| attack:cem_best | 6 | 7 | 8 | 8 |
