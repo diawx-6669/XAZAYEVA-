@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Анатомия ошибки</title>
+<meta name="description" content="Одна настоящая ошибка AuditEnv от события до вердикта оценщика (ep-rmhcqsyns9).">
+<style>
+:root { --paper: #f6f9fc; --sheet: #ffffff; --ink: #0d253d; --soft: #64748d; --navy: #1c1e54; --violet: #533afd;
+  --pen: #ea2261; --rule: #dfe5ee; --code: #eef1fb; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper: #0b1430; --sheet: #121c44;
+  --ink: #e8ecf7; --soft: #a3adc8; --rule: #26325f; --code: #1a2552; } }
+:root[data-theme="dark"] { --paper: #0b1430; --sheet: #121c44; --ink: #e8ecf7; --soft: #a3adc8; --rule: #26325f; --code: #1a2552; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.55 "Inter", system-ui, -apple-system, sans-serif; }
+main { max-width: 760px; margin: 0 auto; padding: 56px 16px 72px; }
+.mast { display: flex; gap: 18px; align-items: center; margin-bottom: 36px; }
+.mast img { width: 64px; height: 64px; }
+h1 { font: 700 clamp(40px, 7vw, 68px)/1.0 "Inter Display", "Inter", system-ui, sans-serif; letter-spacing: -0.03em; margin: 0; }
+.lede { color: var(--soft); max-width: 60ch; margin: 0 0 40px; }
+ol { list-style: none; counter-reset: s; margin: 0; padding: 0; border-left: 3px solid var(--rule); }
+li { counter-increment: s; position: relative; padding: 0 0 34px 34px; }
+li::before { content: counter(s); position: absolute; left: -17px; top: 0; width: 31px; height: 31px; border-radius: 50%;
+  background: var(--navy); color: #fff; font: 600 15px/31px "Inter", sans-serif; text-align: center; }
+li:nth-child(4)::before { background: var(--pen); }
+li:last-child { padding-bottom: 0; }
+h2 { font: 650 22px/1.25 "Inter Display", "Inter", sans-serif; margin: 2px 0 6px; letter-spacing: -0.01em; }
+p { margin: 0; max-width: 64ch; }
+code, pre { font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace; font-size: 0.86em; }
+code { background: var(--code); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; margin: 12px 0 0;
+  overflow-x: auto; white-space: pre; line-height: 1.5; }
+.ok { color: var(--violet); font-weight: 650; } .bad { color: var(--pen); font-weight: 650; }
+footer { margin-top: 48px; color: var(--soft); font-size: 15px; }
+a { color: var(--violet); }
+@media print { body { background: #fff; } main { padding-top: 24px; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="mast"><img src="brand/logo.svg" alt=""><h1>Анатомия ошибки</h1></div>
+  <p class="lede">Одна настоящая ошибка из открытого эпизода <code>ep-rmhcqsyns9</code>: от события до вердикта
+  оценщика. Все ID, время и суммы взяты из файлов эпизода, вердикты посчитаны настоящим оценщиком.</p>
+  <ol>
+    <li>
+      <h2>Что произошло на самом деле</h2>
+      <p>Компания выписала счёт <b>1 ноября, 00:48:35</b> по времени Asia/Almaty. Период закончился в полночь: <code>2026-11-01T00:00:00+05:00</code>, конец не включается. Значит, это выручка <b>следующего</b> периода.</p>
+    </li>
+    <li>
+      <h2>Как ошибку внесли</h2>
+      <p>Генератор провёл этот счёт внутри периода и записал время в UTC. Причина записана в закрытом <code>provenance.json</code>, эталон — в <code>truth.json</code> (ISS-003).</p>
+    </li>
+    <li>
+      <h2>Что видит агент</h2>
+      <p>Документ <code>FD-TNKKMQSQ</code> и 5 строк книги. Строка дебиторки:</p>
+      <pre>row_id        LR-F8CYPG6
+timestamp     2026-10-31T19:48:35+00:00
+account       1200
+debit_minor   288323596
+credit_minor  0
+currency      KZT
+entity_id     CUST-WN3QX4
+invoice_id    INV-54YRZJB
+payment_id    (пусто)</pre>
+    </li>
+    <li>
+      <h2>Ловушка</h2>
+      <p>Прочитать дату как написано: <b>31 октября, 19:48:35 UTC</b> — внутри периода, всё чисто. Пересчитать в Asia/Almaty (+05:00): <b>1 ноября, 00:48:35</b> — уже после границы.</p>
+      <pre>2026-10-31T19:48:35+00:00
+= 2026-11-01T00:48:35+05:00</pre>
+    </li>
+    <li>
+      <h2>Вывод аудитора</h2>
+      <p>Тип, затронутый счёт, сумма искажения 2 883 235,96 ₸ и доказательства: документ, строка книги и политика, которая задаёт границу периода.</p>
+      <pre>{
+ &quot;type&quot;: &quot;period_cutoff&quot;,
+ &quot;affected_ids&quot;: [
+  &quot;INV-54YRZJB&quot;
+ ],
+ &quot;claimed_amount_minor&quot;: 288323596,
+ &quot;currency&quot;: &quot;KZT&quot;,
+ &quot;evidence_ids&quot;: [
+  &quot;FD-TNKKMQSQ&quot;,
+  &quot;LR-F8CYPG6&quot;,
+  &quot;policy&quot;
+ ],
+ &quot;explanation&quot;: &quot;issued 2026-11-01 00:48 Asia/Almaty, after the period end&quot;
+}</pre>
+    </li>
+    <li>
+      <h2>Вердикт оценщика</h2>
+      <p><span class=ok>TP → ISS-003</span> (это 1 из 3 ошибок эпизода). Тот же вывод без <code>policy</code>: <span class=bad>FP, evidence_incomplete</span>. Знать ответ — не значит доказать его.</p>
+    </li>
+  </ol>
+  <footer>Собрано <code>tools/brand.py</code> из <code>episodes/train/ep-rmhcqsyns9</code>.
+  Как устроены остальные типы ошибок — <a href="explain/index.html">примеры «до/после»</a>, как их взламывали —
+  <a href="attacks.html">зал атак</a>.</footer>
+</main>
+</body>
+</html>
