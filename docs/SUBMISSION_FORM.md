@@ -2,7 +2,7 @@
 
 Копируйте блоки как есть. Длины описаний проверяет `tests/test_round4_docs.py::test_submission_form_lengths`
 (в знаках, считая пробелы). Поля «тег» и «SHA» заполняются в момент тега: `make submission-tag`
-печатает SHA, его же показывает `git rev-parse v1.0-submission`.
+печатает SHA, его же показывает `git rev-parse v1.1-submission`.
 
 ## Название
 
@@ -44,10 +44,11 @@ AuditEnv — среда для обучения ИИ-аудитора с под�
 | Поле | Значение |
 |---|---|
 | Репозиторий | https://github.com/diawx-6669/XAZAYEVA- |
-| Тег | `v1.0-submission` |
-| SHA коммита | `<вставить вывод: git rev-parse v1.0-submission>` |
-| Ссылка на тег (её — в форму) | https://github.com/diawx-6669/XAZAYEVA-/tree/v1.0-submission |
-| Видео-демо | `<вставить ссылку YouTube, доступ «по ссылке»; сценарий — docs/MEDIA_KIT.md>` |
+| Тег | `v1.1-submission` |
+| SHA коммита | `<вставить вывод: git rev-parse v1.1-submission>` |
+| Ссылка на тег (её — в форму) | https://github.com/diawx-6669/XAZAYEVA-/tree/v1.1-submission |
+| Предыдущий тег | `v1.0-submission` (`0c8c012`) — страховка; v1.1 закрывает секунды `00`, `episode_id` по конфигу и добавляет `careful_reconcile` |
+| Видео-демо | https://github.com/diawx-6669/XAZAYEVA-/releases/download/v1.0-submission/XAZAYEVA_AuditEnv_music_only.mp4 |
 | Единая команда проверки | `make docker-check` (без Docker: `make venv && make check`) |
 | Лицензия | MIT (`LICENSE`); сторонние пакеты — `THIRD_PARTY_NOTICES.md` |
 

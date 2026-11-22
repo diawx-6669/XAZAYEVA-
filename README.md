@@ -240,7 +240,7 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12
 | `python -m auditenv import-csv --src tests/fixtures/<имя> --out D` | компания, собранная вручную в Google Таблицах (CSV) → эпизод (`tests/fixtures/README.md`) |
 | `python tools/build_replay.py` | пересобрать `site/replay.html` — офлайн‑просмотрщик траекторий 5 эпизодов (без эталона) |
 | `make finale-preflight` | офлайн‑проверка перед финалом за минуту: образ, тесты контракта, демо |
-| `make submission-tag` | команды для тега `v1.0-submission` и SHA для формы (`docs/SUBMISSION.md`) |
+| `make submission-tag` | команды для тега `v1.1-submission` и SHA для формы (`docs/SUBMISSION.md`) |
 
 ## Раунд 4: инструменты проверки (вне `make check`, кроме отмеченных)
 

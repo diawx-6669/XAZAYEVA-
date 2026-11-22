@@ -1,7 +1,7 @@
 """B18: `make verify-release` - is this commit ready to be tagged and submitted? Read-only.
 
 1. working tree clean;
-2. tag v1.0-submission: absent (fine before tagging) or pointing at HEAD;
+2. tag v1.1-submission: absent (fine before tagging) or pointing at HEAD;
 3. reports/selfcheck.json was produced by `make check` on this code: between its header commit and HEAD only
    files under reports/ changed (and docs facts that docs-check --fix rewrites);
 4. reproducibility certificate, SBOM and docs facts are current (repro-cert --check, verify-sbom, docs-check);
@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TAG = "v1.0-submission"
+TAG = "v1.1-submission"
 ALLOWED_AFTER_CHECK = ("reports/", "README", "docs/")  # make check output + docs-check --fix of fact numbers
 
 

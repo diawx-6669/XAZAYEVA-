@@ -154,8 +154,8 @@ shortcut-probe:
 
 submission-tag:
 	@echo "Run on 22.11 after the final make check (docs/SUBMISSION.md):"
-	@echo "  git tag -a v1.0-submission -m 'Genesis Hackathon submission'"
-	@echo "  git push origin v1.0-submission"
+	@echo "  git tag -a v1.1-submission -m 'Genesis Hackathon submission'"
+	@echo "  git push origin v1.1-submission"
 	@git log -1 --format='  SHA for the form: %H'
 
 version:

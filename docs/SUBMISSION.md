@@ -44,11 +44,11 @@ git push origin --delete claude/inspiring-tesla-8qyaxh claude/funny-lovelace-7al
 Тег (после последнего коммита и зелёного CI на нём):
 
 ```bash
-make verify-release && git tag -a v1.0-submission -m "Genesis Hackathon submission" && git push origin v1.0-submission
+make verify-release && git tag -a v1.1-submission -m "Genesis Hackathon submission" && git push origin v1.1-submission
 ```
 
-В форму — ссылку на тег, а не на репозиторий: `https://github.com/diawx-6669/XAZAYEVA-/tree/v1.0-submission` и полный SHA
-(`git rev-parse v1.0-submission^{commit}`).
+В форму — ссылку на тег, а не на репозиторий: `https://github.com/diawx-6669/XAZAYEVA-/tree/v1.1-submission` и полный SHA
+(`git rev-parse v1.1-submission^{commit}`).
 
 Проверка из инкогнито после открытия (20:00 Астаны = 15:00 UTC), с телефона на мобильном интернете:
 README отрисовался; бейдж CI зелёный; ссылка на тег открывается; `git clone` без входа; видео
@@ -67,8 +67,8 @@ README отрисовался; бейдж CI зелёный; ссылка на �
 | 14:00 | репетиция демо: `make finale-preflight`, `make demo` | Ералы, Бека | ≤ 1 минуты, без сети |
 | **16:00** | **заморозка**: в `main` больше ничего не сливаем (кроме опечаток в docs) | все | — |
 | 16:00–17:00 | финальный `make docker-check` на свежем клоне; сохранить вывод | Бека | `ALL GREEN` |
-| 17:00 | тег и SHA: `make submission-tag`, затем `git tag -a v1.0-submission -m "Genesis Hackathon submission"` и `git push origin v1.0-submission` | Ералы | тег виден на GitHub |
-| 18:00 | отправить форму: ссылка на репозиторий, тег `v1.0-submission`, SHA; скриншот подтверждения | Алдик | скриншот сохранён в Drive |
+| 17:00 | тег и SHA: `make submission-tag`, затем `git tag -a v1.1-submission -m "Genesis Hackathon submission"` и `git push origin v1.1-submission` | Ералы | тег виден на GitHub |
+| 18:00 | отправить форму: ссылка на репозиторий, тег `v1.1-submission`, SHA; скриншот подтверждения | Алдик | скриншот сохранён в Drive |
 | 19:00 | офлайн‑набор для финала: `make offline-kit` (zip репозитория по тегу, образ `docker save`, SHA256SUMS в `dist/`), видео‑демо, PDF слайдов — на флешку | Алдик | на другом ноутбуке без сети: команды, которые печатает `make offline-kit` (`sha256sum -c`, `docker load`, `make finale-preflight`) |
 | до 23:59 | запас времени; ничего не менять | — | — |
 
