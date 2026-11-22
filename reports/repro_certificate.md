@@ -1,6 +1,6 @@
 # Сертификат воспроизводимости
 
-Машина: Python 3.13.18 (CPython), Linux x86_64.
+Машина: Python 3.11.18 (CPython), Linux x86_64.
 Сгенерировано `make repro-cert` (`tools/repro_cert.py`). Хеши не зависят от времени, процессора, ОС и
 версии Python: 20 открытых эпизодов пересобираются в памяти из (seed, config) и сверяются с
 `episodes/*/index.json`; плюс 3 golden‑эпизода, хеши конфигов и детерминированная часть
@@ -77,6 +77,6 @@ python tools/repro_cert.py --compare /tmp/mac.json        # здесь: табл
 | `config/stress` | `0e3fc9f073c43cfd` |
 | `config/train-easy` | `d9c840b728596a92` |
 | `config/train-global` | `3a25e26fa41cce5b` |
-| `selfcheck/deterministic` | `3f850e6159c8f5a0` |
+| `selfcheck/deterministic` | `4586457843dd4227` |
 | `selfcheck/total` | `90.0/90` |
-| `selfcheck/grader_log_head` | `d1507ee6ba419334` |
+| `selfcheck/grader_log_head` | `c1b175d833515494` |
