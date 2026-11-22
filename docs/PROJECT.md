@@ -158,6 +158,8 @@ docker run --rm --network none --cpus 2 --memory 4g auditenv
 | Разработчик 1 | основная | `auditenv/`, тесты, конфиги, схемы, Makefile, эпизоды |
 | Бекназар (разработчик 2) | `beka` | `Dockerfile`, `.dockerignore`, `docs/ATTACKS.md` |
 
+Все рабочие ветки (`beka*`, `round3`, `round4`, служебные `claude/*` ИИ‑ассистента) влиты в `main`; к сдаче в репозитории остаётся только `main`.
+
 ## 14. Статус и план
 
 | Этап | Содержание | Статус |

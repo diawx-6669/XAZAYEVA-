@@ -73,5 +73,5 @@ with AuditEnvClient(mode="train") as env:
 
 ## Пример
 
-[`examples/minimal_agent.py`](../examples/minimal_agent.py) — около 35 строк: листает платежи, счета
+[`examples/minimal_agent.py`](../examples/minimal_agent.py) — около 40 строк: листает платежи, счета
 и проводки, находит платежи со ссылками на счета, оставшиеся на 2400, и отправляет выводы.

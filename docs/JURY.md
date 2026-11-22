@@ -12,7 +12,7 @@
 
 Программа читает из stdin строку `{"observation": ..., "reward": ..., "terminated": ..., "truncated": ...}`
 и отвечает одной строкой `{"action": {"tool": "...", "args": {...}}}`; в конце приходит `{"close": true}`.
-Полный протокол — [`docs/ADAPTER.md`](ADAPTER.md), пример на 35 строк — `examples/minimal_agent.py`.
+Полный протокол — [`docs/ADAPTER.md`](ADAPTER.md), пример на ~40 строк — `examples/minimal_agent.py`.
 
 ```bash
 python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12 --config dev-mixed
@@ -25,6 +25,12 @@ python -m auditenv run --policy-cmd "python my_policy.py" --episode-dir episodes
 Процесс политики запускается в песочнице: пустой cwd, окружение `PATH/TZ/LANG` без соли и путей,
 rlimits, под root — пользователь `nobody` (таблица в `docs/ADAPTER.md`). Если вашей программе нужен
 свой интерпретатор или пакеты — укажите абсолютный путь к нему в `--policy-cmd`.
+
+**Если запускаете без Docker от root:** политика стартует от `nobody`, поэтому `nobody` должен иметь право
+войти в папку репозитория и запустить `.venv/bin/python`. Не клонируйте в `/root` или другую папку с правами
+`700` — иначе `tests/test_batch_c.py::test_child_limits_are_applied_and_python_still_starts` упадёт с
+`PermissionError`. Подойдёт, например, `/opt` или `/home/<user>`; в Docker (`make docker-check`) это не нужно —
+там проверка идёт от пользователя `auditor`.
 
 ### 1б. Сервер и клиент (`serve` / `AuditEnvClient`) — для фреймворков обучения
 

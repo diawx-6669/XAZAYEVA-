@@ -109,6 +109,8 @@ commands: [`docs/JURY.md`](docs/JURY.md).
 
 ## Trust card and round-4 tools
 
+"Round" is our internal review-and-fix iteration, not a hackathon stage; everything from rounds 1-4 is in `main`.
+
 | What was checked | Result | Where |
 |---|---|---|
 | Jury-style scoreboard | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |

@@ -10,7 +10,7 @@
 make venv && make quick
 ```
 
-Ожидаемо (~1 мин): строка pytest без `failed`, таблица `3 эпизода × 4 политики` и `quick smoke: …s`.
+Ожидаемо (~1 мин): точки pytest без `F` и `E` (итоговой строки нет — pytest запущен с `-q`), затем 3 строки «эпизод: награды random_explorer, simple_reconcile, flag_all, oracle» и `quick smoke: …s`.
 
 ```bash
 python -m auditenv run --policy simple_reconcile --seed 12 --config dev-mixed
@@ -23,7 +23,7 @@ python -m auditenv run --policy simple_reconcile --seed 12 --config dev-mixed
 make check
 ```
 
-Ожидаемо (~2 мин): табло `<!--fact:selfcheck_total-->90/90<!--/fact-->`, `check: ALL GREEN`, `docs-check: … 0 mismatches`; отчёт — `reports/selfcheck.md`.
+Ожидаемо (~2 мин): табло <!--fact:selfcheck_total-->90/90<!--/fact-->, `check: ALL GREEN`, `docs-check: … 0 mismatches`; отчёт — `reports/selfcheck.md`.
 
 ## Карточка доверия
 
@@ -106,7 +106,7 @@ the answer key and computes F1 and the reward; everything runs offline with one 
 
 | Критерий | Где смотреть | Команда на 1 минуту | Ожидаемый вывод |
 |---|---|---|---|
-| Запуск одной командой | `Makefile`, `scripts/check.sh`, `Dockerfile` (образ по дайджесту), `.github/workflows/check.yml` | `make quick` (полная: `make check` / `make docker-check`) | `quick smoke: …s`; у полной — табло `<!--fact:selfcheck_total-->90/90<!--/fact-->` и `check: ALL GREEN` |
+| Запуск одной командой | `Makefile`, `scripts/check.sh`, `Dockerfile` (образ по дайджесту), `.github/workflows/check.yml` | `make quick` (полная: `make check` / `make docker-check`) | `quick smoke: …s`; у полной — табло <!--fact:selfcheck_total-->90/90<!--/fact--> и `check: ALL GREEN` |
 | Версии конфигураций | `configs/*.json` (`version`), `configs/LOCK.json`, `configs/CHANGELOG.md`, `config_version` + `config_hash` в каждом `manifest.json` | `python -m pytest -q tests/test_configs_lock.py` | `5 passed`: содержимое без смены версии не пройдёт |
 | Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1195<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
 | Измеренный разбор сбоев | [`docs/FAILURES.md`](docs/FAILURES.md): <!--fact:failures_closed-->18<!--/fact--> закрытых уязвимостей с тестами‑сторожами, полнота по вариантам с интервалами Уилсона, seed каждого примера | `python -m auditenv analyze --n 60` | таблицы признаков и вариантов; oracle и независимый проверяльщик решают 100 % |
@@ -244,6 +244,8 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12
 
 ## Раунд 4: инструменты проверки (вне `make check`, кроме отмеченных)
 
+«Раунд» — наш внутренний цикл доработки (ревью → исправления → повторная проверка), а не этап хакатона; всё из раундов 1–4 уже в `main`.
+
 | Команда | Что делает | Результат |
 |---|---|---|
 | `make repro-cert` / `make repro-cert-check` | сертификат воспроизводимости: 20 эпизодов в памяти, golden, конфиги, детерминированная часть self‑check; сравнение с другой машиной | `reports/repro_certificate.md` |
@@ -349,7 +351,7 @@ auditenv/
   runner.py serve.py selfcheck.py leakscan.py lint.py analysis.py verify_provenance.py docs_check.py cli.py
 tools/        verify_independent.py   (независимый проверяльщик: только stdlib)
               mutation_test.py        (мутационное тестирование оценщика), build_replay.py
-examples/     minimal_agent.py        (агент на ~35 строк)
+examples/     minimal_agent.py        (агент на ~40 строк)
 configs/      7 конфигов + splits.json + LOCK.json + CHANGELOG.md
 schemas/      15 JSON Schema
 episodes/     train/ (10) и dev/ (10): <episode_id>/public/*, <episode_id>/grader/*, index.json (+ дайджесты)

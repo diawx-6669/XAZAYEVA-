@@ -92,7 +92,7 @@ trajectories` → `python -m auditenv docs-check --fix` → `make check` (дол
 python -m auditenv run --policy-cmd "python their_agent.py" --episode-dir episodes/dev/<id> --mode eval --log log.jsonl
 ```
 
-Протокол и песочница — [`docs/ADAPTER.md`](ADAPTER.md); пример на ~35 строк —
+Протокол и песочница — [`docs/ADAPTER.md`](ADAPTER.md); пример на ~40 строк —
 `examples/minimal_agent.py`; для фреймворков с объектом `env` — `auditenv.serve.AuditEnvClient`.
 Чтобы политика попала в траектории: добавить имя в `cli.py::AGENT_BASELINES` (если она в пакете) и
 `make trajectories`.
