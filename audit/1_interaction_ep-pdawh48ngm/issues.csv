@@ -1,3 +1,0 @@
-issue_id,type,affected_id,expected_amount_minor,expected_amount,currency,tolerance_minor,evidence_set_1,evidence_set_2,evidence_set_3
-ISS-001,fx_rate,SF-GJ8FSMK,825358,8253.58,KZT,1,DC-3RE2NNK5;LR-VZJ4M89;fx:2026-08-28:KWD:KZT;policy,DC-3RE2NNK5;LR-YZZFTXF;LR-C7NNF67;LR-8YB42Y5;fx:2026-08-28:KWD:KZT;policy,
-ISS-002,duplicate_invoice,SF-HHSFCXX,223077329,2230773.29,KZT,1,DC-3RE2NNK5;DC-KQY4385B;LR-64RVBTD,DC-3RE2NNK5;DC-KQY4385B;LR-8HSJ25F;LR-AVXMA4B;LR-XBQ7JXQ,

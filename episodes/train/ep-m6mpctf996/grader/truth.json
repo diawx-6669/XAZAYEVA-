@@ -1,0 +1,1 @@
+{"episode_id":"ep-m6mpctf996","issues":[{"affected_ids":["SF-HSB84S"],"currency":"USD","evidence_sets":[["FD-K538EFX7","GL-YN8JTC4","fx:2026-02-13:KWD:USD","policy"],["FD-K538EFX7","GL-73V3SPE","GL-VHPHDX3","GL-SAM8R7P","fx:2026-02-13:KWD:USD","policy"]],"expected_amount_minor":1974,"issue_id":"ISS-001","type":"fx_rate"}],"tolerance_minor":1}

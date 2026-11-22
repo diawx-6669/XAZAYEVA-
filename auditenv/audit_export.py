@@ -17,8 +17,8 @@ from .env.data import PublicData
 from .money import format_minor
 from .paths import EPISODES_DIR
 
-PICKS = [("1_interaction", "dev", "ep-pdawh48ngm"), ("2_clean", "dev", "ep-wz2abaewnk"),
-         ("3_fx_weekend", "dev", "ep-83ty6jrf5c")]
+PICKS = [("1_interaction", "dev", "ep-wm5bxcrh9d"), ("2_clean", "dev", "ep-md93e84dvw"),
+         ("3_fx_weekend", "dev", "ep-xt9h93jnn2")]
 
 
 def _w(path: Path, header, rows):

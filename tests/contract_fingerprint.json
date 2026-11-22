@@ -1,6 +1,6 @@
 {
- "schema_version": "1.0",
- "sha256": "c9a923f3bdddccc206b46b6b48e305845a2a35003159e05ba238d80a4dc56548",
+ "schema_version": "1.1",
+ "sha256": "6d1ca7ed47ad4a08502de12e6358bee212a6fe4737b53399fd0f55b54e739975",
  "covers": [
   "error_codes",
   "get_tables",

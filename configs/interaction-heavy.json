@@ -1,6 +1,6 @@
 {
   "name": "interaction-heavy",
-  "version": "2.1",
+  "version": "2.3",
   "foreign_currencies": ["USD", "EUR", "JPY", "KWD"],
   "n_foreign": [2, 3],
   "foreign_share": 0.4,

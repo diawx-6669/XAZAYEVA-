@@ -25,7 +25,7 @@ BAD = [
     ({"foreign_share": 1.5, "tolerance": 2}, "foreign_share: 1.5 > 1"),  # two problems at once
     ({"timezones": ["Europe/Moscow"]}, "timezones/0"),
     ({"max_steps": 50}, "max_steps"),
-    ({"errors": {"duplicate_invoice": 0, "payment_allocation": 0, "period_cutoff": 0}, "foreign_currencies": []},
+    ({"errors": {"duplicate_invoice": 0, "payment_allocation": 0, "period_cutoff": 0, "vat_error": 0}, "foreign_currencies": []},
      "no foreign currency"),
 ]
 

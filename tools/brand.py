@@ -28,8 +28,8 @@ sys.path.insert(0, str(ROOT))
 
 from auditenv.grader.core import EpisodeGrader  # noqa: E402
 
-EPISODE = ROOT / "episodes" / "train" / "ep-8jyef897pe"
-INVOICE = "INV-734N63R"
+EPISODE = ROOT / "episodes" / "train" / "ep-6sbtnqcp2q"
+INVOICE = "INV-WQ6MYJG"
 OUT_SITE = ROOT / "site"
 OUT_BRAND = OUT_SITE / "brand"
 

@@ -2,7 +2,7 @@
 Each must score no better than the honest oracle; most must score badly.
 
 twins            the first correct finding repeated 30 times
-type_bruteforce  every issue reported with all 4 types
+type_bruteforce  every issue reported with all 5 types
 amount_bruteforce every issue reported with amounts expected-5 .. expected+5
 guess_ids        plausible-looking but invented IDs
 evidence_spam    correct type/ids/amount, but evidence = 10 unrelated ledger rows
@@ -20,7 +20,7 @@ import random
 from .base import Policy, finding, submit
 from .oracle import oracle_findings
 
-TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
+TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
 
 
 def _fake(truth, base):

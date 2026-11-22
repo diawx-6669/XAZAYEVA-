@@ -27,9 +27,9 @@ def test_export_matches_truth(tmp_path):
 def test_worked_example_in_manual():
     from decimal import ROUND_HALF_EVEN, Decimal
 
-    assert (Decimal("310.914") * Decimal("1492.36")).quantize(Decimal("0.01"), ROUND_HALF_EVEN) == Decimal("463995.62")
-    assert Decimal("463995.62") - Decimal("463715.79") == Decimal("279.83")
-    issues = list(csv.DictReader((ROOT / "audit" / "3_fx_weekend_ep-83ty6jrf5c" / "issues.csv").open()))
-    assert issues[0]["affected_id"] == "BNK-6QF7D6" and issues[0]["expected_amount"] == "279.83"
+    assert (Decimal("2764.444") * Decimal("1492.36")).quantize(Decimal("0.01"), ROUND_HALF_EVEN) == Decimal("4125545.65")
+    assert Decimal("4125545.65") - Decimal("4123057.65") == Decimal("2488.00")
+    issues = list(csv.DictReader((ROOT / "audit" / "3_fx_weekend_ep-xt9h93jnn2" / "issues.csv").open()))
+    assert issues[0]["affected_id"] == "BNK-6QF7D6" and issues[0]["expected_amount"] == "2488.00"
     text = (ROOT / "docs" / "MANUAL_AUDIT.md").read_text()
-    assert "279.83" in text and "1 492.36" in text
+    assert "2 488.00" in text and "1 492.36" in text

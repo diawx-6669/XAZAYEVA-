@@ -1,24 +1,24 @@
 {
- "episode_id": "ep-83ty6jrf5c",
+ "episode_id": "ep-xt9h93jnn2",
  "messages": [
   {
    "observation": {
     "manifest": {
      "base_currency": "KZT",
-     "config_hash": "58d390229a2b5ad5",
-     "config_version": "2.1",
+     "config_hash": "5e1f417bd366cf52",
+     "config_version": "2.3",
      "counts": {
       "fx": 160,
       "invoices": 37,
-      "ledger": 280,
-      "payments": 28
+      "ledger": 293,
+      "payments": 25
      },
      "currencies": {
       "JPY": 0,
       "KWD": 3,
       "KZT": 2
      },
-     "episode_id": "ep-83ty6jrf5c",
+     "episode_id": "ep-xt9h93jnn2",
      "generator_version": "auditenv-gen-0.1.0",
      "period_end": "2026-11-01T00:00:00+05:00",
      "period_start": "2026-08-01T00:00:00+05:00",
@@ -26,7 +26,7 @@
       "fx_conversion": "per_document",
       "mode": "ROUND_HALF_EVEN"
      },
-     "schema_version": "1.0",
+     "schema_version": "1.1",
      "timezone": "Asia/Almaty"
     },
     "policy_summary": {
@@ -46,10 +46,11 @@
      },
      "recognition": "invoice_issue_date",
      "rounding": "ROUND_HALF_EVEN",
-     "unapplied_cash": "account 2400 holds only cash that cannot be applied: a whole receipt with invoice_refs = null, or the part of a receipt exceeding the open balance of the invoices it references (overpayment), converted at the payment's policy rate"
+     "unapplied_cash": "account 2400 holds only cash that cannot be applied: a whole receipt with invoice_refs = null, or the part of a receipt exceeding the open balance of the invoices it references (overpayment), converted at the payment's policy rate",
+     "vat": "a line item with description 'VAT 12%' must equal round_half_even(12% x the sum of the other line items of the same invoice), in the invoice currency's minor units"
     },
     "steps_remaining": 100,
-    "task": "You are auditing one fictional company for one reporting period. Find financial errors in the books and submit findings with evidence. Error types: duplicate_invoice (affected_ids=[invoice_id of the later copy]), payment_allocation (affected_ids=[payment_id]), fx_rate (affected_ids=[invoice_id or payment_id of the mis-converted document]), period_cutoff (affected_ids=[invoice_id]). claimed_amount_minor = absolute distortion in base currency minor units (tolerance: 1 minor unit); currency = base currency. For payment_allocation the amount is the part of the receipt left on Unapplied Cash (2400) instead of Accounts Receivable (1200), converted at the payment's policy rate (for a foreign-currency receipt this does not depend on the rate posted to Cash). evidence_ids may contain doc_id, ledger row_id, fx id (fx:DATE:SRC:TGT) and 'policy'. Clean books exist: submitting nothing can be correct. Tools: list_records(table, cursor, limit<=50), get_record(table, id), get_document(doc_id), calculator(expression), submit(findings={episode_id, findings:[{type, affected_ids, claimed_amount_minor, currency, evidence_ids, explanation}]}) - the flat form submit(episode_id, findings:[...]) is accepted too; a malformed submission ends the episode with reward -1. Budget: 100 steps including submit; every action, even an error, uses a step. Reward = clip(2*F1 - 1 - 0.002*inspection_steps, -1, 1)."
+    "task": "You are auditing one fictional company for one reporting period. Find financial errors in the books and submit findings with evidence. Error types: duplicate_invoice (affected_ids=[invoice_id of the later copy]), payment_allocation (affected_ids=[payment_id]), fx_rate (affected_ids=[invoice_id or payment_id of the mis-converted document]), period_cutoff (affected_ids=[invoice_id]), vat_error (affected_ids=[invoice_id]; a 'VAT 12%' line must equal 12% of the other lines, half-even). claimed_amount_minor = absolute distortion in base currency minor units (tolerance: 1 minor unit); currency = base currency. For payment_allocation the amount is the part of the receipt left on Unapplied Cash (2400) instead of Accounts Receivable (1200), converted at the payment's policy rate (for a foreign-currency receipt this does not depend on the rate posted to Cash). evidence_ids may contain doc_id, ledger row_id, fx id (fx:DATE:SRC:TGT) and 'policy'. Clean books exist: submitting nothing can be correct. Tools: list_records(table, cursor, limit<=50), get_record(table, id), get_document(doc_id), calculator(expression), submit(findings={episode_id, findings:[{type, affected_ids, claimed_amount_minor, currency, evidence_ids, explanation}]}) - the flat form submit(episode_id, findings:[...]) is accepted too; a malformed submission ends the episode with reward -1. Budget: 100 steps including submit; every action, even an error, uses a step. Reward = clip(2*F1 - 1 - 0.002*inspection_steps, -1, 1)."
    },
    "role": "env",
    "step": 0
@@ -65,14 +66,14 @@
    "observation": {
     "result": {
      "document": {
-      "amount_minor": 310914,
+      "amount_minor": 2764444,
       "currency": "KWD",
       "doc_id": "DC-4CKP4X",
       "invoice_refs": [
        "SF-F7HR7QZ"
       ],
       "payment_id": "BNK-6QF7D6",
-      "timestamp": "2026-10-30T20:46:08+00:00"
+      "timestamp": "2026-10-30T22:35:33+00:00"
      },
      "kind": "payment"
     },
@@ -83,7 +84,7 @@
   },
   {
    "args": {
-    "id": "JE-P42EWND",
+    "id": "JE-TGNW4E3",
     "table": "ledger"
    },
    "role": "assistant",
@@ -96,12 +97,12 @@
       "account": "1000",
       "credit_minor": 0,
       "currency": "KZT",
-      "debit_minor": 46371579,
+      "debit_minor": 412305765,
       "entity_id": "CL-P9P8DEK",
       "invoice_id": null,
       "payment_id": "BNK-6QF7D6",
-      "row_id": "JE-P42EWND",
-      "timestamp": "2026-10-30T20:46:08+00:00"
+      "row_id": "JE-TGNW4E3",
+      "timestamp": "2026-10-30T22:35:33+00:00"
      },
      "table": "ledger"
     },
@@ -177,7 +178,8 @@
       "recognition": "invoice_issue_date",
       "revenue_posting": "Dr 1200 = document base amount; one Cr 4000 row per line item, the base amount split by line amounts with largest remainder (ties to the earlier line)",
       "rounding": "ROUND_HALF_EVEN",
-      "unapplied_cash": "account 2400 holds only cash that cannot be applied: a whole receipt with invoice_refs = null, or the part of a receipt exceeding the open balance of the invoices it references (overpayment), converted at the payment's policy rate"
+      "unapplied_cash": "account 2400 holds only cash that cannot be applied: a whole receipt with invoice_refs = null, or the part of a receipt exceeding the open balance of the invoices it references (overpayment), converted at the payment's policy rate",
+      "vat": "a line item with description 'VAT 12%' must equal round_half_even(12% x the sum of the other line items of the same invoice), in the invoice currency's minor units"
      },
      "table": "policy"
     },
@@ -199,41 +201,62 @@
      "document": {
       "currency": "KWD",
       "doc_id": "DC-XQYNCQ",
-      "due_at": "2026-09-14T04:12:05+00:00",
+      "due_at": "2026-10-16T18:03:56+05:00",
       "entity_id": "CL-P9P8DEK",
       "invoice_id": "SF-F7HR7QZ",
-      "issued_at": "2026-08-15T04:12:05+00:00",
+      "issued_at": "2026-09-16T18:03:56+05:00",
       "line_items": [
        {
-        "amount_minor": 39000,
+        "amount_minor": 334476,
+        "description": "Technical support",
+        "quantity": 6,
+        "service_period": "2026-09",
+        "unit_price_minor": 55746
+       },
+       {
+        "amount_minor": 1020000,
+        "description": "Cloud hosting",
+        "quantity": 4,
+        "service_period": "2026-09",
+        "unit_price_minor": 255000
+       },
+       {
+        "amount_minor": 765000,
         "description": "Logistics services",
-        "quantity": 3,
-        "service_period": "2026-08",
-        "unit_price_minor": 13000
+        "quantity": 5,
+        "service_period": "2026-09",
+        "unit_price_minor": 153000
        },
        {
-        "amount_minor": 61447,
-        "description": "Maintenance contract",
-        "quantity": 1,
-        "service_period": "2026-08",
-        "unit_price_minor": 61447
+        "amount_minor": 165000,
+        "description": "Software license",
+        "quantity": 5,
+        "service_period": "2026-09",
+        "unit_price_minor": 33000
        },
        {
-        "amount_minor": 89000,
-        "description": "Translation services",
-        "quantity": 1,
-        "service_period": "2026-08",
-        "unit_price_minor": 89000
+        "amount_minor": 159968,
+        "description": "Marketing services",
+        "quantity": 4,
+        "service_period": "2026-09",
+        "unit_price_minor": 39992
        },
        {
-        "amount_minor": 121467,
+        "amount_minor": 106000,
         "description": "Consulting services",
-        "quantity": 3,
-        "service_period": "2026-08",
-        "unit_price_minor": 40489
+        "quantity": 1,
+        "service_period": "2026-09",
+        "unit_price_minor": 106000
+       },
+       {
+        "amount_minor": 214000,
+        "description": "Staff training",
+        "quantity": 2,
+        "service_period": "2026-09",
+        "unit_price_minor": 107000
        }
       ],
-      "total_minor": 310914
+      "total_minor": 2764444
      },
      "kind": "invoice"
     },
@@ -244,7 +267,7 @@
   },
   {
    "args": {
-    "id": "JE-HG68CCY",
+    "id": "JE-F64SKBF",
     "table": "ledger"
    },
    "role": "assistant",
@@ -255,14 +278,14 @@
     "result": {
      "record": {
       "account": "2400",
-      "credit_minor": 28303801,
+      "credit_minor": 251658308,
       "currency": "KZT",
       "debit_minor": 0,
       "entity_id": "CL-P9P8DEK",
       "invoice_id": null,
       "payment_id": "BNK-6QF7D6",
-      "row_id": "JE-HG68CCY",
-      "timestamp": "2026-10-30T20:46:08+00:00"
+      "row_id": "JE-F64SKBF",
+      "timestamp": "2026-10-30T22:35:33+00:00"
      },
      "table": "ledger"
     },
@@ -274,17 +297,17 @@
   {
    "args": {
     "findings": {
-     "episode_id": "ep-83ty6jrf5c",
+     "episode_id": "ep-xt9h93jnn2",
      "findings": [
       {
        "affected_ids": [
         "BNK-6QF7D6"
        ],
-       "claimed_amount_minor": 27983,
+       "claimed_amount_minor": 248800,
        "currency": "KZT",
        "evidence_ids": [
         "DC-4CKP4X",
-        "JE-P42EWND",
+        "JE-TGNW4E3",
         "fx:2026-10-30:KWD:KZT",
         "policy"
        ],
@@ -295,12 +318,12 @@
        "affected_ids": [
         "BNK-6QF7D6"
        ],
-       "claimed_amount_minor": 28303801,
+       "claimed_amount_minor": 251658308,
        "currency": "KZT",
        "evidence_ids": [
         "DC-4CKP4X",
         "DC-XQYNCQ",
-        "JE-HG68CCY"
+        "JE-F64SKBF"
        ],
        "explanation": "Receipt references the invoice but part of it was credited to 2400 Unapplied Cash instead of 1200; amount = the part left on 2400.",
        "type": "payment_allocation"
@@ -325,6 +348,6 @@
  "note": "recorded transcript on an OPEN episode; observations contain no answer key (leakscan); only the explanation texts were rewritten (they never affect the reward)",
  "policy": "oracle_observing",
  "reward": 0.988,
- "source": "episodes/dev/ep-83ty6jrf5c",
+ "source": "episodes/dev/ep-xt9h93jnn2",
  "steps": 7
 }

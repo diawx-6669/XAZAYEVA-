@@ -101,7 +101,7 @@ def doc_features(pd) -> dict:
 
 FEATURES = ["paid", "night", "utc_format", "service_period_ne_issue_month", "rent_text", "single_payment",
             "odd_id_prefix", "weekend", "last_3_days", "foreign_currency"]
-TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
+TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
 
 
 def surface_table(results) -> dict:

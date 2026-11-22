@@ -7,193 +7,217 @@
  "n_test_seeds": 120,
  "n_train_seeds": 120,
  "positive_control": {
-  "auc": 0.9517355960704694,
+  "auc": 0.9505714524888922,
   "ci95": [
-   0.9505410553697868,
-   0.9527750511236591
+   0.949525608147697,
+   0.9516303664412072
   ],
-  "n_test_positive": 5347,
-  "n_test_records": 131279,
+  "n_test_positive": 5660,
+  "n_test_records": 133814,
   "rates": {
    "invoices:clean": {
-    "n": 13966,
-    "round_2": 708,
-    "seconds_zero": 221,
-    "utc_written": 7326
+    "n": 13888,
+    "round_2": 670,
+    "seconds_zero": 234,
+    "utc_written": 7319
    },
    "invoices:duplicate_invoice": {
-    "n": 236,
-    "round_2": 10,
-    "seconds_zero": 2,
-    "utc_written": 112
+    "n": 199,
+    "round_2": 7,
+    "seconds_zero": 3,
+    "utc_written": 94
    },
    "invoices:fx_rate": {
-    "n": 201,
-    "round_2": 4,
-    "seconds_zero": 1,
-    "utc_written": 92
+    "n": 194,
+    "round_2": 6,
+    "seconds_zero": 5,
+    "utc_written": 100
    },
    "invoices:period_cutoff": {
-    "n": 136,
-    "round_2": 6,
-    "seconds_zero": 2,
-    "utc_written": 96
+    "n": 105,
+    "round_2": 3,
+    "seconds_zero": 0,
+    "utc_written": 73
    },
-   "ledger:clean": {
-    "n": 103645,
-    "round_2": 21663,
-    "seconds_zero": 1607,
-    "utc_written": 54245
-   },
-   "ledger:duplicate_invoice": {
-    "n": 1384,
-    "round_2": 152,
-    "seconds_zero": 9,
-    "utc_written": 667
-   },
-   "ledger:fx_rate": {
-    "n": 1426,
-    "round_2": 36,
-    "seconds_zero": 11,
-    "utc_written": 609
-   },
-   "ledger:payment_allocation": {
-    "n": 823,
-    "round_2": 91,
-    "seconds_zero": 14,
-    "utc_written": 601
-   },
-   "ledger:period_cutoff": {
-    "n": 851,
-    "round_2": 225,
-    "seconds_zero": 16,
-    "utc_written": 598
-   },
-   "payments:clean": {
-    "n": 8321,
-    "round_2": 422,
-    "seconds_zero": 137,
-    "utc_written": 4319
-   },
-   "payments:fx_rate": {
-    "n": 61,
+   "invoices:vat_error": {
+    "n": 109,
     "round_2": 0,
     "seconds_zero": 1,
-    "utc_written": 19
+    "utc_written": 52
+   },
+   "ledger:clean": {
+    "n": 105901,
+    "round_2": 21586,
+    "seconds_zero": 1740,
+    "utc_written": 55632
+   },
+   "ledger:duplicate_invoice": {
+    "n": 1200,
+    "round_2": 86,
+    "seconds_zero": 20,
+    "utc_written": 569
+   },
+   "ledger:fx_rate": {
+    "n": 1396,
+    "round_2": 50,
+    "seconds_zero": 41,
+    "utc_written": 716
+   },
+   "ledger:payment_allocation": {
+    "n": 706,
+    "round_2": 64,
+    "seconds_zero": 15,
+    "utc_written": 529
+   },
+   "ledger:period_cutoff": {
+    "n": 712,
+    "round_2": 199,
+    "seconds_zero": 2,
+    "utc_written": 482
+   },
+   "ledger:vat_error": {
+    "n": 783,
+    "round_2": 217,
+    "seconds_zero": 8,
+    "utc_written": 386
+   },
+   "payments:clean": {
+    "n": 8365,
+    "round_2": 394,
+    "seconds_zero": 136,
+    "utc_written": 4341
+   },
+   "payments:fx_rate": {
+    "n": 58,
+    "round_2": 0,
+    "seconds_zero": 1,
+    "utc_written": 27
    },
    "payments:payment_allocation": {
-    "n": 229,
-    "round_2": 6,
-    "seconds_zero": 3,
-    "utc_written": 159
+    "n": 198,
+    "round_2": 10,
+    "seconds_zero": 4,
+    "utc_written": 140
    }
   },
   "univariate_auc": {
-   "amount_trailing_zeros": 0.5476883771097925,
-   "doc_id_rank": 0.5034939298091837,
-   "id_length": 0.5006014479029209,
-   "id_rank": 0.5022942403196026,
-   "minute": 0.5050017969330935,
-   "n_line_items": 0.5019121792976092,
-   "position_in_file": 0.9491326835804963,
-   "seconds": 0.5006855375937359,
-   "seconds_is_zero": 0.5022847171593332,
-   "utc_offset_written_as_zero": 0.5145267110975272
+   "amount_trailing_zeros": 0.5359841462549116,
+   "doc_id_rank": 0.5028756549030481,
+   "id_length": 0.5021270697064943,
+   "id_rank": 0.5003216143552112,
+   "minute": 0.5062166089539688,
+   "n_line_items": 0.5003418700480224,
+   "position_in_file": 0.9481732046542282,
+   "seconds": 0.507937849978529,
+   "seconds_is_zero": 0.50060163922701,
+   "utc_offset_written_as_zero": 0.5173151548950796
   }
  },
  "real": {
-  "auc": 0.6016456638744201,
+  "auc": 0.5690327156356881,
   "ci95": [
-   0.5867590242132745,
-   0.6170199982140807
+   0.5515922705846659,
+   0.5878676162866897
   ],
-  "n_test_positive": 5347,
-  "n_test_records": 131279,
+  "n_test_positive": 5660,
+  "n_test_records": 133814,
   "rates": {
    "invoices:clean": {
-    "n": 13966,
-    "round_2": 708,
-    "seconds_zero": 221,
-    "utc_written": 7326
+    "n": 13888,
+    "round_2": 670,
+    "seconds_zero": 234,
+    "utc_written": 7319
    },
    "invoices:duplicate_invoice": {
-    "n": 236,
-    "round_2": 10,
-    "seconds_zero": 2,
-    "utc_written": 112
+    "n": 199,
+    "round_2": 7,
+    "seconds_zero": 3,
+    "utc_written": 94
    },
    "invoices:fx_rate": {
-    "n": 201,
-    "round_2": 4,
-    "seconds_zero": 1,
-    "utc_written": 92
+    "n": 194,
+    "round_2": 6,
+    "seconds_zero": 5,
+    "utc_written": 100
    },
    "invoices:period_cutoff": {
-    "n": 136,
-    "round_2": 6,
-    "seconds_zero": 2,
-    "utc_written": 96
+    "n": 105,
+    "round_2": 3,
+    "seconds_zero": 0,
+    "utc_written": 73
    },
-   "ledger:clean": {
-    "n": 103645,
-    "round_2": 21663,
-    "seconds_zero": 1607,
-    "utc_written": 54245
-   },
-   "ledger:duplicate_invoice": {
-    "n": 1384,
-    "round_2": 152,
-    "seconds_zero": 9,
-    "utc_written": 667
-   },
-   "ledger:fx_rate": {
-    "n": 1426,
-    "round_2": 36,
-    "seconds_zero": 11,
-    "utc_written": 609
-   },
-   "ledger:payment_allocation": {
-    "n": 823,
-    "round_2": 91,
-    "seconds_zero": 14,
-    "utc_written": 601
-   },
-   "ledger:period_cutoff": {
-    "n": 851,
-    "round_2": 225,
-    "seconds_zero": 16,
-    "utc_written": 598
-   },
-   "payments:clean": {
-    "n": 8321,
-    "round_2": 422,
-    "seconds_zero": 137,
-    "utc_written": 4319
-   },
-   "payments:fx_rate": {
-    "n": 61,
+   "invoices:vat_error": {
+    "n": 109,
     "round_2": 0,
     "seconds_zero": 1,
-    "utc_written": 19
+    "utc_written": 52
+   },
+   "ledger:clean": {
+    "n": 105901,
+    "round_2": 21586,
+    "seconds_zero": 1740,
+    "utc_written": 55632
+   },
+   "ledger:duplicate_invoice": {
+    "n": 1200,
+    "round_2": 86,
+    "seconds_zero": 20,
+    "utc_written": 569
+   },
+   "ledger:fx_rate": {
+    "n": 1396,
+    "round_2": 50,
+    "seconds_zero": 41,
+    "utc_written": 716
+   },
+   "ledger:payment_allocation": {
+    "n": 706,
+    "round_2": 64,
+    "seconds_zero": 15,
+    "utc_written": 529
+   },
+   "ledger:period_cutoff": {
+    "n": 712,
+    "round_2": 199,
+    "seconds_zero": 2,
+    "utc_written": 482
+   },
+   "ledger:vat_error": {
+    "n": 783,
+    "round_2": 217,
+    "seconds_zero": 8,
+    "utc_written": 386
+   },
+   "payments:clean": {
+    "n": 8365,
+    "round_2": 394,
+    "seconds_zero": 136,
+    "utc_written": 4341
+   },
+   "payments:fx_rate": {
+    "n": 58,
+    "round_2": 0,
+    "seconds_zero": 1,
+    "utc_written": 27
    },
    "payments:payment_allocation": {
-    "n": 229,
-    "round_2": 6,
-    "seconds_zero": 3,
-    "utc_written": 159
+    "n": 198,
+    "round_2": 10,
+    "seconds_zero": 4,
+    "utc_written": 140
    }
   },
   "univariate_auc": {
-   "amount_trailing_zeros": 0.5476883771097925,
-   "doc_id_rank": 0.5034939298091837,
-   "id_length": 0.5006014479029209,
-   "id_rank": 0.5022942403196026,
-   "minute": 0.5050017969330935,
-   "n_line_items": 0.5019121792976092,
-   "position_in_file": 0.5283912310092739,
-   "seconds": 0.5006855375937359,
-   "seconds_is_zero": 0.5022847171593332,
-   "utc_offset_written_as_zero": 0.5145267110975272
+   "amount_trailing_zeros": 0.5359841462549116,
+   "doc_id_rank": 0.5028756549030481,
+   "id_length": 0.5021270697064943,
+   "id_rank": 0.5003216143552112,
+   "minute": 0.5062166089539688,
+   "n_line_items": 0.5003418700480224,
+   "position_in_file": 0.5005721638679965,
+   "seconds": 0.507937849978529,
+   "seconds_is_zero": 0.50060163922701,
+   "utc_offset_written_as_zero": 0.5173151548950796
   }
  }
 }

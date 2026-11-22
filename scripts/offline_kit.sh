@@ -4,7 +4,7 @@
 # without network. Writes only into dist/ (git-ignored). Usage:  sh scripts/offline_kit.sh [tag]   (= make offline-kit)
 set -e
 cd "$(dirname "$0")/.."
-REF="${1:-v1.1-submission}"
+REF="${1:-v1.2-submission}"
 if ! git rev-parse -q --verify "$REF^{commit}" >/dev/null; then
   echo "offline-kit: no tag $REF yet - using HEAD (re-run after tagging)"; REF=HEAD
 fi

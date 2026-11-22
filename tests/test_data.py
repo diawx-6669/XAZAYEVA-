@@ -18,7 +18,7 @@ TYPES = sorted(INV)
 def single(typ):
     return {"name": f"only-{typ}", "errors": {t: (1.0 if t == typ else 0.0) for t in TYPES}, "n_errors": [1, 2],
             "clean_probability": 0.0, "foreign_currencies": ["USD", "EUR", "JPY", "KWD"], "n_foreign": [2, 3],
-            "foreign_share": 0.4}
+            "foreign_share": 0.4, "vat_share": 0.5}
 
 
 @pytest.mark.parametrize("seed", range(50))

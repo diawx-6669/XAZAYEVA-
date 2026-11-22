@@ -1,0 +1,8 @@
+issue_id,type,evidence_set,evidence_id,record_kind,what_it_says
+ISS-001,fx_rate,1,DC-3VZBGN7Y,invoice,invoice SF-M8PPGCS client CP-RF326R issued 2026-07-11T05:27:20+00:00 (local 2026-07-11T09:27:20+04:00) total 12913.35 EUR
+ISS-001,fx_rate,1,LR-H884GKC,ledger,account 1200 Dr 6831110.50 Cr 0.00 KZT at 2026-07-11T05:27:20+00:00 invoice=SF-M8PPGCS payment=None
+ISS-001,fx_rate,1,fx:2026-07-10:EUR:KZT,fx,rate 529.260 KZT per 1 EUR on 2026-07-10
+ISS-001,fx_rate,1,policy,policy,"policy.json (rules: rate date, previous business day, period, rounding)"
+ISS-002,duplicate_invoice,1,DC-3VZBGN7Y,invoice,invoice SF-M8PPGCS client CP-RF326R issued 2026-07-11T05:27:20+00:00 (local 2026-07-11T09:27:20+04:00) total 12913.35 EUR
+ISS-002,duplicate_invoice,1,DC-9WVDC4M9,invoice,invoice SF-24AFAY9 client CP-RF326R issued 2026-07-12T10:24:24+04:00 (local 2026-07-12T10:24:24+04:00) total 12913.35 EUR
+ISS-002,duplicate_invoice,1,LR-VFV2VWM,ledger,account 1200 Dr 6831110.50 Cr 0.00 KZT at 2026-07-12T10:24:24+04:00 invoice=SF-24AFAY9 payment=None

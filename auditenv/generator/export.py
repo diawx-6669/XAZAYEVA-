@@ -47,6 +47,8 @@ def make_policy(book) -> dict:
         "credit_notes": "an invoice whose line_items carry cancels_invoice_id cancels that invoice; both stay in the books",
         "revenue_posting": "Dr 1200 = document base amount; one Cr 4000 row per line item, the base amount split by "
                            "line amounts with largest remainder (ties to the earlier line)",
+        "vat": ("a line item with description 'VAT 12%' must equal round_half_even(12% x the sum of the other "
+                "line items of the same invoice), in the invoice currency's minor units"),
         "accounts": dict(ACCOUNTS),
     }
 

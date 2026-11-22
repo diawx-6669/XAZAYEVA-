@@ -28,7 +28,8 @@ VARIANTS = ["duplicate_invoice/copy", "duplicate_invoice/copy_as_posted", "dupli
             "payment_allocation/unallocated", "payment_allocation/partial", "payment_allocation/wrong_invoice",
             "fx_rate/adjacent_day", "fx_rate/utc_date", "fx_rate/inverted", "fx_rate/historical_rate",
             "fx_rate/wrong_pair", "fx_rate/due_date", "period_cutoff/utc_trap", "period_cutoff/backdated_posting",
-            "period_cutoff/prior_period"]
+            "period_cutoff/prior_period", "vat_error/unpaid_rate_10", "vat_error/unpaid_rate_20",
+            "vat_error/paid_in_full_rate_10", "vat_error/paid_in_full_rate_20"]
 DOMAINS = {"variant": VARIANTS, "tz_sign": ["+", "-"], "exponent": ["0", "2", "3"],
            "base": ["KZT", "USD", "EUR", "JPY", "KWD"], "interaction": ["none", "duplicate_fx", "partial_fx_cutoff"],
            "weekend": ["no", "yes"]}

@@ -1,6 +1,6 @@
 # Сертификат воспроизводимости
 
-Машина: Python 3.11.18 (CPython), Linux x86_64.
+Машина: Python 3.13.18 (CPython), Linux x86_64.
 Сгенерировано `make repro-cert` (`tools/repro_cert.py`). Хеши не зависят от времени, процессора, ОС и
 версии Python: 20 открытых эпизодов пересобираются в памяти из (seed, config) и сверяются с
 `episodes/*/index.json`; плюс 3 golden‑эпизода, хеши конфигов и детерминированная часть
@@ -24,59 +24,59 @@ python tools/repro_cert.py --compare /tmp/mac.json        # здесь: табл
 
 | Что | Хеш (первые 16 знаков) |
 |---|---|
-| `episode/train/train-easy#101/public` | `5463d7b46b090c8b` |
-| `episode/train/train-easy#101/grader` | `350f39b46bc6b600` |
-| `episode/train/train-easy#102/public` | `4d2d8a5795f683cc` |
-| `episode/train/train-easy#102/grader` | `832f2a5de296dc38` |
-| `episode/train/train-easy#103/public` | `814563cd3c3cfae5` |
-| `episode/train/train-easy#103/grader` | `5c572ccd38e524e0` |
-| `episode/train/train-easy#104/public` | `554b7d341702c98e` |
-| `episode/train/train-easy#104/grader` | `8a7ae5a9db5f2186` |
-| `episode/train/train-easy#105/public` | `2f0b3b4904123346` |
-| `episode/train/train-easy#105/grader` | `904f70883774cf42` |
-| `episode/train/train-easy#106/public` | `7b166022eeabc9f1` |
-| `episode/train/train-easy#106/grader` | `27cf86db1d9f63ec` |
-| `episode/train/train-global#107/public` | `138e74f3ada59095` |
-| `episode/train/train-global#107/grader` | `2522b0aa2c5b8e2e` |
-| `episode/train/train-global#108/public` | `028c2e8c9d98a87b` |
-| `episode/train/train-global#108/grader` | `3f8fab8943c5ffaa` |
-| `episode/train/train-global#109/public` | `72ae11da234c0e32` |
-| `episode/train/train-global#109/grader` | `26c3c22620b12e3a` |
-| `episode/train/train-global#110/public` | `5456bdc3646a14e3` |
-| `episode/train/train-global#110/grader` | `45300c9a4244c461` |
-| `episode/dev/dev-mixed#201/public` | `c44a09b581f62f8b` |
-| `episode/dev/dev-mixed#201/grader` | `a79c62118d902d0b` |
-| `episode/dev/dev-mixed#202/public` | `2326b81137081b6f` |
-| `episode/dev/dev-mixed#202/grader` | `4e37409bafe9b015` |
-| `episode/dev/dev-mixed#203/public` | `1e0b6f46d415454b` |
-| `episode/dev/dev-mixed#203/grader` | `4fe035a8d946ef3e` |
-| `episode/dev/dev-global#204/public` | `e9468424dd590b3e` |
-| `episode/dev/dev-global#204/grader` | `a8033b1cdcf315e0` |
-| `episode/dev/dev-global#205/public` | `5b22f83aed5ddb71` |
-| `episode/dev/dev-global#205/grader` | `d83474858c712521` |
-| `episode/dev/interaction-heavy#206/public` | `1c542ed2f328363f` |
-| `episode/dev/interaction-heavy#206/grader` | `bfb361d1644f91f9` |
-| `episode/dev/interaction-heavy#207/public` | `cb4e6ddea1dfd62d` |
-| `episode/dev/interaction-heavy#207/grader` | `637d79d2bf936f66` |
-| `episode/dev/interaction-heavy#208/public` | `969c5e239c65141a` |
-| `episode/dev/interaction-heavy#208/grader` | `74b6985be029db06` |
-| `episode/dev/clean-only#209/public` | `377592e3ca77f259` |
-| `episode/dev/clean-only#209/grader` | `291748a4d8bf6edb` |
-| `episode/dev/clean-only#210/public` | `a01096a58adb98ea` |
-| `episode/dev/clean-only#210/grader` | `213d5359c01cc900` |
-| `golden/dev-mixed#22/public` | `10a9d80affd0d4bf` |
-| `golden/dev-mixed#22/truth` | `2e101c4313083c19` |
-| `golden/interaction-heavy#33/public` | `9b9f9bd2f0dbe9ef` |
-| `golden/interaction-heavy#33/truth` | `263aebb8ebf5003e` |
-| `golden/train-easy#11/public` | `0519edcb1f2dbbdb` |
-| `golden/train-easy#11/truth` | `69dbe63a6fb8a2a6` |
-| `config/clean-only` | `888d9b2efe8dabab` |
-| `config/dev-global` | `3e5719530ff397f6` |
-| `config/dev-mixed` | `58d390229a2b5ad5` |
-| `config/interaction-heavy` | `11d80441ae5df73a` |
-| `config/stress` | `60b0fe2dbb0fcdfe` |
-| `config/train-easy` | `8946748a75222c01` |
-| `config/train-global` | `54ed4c6d541dc3f9` |
-| `selfcheck/deterministic` | `7b9070908ef75118` |
+| `episode/train/train-easy#101/public` | `2d2005922d640975` |
+| `episode/train/train-easy#101/grader` | `586192350207a997` |
+| `episode/train/train-easy#102/public` | `4de29f72bb00e574` |
+| `episode/train/train-easy#102/grader` | `0aa1ec15818a8a6f` |
+| `episode/train/train-easy#103/public` | `1c521fc5915fb02b` |
+| `episode/train/train-easy#103/grader` | `8e2ef131b0eb2449` |
+| `episode/train/train-easy#104/public` | `e3e35690e8071b35` |
+| `episode/train/train-easy#104/grader` | `803350d1e76357b2` |
+| `episode/train/train-easy#105/public` | `5470d345e76f4010` |
+| `episode/train/train-easy#105/grader` | `42344771957b3b88` |
+| `episode/train/train-easy#106/public` | `858af478466b8272` |
+| `episode/train/train-easy#106/grader` | `d9ff775a6145779c` |
+| `episode/train/train-global#107/public` | `5804667238d6b67f` |
+| `episode/train/train-global#107/grader` | `87eb9c6fbf36166c` |
+| `episode/train/train-global#108/public` | `cc8c9ce25de4bed9` |
+| `episode/train/train-global#108/grader` | `d1500308bada7682` |
+| `episode/train/train-global#109/public` | `37e743278eefe1e4` |
+| `episode/train/train-global#109/grader` | `b3e14f980dbcdc5e` |
+| `episode/train/train-global#110/public` | `7f4231c2f603264e` |
+| `episode/train/train-global#110/grader` | `d0c0c04586cc083a` |
+| `episode/dev/dev-mixed#201/public` | `2269bd17aab31ec2` |
+| `episode/dev/dev-mixed#201/grader` | `a3cdf70c19e1eb84` |
+| `episode/dev/dev-mixed#202/public` | `905794ec1340197d` |
+| `episode/dev/dev-mixed#202/grader` | `4e3b0923f6f7be23` |
+| `episode/dev/dev-mixed#203/public` | `cc9b606d0ac15086` |
+| `episode/dev/dev-mixed#203/grader` | `dc06e40fcd69066b` |
+| `episode/dev/dev-global#204/public` | `4aa6c035b75f4f2a` |
+| `episode/dev/dev-global#204/grader` | `f4ececd249f2aa1c` |
+| `episode/dev/dev-global#205/public` | `681f82fa8313a046` |
+| `episode/dev/dev-global#205/grader` | `5f15f8abcaf67963` |
+| `episode/dev/interaction-heavy#206/public` | `fbba48b95d26b7ea` |
+| `episode/dev/interaction-heavy#206/grader` | `db31a35de2f4d6ce` |
+| `episode/dev/interaction-heavy#207/public` | `21864fbedae3df9c` |
+| `episode/dev/interaction-heavy#207/grader` | `82cf6b9fb9e9c887` |
+| `episode/dev/interaction-heavy#208/public` | `b6d746be3efe3998` |
+| `episode/dev/interaction-heavy#208/grader` | `375df38e76e15510` |
+| `episode/dev/clean-only#209/public` | `9d832f1586de4b6d` |
+| `episode/dev/clean-only#209/grader` | `b23e1f37c1c2cfa2` |
+| `episode/dev/clean-only#210/public` | `6fec4d34f6226ed1` |
+| `episode/dev/clean-only#210/grader` | `5d039e6678f12c90` |
+| `golden/dev-mixed#22/public` | `29a3823792300c75` |
+| `golden/dev-mixed#22/truth` | `202444fbb0d06d8c` |
+| `golden/interaction-heavy#33/public` | `6ef81fad2ee16cfe` |
+| `golden/interaction-heavy#33/truth` | `7fe57d2c47d1ecc9` |
+| `golden/train-easy#11/public` | `938c294522ee9abd` |
+| `golden/train-easy#11/truth` | `7568485ae3a7579f` |
+| `config/clean-only` | `75364dea035f003d` |
+| `config/dev-global` | `6758725924324bb2` |
+| `config/dev-mixed` | `5e1f417bd366cf52` |
+| `config/interaction-heavy` | `0b4a5ffba66d6c72` |
+| `config/stress` | `0e3fc9f073c43cfd` |
+| `config/train-easy` | `d9c840b728596a92` |
+| `config/train-global` | `3a25e26fa41cce5b` |
+| `selfcheck/deterministic` | `3f850e6159c8f5a0` |
 | `selfcheck/total` | `90.0/90` |
-| `selfcheck/grader_log_head` | `123c0f370bb03583` |
+| `selfcheck/grader_log_head` | `d1507ee6ba419334` |

@@ -6,8 +6,8 @@ Learner: logistic regression on 10 format-only features (+ squares), trained on 
 
 | Run | ROC AUC | 95% interval | test records | of them affected |
 |---|---|---|---|---|
-| real episodes | **0.602** | 0.587 - 0.617 | 131279 | 5347 |
-| positive control (planted tell: affected records at the end of the file) | **0.952** | 0.951 - 0.953 | 131279 | 5347 |
+| real episodes | **0.569** | 0.552 - 0.588 | 133814 | 5660 |
+| positive control (planted tell: affected records at the end of the file) | **0.951** | 0.950 - 0.952 | 133814 | 5660 |
 
 Verdict: **weak format signal, explained below (no strong shortcut)**. The control shows the probe is strong enough to see a tell when one exists.
 
@@ -15,16 +15,16 @@ Verdict: **weak format signal, explained below (no strong shortcut)**. The contr
 
 | Feature | AUC |
 |---|---|
-| `position_in_file` | 0.528 |
-| `id_rank` | 0.502 |
+| `position_in_file` | 0.501 |
+| `id_rank` | 0.500 |
 | `doc_id_rank` | 0.503 |
-| `id_length` | 0.501 |
-| `seconds` | 0.501 |
-| `seconds_is_zero` | 0.502 |
-| `minute` | 0.505 |
-| `utc_offset_written_as_zero` | 0.515 |
-| `amount_trailing_zeros` | 0.548 |
-| `n_line_items` | 0.502 |
+| `id_length` | 0.502 |
+| `seconds` | 0.508 |
+| `seconds_is_zero` | 0.501 |
+| `minute` | 0.506 |
+| `utc_offset_written_as_zero` | 0.517 |
+| `amount_trailing_zeros` | 0.536 |
+| `n_line_items` | 0.500 |
 
 Not used on purpose (legitimate audit signal, not a shortcut): accounts (2400 means unapplied cash), currencies (an FX error needs a foreign document), dates against the period boundary (that is the cutoff test), amounts compared between records (that is the duplicate test).
 
@@ -32,21 +32,23 @@ Not used on purpose (legitimate audit signal, not a shortcut): accounts (2400 me
 
 | Records | n | seconds = 00 | written in UTC (+00:00) | amount ends in >= 2 zeros |
 |---|---|---|---|---|
-| invoices:clean | 13966 | 1.6% | 52.5% | 5.1% |
-| invoices:duplicate_invoice | 236 | 0.8% | 47.5% | 4.2% |
-| invoices:fx_rate | 201 | 0.5% | 45.8% | 2.0% |
-| invoices:period_cutoff | 136 | 1.5% | 70.6% | 4.4% |
-| ledger:clean | 103645 | 1.6% | 52.3% | 20.9% |
-| ledger:duplicate_invoice | 1384 | 0.7% | 48.2% | 11.0% |
-| ledger:fx_rate | 1426 | 0.8% | 42.7% | 2.5% |
-| ledger:payment_allocation | 823 | 1.7% | 73.0% | 11.1% |
-| ledger:period_cutoff | 851 | 1.9% | 70.3% | 26.4% |
-| payments:clean | 8321 | 1.6% | 51.9% | 5.1% |
-| payments:fx_rate | 61 | 1.6% | 31.1% | 0.0% |
-| payments:payment_allocation | 229 | 1.3% | 69.4% | 2.6% |
+| invoices:clean | 13888 | 1.7% | 52.7% | 4.8% |
+| invoices:duplicate_invoice | 199 | 1.5% | 47.2% | 3.5% |
+| invoices:fx_rate | 194 | 2.6% | 51.5% | 3.1% |
+| invoices:period_cutoff | 105 | 0.0% | 69.5% | 2.9% |
+| invoices:vat_error | 109 | 0.9% | 47.7% | 0.0% |
+| ledger:clean | 105901 | 1.6% | 52.5% | 20.4% |
+| ledger:duplicate_invoice | 1200 | 1.7% | 47.4% | 7.2% |
+| ledger:fx_rate | 1396 | 2.9% | 51.3% | 3.6% |
+| ledger:payment_allocation | 706 | 2.1% | 74.9% | 9.1% |
+| ledger:period_cutoff | 712 | 0.3% | 67.7% | 27.9% |
+| ledger:vat_error | 783 | 1.0% | 49.3% | 27.7% |
+| payments:clean | 8365 | 1.6% | 51.9% | 4.7% |
+| payments:fx_rate | 58 | 1.7% | 46.6% | 0.0% |
+| payments:payment_allocation | 198 | 2.0% | 70.7% | 5.1% |
 
 Three sources, two of them legitimate:
 
 1. **Written in UTC** is part of the error, not a tell: a `period_cutoff` utc_trap exists only because the invoice time is written in UTC and its UTC date differs from the local one; the `partial_fx_cutoff` receipt is the same trap on a payment. The generator writes the look-alikes `boundary_end`, `boundary_start` and `night_fx` in UTC too, so UTC writing alone is a weak signal (see the rates).
 2. **Round amounts** are a currency proxy: foreign documents are converted, so their base-currency postings are rarely round; an FX error needs a foreign document. Legitimate.
-3. **Seconds = 00 was a real tell, fixed on 22.11 (v1.1).** The carrier payment of `partial_fx_cutoff` used to be timestamped `midnight + timedelta(minutes=...)` without seconds (36.5% of `payment_allocation` receipts had 00 seconds against 8.0% of clean ones). Every generated timestamp now draws its seconds, the look-alikes `boundary_end` / `boundary_start` / boundary payments included, so 00 seconds no longer mark either errors or their twins: now 1.3% of `payment_allocation` receipts vs 1.6% of clean receipts. `tests/test_shortcut_probe.py` pins the fix.
+3. **Seconds = 00 was a real tell, fixed on 22.11 (v1.1).** The carrier payment of `partial_fx_cutoff` used to be timestamped `midnight + timedelta(minutes=...)` without seconds (36.5% of `payment_allocation` receipts had 00 seconds against 8.0% of clean ones). Every generated timestamp now draws its seconds, the look-alikes `boundary_end` / `boundary_start` / boundary payments included, so 00 seconds no longer mark either errors or their twins: now 2.0% of `payment_allocation` receipts vs 1.6% of clean receipts. `tests/test_shortcut_probe.py` pins the fix.

@@ -30,7 +30,7 @@ make check
 | Что проверено | Результат | Где смотреть / как повторить |
 |---|---|---|
 | Табло самопроверки в духе жюри (контракт, данные, награда, воспроизводимость) | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
-| Тестов (pytest + hypothesis) | <!--fact:n_tests-->691<!--/fact--> | `make check` |
+| Тестов (pytest + hypothesis) | <!--fact:n_tests-->699<!--/fact--> | `make check` |
 | Намеренные ошибки в оценщике, пойманные тестами | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` → `reports/mutation.md` |
 | Независимый проверяльщик эталона и доказательств (без `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> эпизодов, 0 расхождений | шаг `verify-independent` в `make check` |
 | Симуляция жюри чёрным ящиком (свои политики и оценщик) | <!--fact:jury_sim_open-->0<!--/fact--> открытых находок | [`reports/jury_sim.md`](reports/jury_sim.md) |
@@ -108,7 +108,7 @@ the answer key and computes F1 and the reward; everything runs offline with one 
 |---|---|---|---|
 | Запуск одной командой | `Makefile`, `scripts/check.sh`, `Dockerfile` (образ по дайджесту), `.github/workflows/check.yml` | `make quick` (полная: `make check` / `make docker-check`) | `quick smoke: …s`; у полной — табло <!--fact:selfcheck_total-->90/90<!--/fact--> и `check: ALL GREEN` |
 | Версии конфигураций | `configs/*.json` (`version`), `configs/LOCK.json`, `configs/CHANGELOG.md`, `config_version` + `config_hash` в каждом `manifest.json` | `python -m pytest -q tests/test_configs_lock.py` | `5 passed`: содержимое без смены версии не пройдёт |
-| Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1198<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
+| Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1200<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
 | Измеренный разбор сбоев | [`docs/FAILURES.md`](docs/FAILURES.md): <!--fact:failures_closed-->18<!--/fact--> закрытых уязвимостей с тестами‑сторожами, полнота по вариантам с интервалами Уилсона, seed каждого примера | `python -m auditenv analyze --n 60` | таблицы признаков и вариантов; oracle и независимый проверяльщик решают 100 % |
 | Честные ограничения | [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) | `python -m auditenv docs-check` | `0 mismatches`: числа в документах совпадают с реальностью |
 
@@ -143,7 +143,7 @@ make check
 
 `make check` — это по порядку:
 
-1. весь pytest (<!--fact:n_tests-->691<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
+1. весь pytest (<!--fact:n_tests-->699<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
    поверхностных признаков, атаки на песочницу агента);
 2. табло self‑check в духе жюри: 4 блока × 20 проверок на 20 эпизодах и 20 парных преобразованиях,
    диагностика P/R/F1 (макро и микро), возврат на чистых и ошибочных книгах, шаги, время p50/p95;
@@ -164,7 +164,7 @@ make check
 проверяет собственный валидатор `auditenv/jsonschema_lite.py`. В контейнере проверка идёт от
 пользователя `auditor`, писать можно только в `reports/` и `trajectories/`.
 
-Размеры открытых эпизодов: <!--fact:ep_ledger_range-->235–360<!--/fact--> проводок, <!--fact:ep_docs_range-->50–77<!--/fact--> документов,
+Размеры открытых эпизодов: <!--fact:ep_ledger_range-->244–364<!--/fact--> проводок, <!--fact:ep_docs_range-->53–71<!--/fact--> документов,
 <!--fact:ep_issues_range-->0–4<!--/fact--> ошибок; oracle тратит 1 шаг, simple_reconcile — 11–16 из 100.
 
 **Закрытый прогон (жюри).** Генератор открыт, поэтому для скрытых seed задайте секретную соль —
@@ -240,7 +240,7 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12
 | `python -m auditenv import-csv --src tests/fixtures/<имя> --out D` | компания, собранная вручную в Google Таблицах (CSV) → эпизод (`tests/fixtures/README.md`) |
 | `python tools/build_replay.py` | пересобрать `site/replay.html` — офлайн‑просмотрщик траекторий 5 эпизодов (без эталона) |
 | `make finale-preflight` | офлайн‑проверка перед финалом за минуту: образ, тесты контракта, демо |
-| `make submission-tag` | команды для тега `v1.1-submission` и SHA для формы (`docs/SUBMISSION.md`) |
+| `make submission-tag` | команды для тега `v1.2-submission` и SHA для формы (`docs/SUBMISSION.md`) |
 
 ## Раунд 4: инструменты проверки (вне `make check`, кроме отмеченных)
 
@@ -301,13 +301,14 @@ seed, config ──► story (скрытые события, курсы) ──�
 * Отсутствующая ссылка — пустая ячейка CSV / `null` в JSON, не угаданная связь. Поля файлов —
   ровно поля раздела 03 кейса.
 
-Четыре типа ошибок (каждый — один модуль в `auditenv/generator/errors/`, включаются независимо):
+Пять типов ошибок (каждый — один модуль в `auditenv/generator/errors/`, включаются независимо; кейс требует минимум четыре):
 
 | Тип | Варианты |
 |---|---|
 | `duplicate_invoice` | `copy`, `paid_twice` (клиент оплатил и дубль), `copy_as_posted` (сценарий); косметика: другой порядок строк, другой срок оплаты, другой формат смещения; дубль всегда в рабочие часы |
 | `payment_allocation` | `unallocated`, `partial`, `wrong_invoice` (Cr 1200 на другой счёт того же клиента) |
 | `fx_rate` | `adjacent_day`, `utc_date`, `inverted`, `historical_rate`, `wrong_pair`, `due_date`; в том числе на оплаченных счетах |
+| `vat_error` | v1.1: строка «VAT 12%» посчитана по ставке 10 % или 20 %; итог счёта следует за строками, книга внутри согласована — противоречит только правилу `policy.vat`. Корректные «двойники»: такие же строки НДС у 35 % счетов в базовой валюте |
 | `period_cutoff` | `utc_trap`, `backdated_posting` (проводки в периоде, документ — нет), `prior_period` (в том числе счёт, оплаченный в периоде) |
 
 Два сценария взаимодействия: `partial_fx_cutoff`, `duplicate_fx` (суммы независимы — тест).
@@ -342,7 +343,7 @@ env.close()
 ```
 auditenv/
   money.py ids.py timeutil.py config.py canon.py schemas.py jsonschema_lite.py paths.py contract.py
-  generator/  story.py books.py invariants.py errors/{base,duplicate_invoice,payment_allocation,fx_rate,period_cutoff}.py
+  generator/  story.py books.py invariants.py errors/{base,duplicate_invoice,payment_allocation,fx_rate,period_cutoff,vat_error}.py
               interactions.py transforms.py episode.py export.py
   env/        env.py tools.py calculator.py cursors.py errors.py data.py
   grader/     schema.py normalize.py matcher.py reward.py validate_truth.py log.py core.py
@@ -451,7 +452,7 @@ audit/        3 dev-эпизода в CSV для ручного аудита (Go
   (+1). Так она и задумана: знание ответа без чтения доказательств не вознаграждается.
   `oracle_observing` открывает все ID доказательств и получает одинаковую награду по обеим формулам.
 * **attack:type_bruteforce выше пустого ответа, но ниже oracle.** Это сильнейший атакующий: он
-  читает truth и шлёт каждую ошибку со всеми 4 типами. TP = n, FP = 3n, F1 = 0.4, награда −0.2 на
+  читает truth и шлёт каждую ошибку со всеми 5 типами. TP = n, FP = 4n, F1 = 1/3, награда ≈ −0.33 на
   каждом ошибочном эпизоде (молчание даёт −1, oracle +1); на чистых ему нечего перебирать (+1).
   Выгоды нет: на каждом ошибочном эпизоде перебор строго хуже oracle, а без доступа к truth он
   не знает ни ID, ни сумм (`attack:guess_ids`: 0 TP; автопоиск эксплойтов — `reports/exploit_search.md`).

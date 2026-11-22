@@ -26,6 +26,7 @@ import io
 import json
 from pathlib import Path
 
+from . import SCHEMA_VERSION
 from .generator.episode import Episode
 from .generator.export import serialize_tables
 
@@ -162,7 +163,7 @@ def read_tables(folder: Path) -> tuple[dict, dict, dict]:
     truth = {"episode_id": episode_id, "issues": sorted(issues, key=lambda i: i["issue_id"]),
              "tolerance_minor": 1 if tol is None else tol}
 
-    manifest = {"schema_version": "1.0", "episode_id": episode_id, "base_currency": base, "currencies": exps,
+    manifest = {"schema_version": SCHEMA_VERSION, "episode_id": episode_id, "base_currency": base, "currencies": exps,
                 "period_start": pb["start"], "period_end": pb["end"], "timezone": pb["timezone"],
                 "counts": {"ledger": len(ledger), "invoices": len(invoices), "payments": len(payments), "fx": len(fx)},
                 "rounding": {"mode": policy.get("rounding", "ROUND_HALF_EVEN"), "fx_conversion": "per_document"},

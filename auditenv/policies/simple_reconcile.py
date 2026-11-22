@@ -4,7 +4,8 @@ Uses only what the tools return. Reads the policy and every table page by page, 
   - duplicates: same entity + currency + identical line items -> the later one;
   - allocation: a receipt that references invoices but has an Unapplied Cash (2400) credit;
   - fx: re-converts every foreign document with the rate of its LOCAL transaction date;
-  - cutoff: invoice issued outside the period by LOCAL time.
+  - cutoff: invoice issued outside the period by LOCAL time;
+  - vat: a 'VAT 12%' line that is not round_half_even(12 % x the other lines).
 Known, deliberate simplifications (measured in docs/FAILURES.md):
   - ignores credit notes when looking for duplicates (a re-issued invoice looks duplicated);
   - needs an exact-date FX rate: weekend documents (previous_business_day rule) are skipped;
@@ -16,12 +17,14 @@ from __future__ import annotations
 
 import json
 
+from decimal import ROUND_HALF_EVEN, Decimal
+
 from ..money import convert_minor
 from ..timeutil import parse_ts, tzinfo_for
 from .base import Policy, TableReader, finding, submit
 
 
-BASE_RULES = frozenset({"dup", "alloc", "fx", "cutoff"})
+BASE_RULES = frozenset({"dup", "alloc", "fx", "cutoff", "vat"})
 # Optional refinements (off in the official baseline; used only by `make experiment`, docs/EXPERIMENT.md):
 #   fx_prev_business_day  use the latest rate on/before the local date (policy fx_missing_rate)
 #   credit_note_aware     ignore credit notes and the invoices they cancel when looking for duplicates
@@ -161,6 +164,17 @@ class SimpleReconcile(Policy):
                 if row:
                     out.append(finding("period_cutoff", [i["invoice_id"]], row["debit_minor"], base,
                                        [i["doc_id"], row["row_id"], "policy"], "issued outside the period (local time)"))
+        # vat
+        for i in invs if "vat" in R else []:
+            vat = [li for li in i["line_items"] if li["description"] == "VAT 12%"]
+            if not vat or i["total_minor"] <= 0:
+                continue
+            net = sum(li["amount_minor"] for li in i["line_items"] if li["description"] != "VAT 12%")
+            should = int((Decimal(net) * Decimal("0.12")).quantize(Decimal(1), rounding=ROUND_HALF_EVEN))
+            gap = abs(vat[0]["amount_minor"] - should)
+            if gap > 1:
+                out.append(finding("vat_error", [i["invoice_id"]], gap, base, [i["doc_id"], "policy"],
+                                   "VAT line is not 12% of the other lines"))
         return out[:30]
 
 

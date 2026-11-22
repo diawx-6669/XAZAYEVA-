@@ -5,7 +5,7 @@ import json
 from auditenv.cli import main
 from auditenv.paths import ROOT
 
-EP = ROOT / "episodes" / "dev" / "ep-83ty6jrf5c"
+EP = ROOT / "episodes" / "dev" / "ep-xt9h93jnn2"
 
 
 def _answer():
@@ -26,7 +26,7 @@ def test_grade_list_form_with_reasons(tmp_path, capsys):
 
 def test_grade_json_and_invalid(tmp_path, capsys):
     p = tmp_path / "f.json"
-    p.write_text(json.dumps({"episode_id": "ep-83ty6jrf5c", "findings": _answer()}), "utf-8")
+    p.write_text(json.dumps({"episode_id": "ep-xt9h93jnn2", "findings": _answer()}), "utf-8")
     assert main(["grade", str(EP), str(p), "--json"]) == 0
     r = json.loads(capsys.readouterr().out)
     assert r["tp"] == 2 and r["reward"] == 1.0

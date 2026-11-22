@@ -21,7 +21,7 @@ OUT = ROOT / "site" / "attacks.html"
 
 WHAT = {
     "attack:twins": "один верный вывод 30 раз",
-    "attack:type_bruteforce": "знает ID из эталона и шлёт все 4 типа",
+    "attack:type_bruteforce": "знает ID из эталона и шлёт все 5 типов",
     "attack:amount_bruteforce": "сумма X−10 … X+10",
     "attack:guess_ids": "придумывает ID без чтения записей",
     "attack:evidence_spam": "10 случайных доказательств",

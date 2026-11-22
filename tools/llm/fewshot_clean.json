@@ -1,16 +1,16 @@
 {
- "episode_id": "ep-9m7sfznpsr",
+ "episode_id": "ep-nge3f44dyd",
  "messages": [
   {
    "observation": {
     "manifest": {
      "base_currency": "USD",
-     "config_hash": "3e5719530ff397f6",
-     "config_version": "2.1",
+     "config_hash": "6758725924324bb2",
+     "config_version": "2.3",
      "counts": {
       "fx": 177,
-      "invoices": 40,
-      "ledger": 318,
+      "invoices": 39,
+      "ledger": 317,
       "payments": 25
      },
      "currencies": {
@@ -19,7 +19,7 @@
       "KZT": 2,
       "USD": 2
      },
-     "episode_id": "ep-9m7sfznpsr",
+     "episode_id": "ep-nge3f44dyd",
      "generator_version": "auditenv-gen-0.1.0",
      "period_end": "2027-01-01T00:00:00+09:00",
      "period_start": "2026-11-01T00:00:00+09:00",
@@ -27,7 +27,7 @@
       "fx_conversion": "per_document",
       "mode": "ROUND_HALF_EVEN"
      },
-     "schema_version": "1.0",
+     "schema_version": "1.1",
      "timezone": "Asia/Tokyo"
     },
     "policy_summary": {
@@ -47,10 +47,11 @@
      },
      "recognition": "invoice_issue_date",
      "rounding": "ROUND_HALF_EVEN",
-     "unapplied_cash": "account 2400 holds only cash that cannot be applied: a whole receipt with invoice_refs = null, or the part of a receipt exceeding the open balance of the invoices it references (overpayment), converted at the payment's policy rate"
+     "unapplied_cash": "account 2400 holds only cash that cannot be applied: a whole receipt with invoice_refs = null, or the part of a receipt exceeding the open balance of the invoices it references (overpayment), converted at the payment's policy rate",
+     "vat": "a line item with description 'VAT 12%' must equal round_half_even(12% x the sum of the other line items of the same invoice), in the invoice currency's minor units"
     },
     "steps_remaining": 100,
-    "task": "You are auditing one fictional company for one reporting period. Find financial errors in the books and submit findings with evidence. Error types: duplicate_invoice (affected_ids=[invoice_id of the later copy]), payment_allocation (affected_ids=[payment_id]), fx_rate (affected_ids=[invoice_id or payment_id of the mis-converted document]), period_cutoff (affected_ids=[invoice_id]). claimed_amount_minor = absolute distortion in base currency minor units (tolerance: 1 minor unit); currency = base currency. For payment_allocation the amount is the part of the receipt left on Unapplied Cash (2400) instead of Accounts Receivable (1200), converted at the payment's policy rate (for a foreign-currency receipt this does not depend on the rate posted to Cash). evidence_ids may contain doc_id, ledger row_id, fx id (fx:DATE:SRC:TGT) and 'policy'. Clean books exist: submitting nothing can be correct. Tools: list_records(table, cursor, limit<=50), get_record(table, id), get_document(doc_id), calculator(expression), submit(findings={episode_id, findings:[{type, affected_ids, claimed_amount_minor, currency, evidence_ids, explanation}]}) - the flat form submit(episode_id, findings:[...]) is accepted too; a malformed submission ends the episode with reward -1. Budget: 100 steps including submit; every action, even an error, uses a step. Reward = clip(2*F1 - 1 - 0.002*inspection_steps, -1, 1)."
+    "task": "You are auditing one fictional company for one reporting period. Find financial errors in the books and submit findings with evidence. Error types: duplicate_invoice (affected_ids=[invoice_id of the later copy]), payment_allocation (affected_ids=[payment_id]), fx_rate (affected_ids=[invoice_id or payment_id of the mis-converted document]), period_cutoff (affected_ids=[invoice_id]), vat_error (affected_ids=[invoice_id]; a 'VAT 12%' line must equal 12% of the other lines, half-even). claimed_amount_minor = absolute distortion in base currency minor units (tolerance: 1 minor unit); currency = base currency. For payment_allocation the amount is the part of the receipt left on Unapplied Cash (2400) instead of Accounts Receivable (1200), converted at the payment's policy rate (for a foreign-currency receipt this does not depend on the rate posted to Cash). evidence_ids may contain doc_id, ledger row_id, fx id (fx:DATE:SRC:TGT) and 'policy'. Clean books exist: submitting nothing can be correct. Tools: list_records(table, cursor, limit<=50), get_record(table, id), get_document(doc_id), calculator(expression), submit(findings={episode_id, findings:[{type, affected_ids, claimed_amount_minor, currency, evidence_ids, explanation}]}) - the flat form submit(episode_id, findings:[...]) is accepted too; a malformed submission ends the episode with reward -1. Budget: 100 steps including submit; every action, even an error, uses a step. Reward = clip(2*F1 - 1 - 0.002*inspection_steps, -1, 1)."
    },
    "role": "env",
    "step": 0
@@ -58,7 +59,7 @@
   {
    "args": {
     "findings": {
-     "episode_id": "ep-9m7sfznpsr",
+     "episode_id": "ep-nge3f44dyd",
      "findings": []
     }
    },
@@ -79,6 +80,6 @@
  "note": "recorded transcript on an OPEN episode; observations contain no answer key (leakscan); only the explanation texts were rewritten (they never affect the reward)",
  "policy": "oracle_observing",
  "reward": 1.0,
- "source": "episodes/dev/ep-9m7sfznpsr",
+ "source": "episodes/dev/ep-nge3f44dyd",
  "steps": 1
 }

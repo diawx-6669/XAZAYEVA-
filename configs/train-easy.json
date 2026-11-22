@@ -1,6 +1,6 @@
 {
   "name": "train-easy",
-  "version": "2.1",
+  "version": "2.3",
   "foreign_currencies": ["USD"],
   "n_foreign": [1, 1],
   "foreign_share": 0.25,
@@ -9,7 +9,7 @@
   "distractors": {"recurring_rent": 0.3, "repeat_amount": 0.2, "split_payment": 0.3, "multi_invoice_payment": 0.3, "partial_open": 0.3, "refund": 0.2, "bank_fee": 0.3, "rounding_residual": 0.0, "boundary_time": 0.2, "credit_note_reissue": 0.0, "unidentified_receipt": 0.0},
   "clean_probability": 0.2,
   "n_errors": [1, 3],
-  "errors": {"duplicate_invoice": 1.0, "payment_allocation": 1.0, "fx_rate": 1.0, "period_cutoff": 1.0},
+  "errors": {"duplicate_invoice": 1.0, "payment_allocation": 1.0, "fx_rate": 1.0, "period_cutoff": 1.0, "vat_error": 1.0},
   "interactions": {"partial_fx_cutoff": 0.0, "duplicate_fx": 0.0},
   "fx_variants": {"adjacent_day": 1.0, "utc_date": 0.0, "inverted": 0.0, "historical_rate": 0.0, "wrong_pair": 0.0, "due_date": 0.0},
   "allocation_variants": {"unallocated": 0.5, "partial": 0.5, "wrong_invoice": 0.0},

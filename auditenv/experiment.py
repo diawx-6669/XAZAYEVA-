@@ -39,11 +39,17 @@ PROTOCOLS = {
 }
 
 
+# The pre-registered arm space varies the 4 ORIGINAL detection rules; `vat` (added in v1.1 with the
+# vat_error type) is always on, so the space stays 256 arms and the baseline arm is still BASE_RULES.
+VARIED = ("alloc", "cutoff", "dup", "fx")
+FIXED = tuple(sorted(BASE_RULES - set(VARIED)))
+
+
 def arms() -> list:
-    base = sorted(BASE_RULES)
     out = []
-    for k in range(len(base) + 1):
-        for det in itertools.combinations(base, k):
+    for k in range(len(VARIED) + 1):
+        for det in itertools.combinations(VARIED, k):
+            det = det + FIXED
             for m in range(len(OPTIONAL_RULES) + 1):
                 for opt in itertools.combinations(OPTIONAL_RULES, m):
                     out.append(tuple(sorted(det + opt)))

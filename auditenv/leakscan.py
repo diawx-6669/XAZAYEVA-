@@ -16,7 +16,7 @@ from .env.errors import CODES
 
 FORBIDDEN = ["truth", "provenance", "grader/", "issue_id", "evidence_sets", "expected_amount", "seed",
              "Traceback", "/home/", "/app/", "episodes/"]
-TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
+TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
 ISSUE_RE = re.compile(r"ISS-[0-9]{3}")
 FIRST_KEYS = {"task", "manifest", "policy_summary", "steps_remaining"}
 

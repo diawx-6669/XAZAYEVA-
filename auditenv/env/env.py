@@ -35,7 +35,8 @@ def task_text(tolerance_minor: int = 1) -> str:
         "You are auditing one fictional company for one reporting period. Find financial errors in the "
         "books and submit findings with evidence. Error types: duplicate_invoice (affected_ids=[invoice_id of "
         "the later copy]), payment_allocation (affected_ids=[payment_id]), fx_rate (affected_ids=[invoice_id or "
-        "payment_id of the mis-converted document]), period_cutoff (affected_ids=[invoice_id]). "
+        "payment_id of the mis-converted document]), period_cutoff (affected_ids=[invoice_id]), vat_error "
+        "(affected_ids=[invoice_id]; a 'VAT 12%' line must equal 12% of the other lines, half-even). "
         f"claimed_amount_minor = absolute distortion in base currency minor units (tolerance: {tolerance_minor} "
         f"{unit}); currency = base currency. For payment_allocation the amount is the part of the receipt "
         "left on Unapplied Cash (2400) instead of Accounts Receivable (1200), converted at the payment's policy "
@@ -70,7 +71,7 @@ def submission_from_args(args):
 
 def policy_summary(policy: dict) -> dict:
     keys = ("fx_rate_date", "fx_rate_date_basis", "fx_missing_rate", "fx_rate_meaning", "period_boundary",
-            "rounding", "recognition", "payment_allocation", "unapplied_cash", "credit_notes")
+            "rounding", "recognition", "payment_allocation", "unapplied_cash", "credit_notes", "vat")
     return {k: policy[k] for k in keys}
 
 

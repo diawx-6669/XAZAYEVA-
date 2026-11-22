@@ -48,7 +48,8 @@
       "type": "object", "additionalProperties": false,
       "properties": {
         "duplicate_invoice": {"type": "number", "minimum": 0}, "payment_allocation": {"type": "number", "minimum": 0},
-        "fx_rate": {"type": "number", "minimum": 0}, "period_cutoff": {"type": "number", "minimum": 0}
+        "fx_rate": {"type": "number", "minimum": 0}, "period_cutoff": {"type": "number", "minimum": 0},
+        "vat_error": {"type": "number", "minimum": 0}
       }
     },
     "interactions": {
@@ -73,6 +74,7 @@
       "type": "object", "additionalProperties": false,
       "properties": {"utc_trap": {"type": "number", "minimum": 0}, "backdated_posting": {"type": "number", "minimum": 0}, "prior_period": {"type": "number", "minimum": 0}}
     },
+    "vat_share": {"$ref": "#/$defs/prob", "description": "share of base-currency invoices with a 'VAT 12%' line"},
     "min_lookalikes_per_type": {"type": "integer", "minimum": 0, "maximum": 3,
                                 "description": "every episode gets at least this many CORRECT look-alikes (distractor kinds) per error type"
     },

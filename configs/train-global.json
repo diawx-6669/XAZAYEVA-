@@ -1,6 +1,6 @@
 {
   "name": "train-global",
-  "version": "2.1",
+  "version": "2.3",
   "base_currencies": ["USD", "JPY", "KWD"],
   "foreign_currencies": ["KZT", "USD", "EUR", "JPY", "KWD"],
   "n_foreign": [1, 2],

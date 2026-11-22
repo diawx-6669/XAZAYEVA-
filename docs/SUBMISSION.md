@@ -8,9 +8,9 @@
 | README: инструкции контейнера и единая команда проверки | `README.md` (блок критериев в начале), `make docker-check`, `make check`, `scripts/check.sh` | CI `.github/workflows/check.yml` (тот же `docker run --network none --cpus 2 --memory 4g`); локальный прогон образа: табло <!--fact:selfcheck_total-->90/90<!--/fact-->, `check: ALL GREEN` |
 | Matcher и награда: общий код сопоставления и награды, схемы и политики | `auditenv/grader/` (normalize, matcher, reward), `schemas/` (15 схем), `auditenv/policies/` | `tests/test_reward.py`, `tests/test_batch_c.py::test_jury_oracles_score_max`, блок «Надёжность награды» табло |
 | Эпизоды: 10 train + 10 dev | `episodes/train/`, `episodes/dev/` (+ `index.json` с дайджестами public и grader) | `tests/test_repro.py::test_exported_episodes_match_generator`, `check-schemas`, `verify-independent`, `verify-provenance` |
-| Тесты среды, сопоставления и награды | `tests/` (<!--fact:n_tests-->691<!--/fact--> тестов) | `make check` |
+| Тесты среды, сопоставления и награды | `tests/` (<!--fact:n_tests-->699<!--/fact--> тестов) | `make check` |
 | Четыре адаптера базовых политик | `random_explorer.py`, `simple_reconcile.py`, `flag_all.py`, `oracle.py` в `auditenv/policies/`; свой агент — `--policy-cmd` (`docs/ADAPTER.md`) | `tests/test_runner.py`, диагностика в `reports/selfcheck.md` |
-| Траектории: `trajectories.jsonl` с episode_id, step, action, observation, reward, terminated, truncated, без эталона в наблюдениях | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1198<!--/fact--> строк, `run_id` + метаданные) | `leakscan`, `replay`, `check-schemas` (схема `trajectory`), `tests/test_leaks.py::test_committed_trajectories_are_clean` |
+| Траектории: `trajectories.jsonl` с episode_id, step, action, observation, reward, terminated, truncated, без эталона в наблюдениях | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1200<!--/fact--> строк, `run_id` + метаданные) | `leakscan`, `replay`, `check-schemas` (схема `trajectory`), `tests/test_leaks.py::test_committed_trajectories_are_clean` |
 | Записка о дизайне | `docs/DESIGN.md` (+ `docs/CONTRACT.md`, `docs/ADAPTER.md`) | ревью; `make docs-check` сверяет числа |
 | Демо (достаточно скриптовой политики) | `make demo` (`scripts/demo.sh`), `make finale-preflight` | ручной прогон 22.11 (см. план) |
 
@@ -44,11 +44,11 @@ git push origin --delete claude/inspiring-tesla-8qyaxh claude/funny-lovelace-7al
 Тег (после последнего коммита и зелёного CI на нём):
 
 ```bash
-make verify-release && git tag -a v1.1-submission -m "Genesis Hackathon submission" && git push origin v1.1-submission
+make verify-release && git tag -a v1.2-submission -m "Genesis Hackathon submission" && git push origin v1.2-submission
 ```
 
-В форму — ссылку на тег, а не на репозиторий: `https://github.com/diawx-6669/XAZAYEVA-/tree/v1.1-submission` и полный SHA
-(`git rev-parse v1.1-submission^{commit}`).
+В форму — ссылку на тег, а не на репозиторий: `https://github.com/diawx-6669/XAZAYEVA-/tree/v1.2-submission` и полный SHA
+(`git rev-parse v1.2-submission^{commit}`).
 
 Проверка из инкогнито после открытия (20:00 Астаны = 15:00 UTC), с телефона на мобильном интернете:
 README отрисовался; бейдж CI зелёный; ссылка на тег открывается; `git clone` без входа; видео
@@ -67,8 +67,8 @@ README отрисовался; бейдж CI зелёный; ссылка на �
 | 14:00 | репетиция демо: `make finale-preflight`, `make demo` | Ералы, Бека | ≤ 1 минуты, без сети |
 | **16:00** | **заморозка**: в `main` больше ничего не сливаем (кроме опечаток в docs) | все | — |
 | 16:00–17:00 | финальный `make docker-check` на свежем клоне; сохранить вывод | Бека | `ALL GREEN` |
-| 17:00 | тег и SHA: `make submission-tag`, затем `git tag -a v1.1-submission -m "Genesis Hackathon submission"` и `git push origin v1.1-submission` | Ералы | тег виден на GitHub |
-| 18:00 | отправить форму: ссылка на репозиторий, тег `v1.1-submission`, SHA; скриншот подтверждения | Алдик | скриншот сохранён в Drive |
+| 17:00 | тег и SHA: `make submission-tag`, затем `git tag -a v1.2-submission -m "Genesis Hackathon submission"` и `git push origin v1.2-submission` | Ералы | тег виден на GitHub |
+| 18:00 | отправить форму: ссылка на репозиторий, тег `v1.2-submission`, SHA; скриншот подтверждения | Алдик | скриншот сохранён в Drive |
 | 19:00 | офлайн‑набор для финала: `make offline-kit` (zip репозитория по тегу, образ `docker save`, SHA256SUMS в `dist/`), видео‑демо, PDF слайдов — на флешку | Алдик | на другом ноутбуке без сети: команды, которые печатает `make offline-kit` (`sha256sum -c`, `docker load`, `make finale-preflight`) |
 | до 23:59 | запас времени; ничего не менять | — | — |
 

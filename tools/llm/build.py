@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 OUT = Path(__file__).resolve().parent
-FEWSHOT = {"fewshot_erroneous.json": "ep-83ty6jrf5c", "fewshot_clean.json": "ep-9m7sfznpsr"}
+FEWSHOT = {"fewshot_erroneous.json": "ep-xt9h93jnn2", "fewshot_clean.json": "ep-nge3f44dyd"}
 
 EXPLAIN = {
     "fx_rate": "Posted with the rate of another date than the policy's local transaction date; "

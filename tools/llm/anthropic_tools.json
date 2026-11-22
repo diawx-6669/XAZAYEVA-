@@ -144,7 +144,8 @@
            "duplicate_invoice",
            "payment_allocation",
            "fx_rate",
-           "period_cutoff"
+           "period_cutoff",
+           "vat_error"
           ]
          }
         },

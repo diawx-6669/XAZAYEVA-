@@ -4,7 +4,7 @@ limits allow (30 findings), rotating through the error types, claiming the docum
 from ..env.data import TABLES  # noqa: F401
 from .base import Policy, TableReader, finding, submit
 
-TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
+TYPES = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
 
 
 class FlagAll(Policy):

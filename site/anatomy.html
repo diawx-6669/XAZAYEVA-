@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Анатомия ошибки</title>
-<meta name="description" content="Одна настоящая ошибка AuditEnv от события до вердикта оценщика (ep-8jyef897pe).">
+<meta name="description" content="Одна настоящая ошибка AuditEnv от события до вердикта оценщика (ep-6sbtnqcp2q).">
 <style>
 :root { --paper: #f6f9fc; --sheet: #ffffff; --ink: #0d253d; --soft: #64748d; --navy: #1c1e54; --violet: #533afd;
   --pen: #ea2261; --rule: #dfe5ee; --code: #eef1fb; }
@@ -39,60 +39,60 @@ a { color: var(--violet); }
 <body>
 <main>
   <div class="mast"><img src="brand/logo.svg" alt=""><h1>Анатомия ошибки</h1></div>
-  <p class="lede">Одна настоящая ошибка из открытого эпизода <code>ep-8jyef897pe</code>: от события до вердикта
+  <p class="lede">Одна настоящая ошибка из открытого эпизода <code>ep-6sbtnqcp2q</code>: от события до вердикта
   оценщика. Все ID, время и суммы взяты из файлов эпизода, вердикты посчитаны настоящим оценщиком.</p>
   <ol>
     <li>
       <h2>Что произошло на самом деле</h2>
-      <p>Компания выписала счёт <b>1 ноября, 01:01:04</b> по времени Asia/Almaty. Период закончился в полночь: <code>2026-11-01T00:00:00+05:00</code>, конец не включается. Значит, это выручка <b>следующего</b> периода.</p>
+      <p>Компания выписала счёт <b>1 ноября, 00:54:01</b> по времени Asia/Almaty. Период закончился в полночь: <code>2026-11-01T00:00:00+05:00</code>, конец не включается. Значит, это выручка <b>следующего</b> периода.</p>
     </li>
     <li>
       <h2>Как ошибку внесли</h2>
-      <p>Генератор провёл этот счёт внутри периода и записал время в UTC. Причина записана в закрытом <code>provenance.json</code>, эталон — в <code>truth.json</code> (ISS-002).</p>
+      <p>Генератор провёл этот счёт внутри периода и записал время в UTC. Причина записана в закрытом <code>provenance.json</code>, эталон — в <code>truth.json</code> (ISS-001).</p>
     </li>
     <li>
       <h2>Что видит агент</h2>
-      <p>Документ <code>FD-EE3287ER</code> и 5 строк книги. Строка дебиторки:</p>
-      <pre>row_id        LR-RP2Q6WX
-timestamp     2026-10-31T20:01:04+00:00
+      <p>Документ <code>FD-JKH43TF3</code> и 7 строк книги. Строка дебиторки:</p>
+      <pre>row_id        LR-DEBXQDW
+timestamp     2026-10-31T19:54:01+00:00
 account       1200
-debit_minor   316234228
+debit_minor   637887689
 credit_minor  0
 currency      KZT
-entity_id     CUST-WY3RPB
-invoice_id    INV-734N63R
+entity_id     CUST-P2KN4Z
+invoice_id    INV-WQ6MYJG
 payment_id    (пусто)</pre>
     </li>
     <li>
       <h2>Ловушка</h2>
-      <p>Прочитать дату как написано: <b>31 октября, 20:01:04 UTC</b> — внутри периода, всё чисто. Пересчитать в Asia/Almaty (+05:00): <b>1 ноября, 01:01:04</b> — уже после границы.</p>
-      <pre>2026-10-31T20:01:04+00:00
-= 2026-11-01T01:01:04+05:00</pre>
+      <p>Прочитать дату как написано: <b>31 октября, 19:54:01 UTC</b> — внутри периода, всё чисто. Пересчитать в Asia/Almaty (+05:00): <b>1 ноября, 00:54:01</b> — уже после границы.</p>
+      <pre>2026-10-31T19:54:01+00:00
+= 2026-11-01T00:54:01+05:00</pre>
     </li>
     <li>
       <h2>Вывод аудитора</h2>
-      <p>Тип, затронутый счёт, сумма искажения 3 162 342,28 ₸ и доказательства: документ, строка книги и политика, которая задаёт границу периода.</p>
+      <p>Тип, затронутый счёт, сумма искажения 6 378 876,89 ₸ и доказательства: документ, строка книги и политика, которая задаёт границу периода.</p>
       <pre>{
  &quot;type&quot;: &quot;period_cutoff&quot;,
  &quot;affected_ids&quot;: [
-  &quot;INV-734N63R&quot;
+  &quot;INV-WQ6MYJG&quot;
  ],
- &quot;claimed_amount_minor&quot;: 316234228,
+ &quot;claimed_amount_minor&quot;: 637887689,
  &quot;currency&quot;: &quot;KZT&quot;,
  &quot;evidence_ids&quot;: [
-  &quot;FD-EE3287ER&quot;,
-  &quot;LR-RP2Q6WX&quot;,
+  &quot;FD-JKH43TF3&quot;,
+  &quot;LR-DEBXQDW&quot;,
   &quot;policy&quot;
  ],
- &quot;explanation&quot;: &quot;issued 2026-11-01 01:01 Asia/Almaty, after the period end&quot;
+ &quot;explanation&quot;: &quot;issued 2026-11-01 00:54 Asia/Almaty, after the period end&quot;
 }</pre>
     </li>
     <li>
       <h2>Вердикт оценщика</h2>
-      <p><span class=ok>TP → ISS-002</span> (это 1 из 3 ошибок эпизода). Тот же вывод без <code>policy</code>: <span class=bad>FP, evidence_incomplete</span>. Знать ответ — не значит доказать его.</p>
+      <p><span class=ok>TP → ISS-001</span> (это 1 из 3 ошибок эпизода). Тот же вывод без <code>policy</code>: <span class=bad>FP, evidence_incomplete</span>. Знать ответ — не значит доказать его.</p>
     </li>
   </ol>
-  <footer>Собрано <code>tools/brand.py</code> из <code>episodes/train/ep-8jyef897pe</code>.
+  <footer>Собрано <code>tools/brand.py</code> из <code>episodes/train/ep-6sbtnqcp2q</code>.
   Как устроены остальные типы ошибок — <a href="explain/index.html">примеры «до/после»</a>, как их взламывали —
   <a href="attacks.html">зал атак</a>.</footer>
 </main>

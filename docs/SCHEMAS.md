@@ -48,13 +48,14 @@ Episode generation config
 | `distractors` | object {recurring_rent, repeat_amount, split_payment, multi_invoice_payment, partial_open, refund, bank_fee, rounding_residual, boundary_time, credit_note_reissue, unidentified_receipt, night_fx, overpayment, weekend_fx} | да |
 | `clean_probability` | number (≥ 0, ≤ 1) | да |
 | `n_errors` | array of (integer (≥ 0, ≤ 12)) (элементов ≥ 2, элементов ≤ 2) | да |
-| `errors` | object {duplicate_invoice, payment_allocation, fx_rate, period_cutoff} | да |
+| `errors` | object {duplicate_invoice, payment_allocation, fx_rate, period_cutoff, vat_error} | да |
 | `interactions` | object {partial_fx_cutoff, duplicate_fx} | да |
 | `min_interactions` | integer (≥ 0, ≤ 2) | да |
 | `fx_variants` | object {adjacent_day, utc_date, inverted, historical_rate, wrong_pair, due_date} | да |
 | `allocation_variants` | object {unallocated, partial, wrong_invoice} | да |
 | `duplicate_variants` | object {copy, paid_twice} | да |
 | `cutoff_variants` | object {utc_trap, backdated_posting, prior_period} | да |
+| `vat_share` | number (≥ 0, ≤ 1) | нет |
 | `min_lookalikes_per_type` | integer (≥ 0, ≤ 3) | да |
 | `max_steps` | = `100` | да |
 | `tolerance_minor` | integer (≥ 0, ≤ 49) | да |
@@ -144,7 +145,7 @@ One row of ledger.csv after parsing (empty cell = null). Amounts are base-curren
 
 | Поле | Тип и ограничения | Обязательное |
 |---|---|---|
-| `schema_version` | = `1.0` | да |
+| `schema_version` | = `1.1` | да |
 | `episode_id` | string (шаблон `^ep-[a-z0-9]{10}$`) | да |
 | `base_currency` | string (шаблон `^[A-Z]{3}$`) | да |
 | `currencies` | object | да |
@@ -200,6 +201,7 @@ One row of ledger.csv after parsing (empty cell = null). Amounts are base-curren
 | `unapplied_cash` | string | да |
 | `credit_notes` | string | да |
 | `revenue_posting` | string | да |
+| `vat` | string | да |
 | `accounts` | object | да |
 
 ## `trajectory.schema.json`

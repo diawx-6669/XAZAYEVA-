@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from ..canon import dumps
 
-INVARIANTS = ["double_entry", "completeness", "allocation", "fx_conversion", "period", "unique_billing"]
+INVARIANTS = ["double_entry", "completeness", "allocation", "fx_conversion", "period", "unique_billing", "vat"]
 
 
 def _v(name, rid, amount, **detail):
@@ -256,6 +256,20 @@ def check_unique(pd) -> list:
                original=orig["invoice_id"]) for dup, orig in duplicate_invoices(pd)]
 
 
+def check_vat(pd) -> list:
+    """Every 'VAT 12%' line equals round_half_even(12 % x the other lines)."""
+    from .errors.vat_error import split_vat, vat_of
+
+    out = []
+    for inv in sorted(pd.invoices, key=lambda i: i["invoice_id"]):
+        if inv["total_minor"] <= 0:
+            continue
+        vat, net = split_vat(inv["line_items"])
+        if vat is not None and vat["amount_minor"] != vat_of(net):
+            out.append(_v("vat", inv["invoice_id"], abs(vat["amount_minor"] - vat_of(net))))
+    return out
+
+
 def check_all(pd) -> dict:
     uniq = check_unique(pd)
     return {
@@ -265,6 +279,7 @@ def check_all(pd) -> dict:
         "fx_conversion": check_fx(pd, skip_invoice_ids=[v["id"] for v in uniq]),
         "period": check_period(pd),
         "unique_billing": uniq,
+        "vat": check_vat(pd),
     }
 
 

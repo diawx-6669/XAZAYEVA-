@@ -35,9 +35,9 @@ def test_lone_wrong_type_is_fp_with_reason_wrong_type():  # kills M05
 
 
 def test_wrong_type_on_real_episode_never_matches(erroneous):  # kills M05 on generated data too
-    types = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
+    types = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
     good = oracle_findings(erroneous.truth)
-    swapped = [dict(f, type=types[(types.index(f["type"]) + 1) % 4]) for f in good]
+    swapped = [dict(f, type=types[(types.index(f["type"]) + 1) % len(types)]) for f in good]
     g = EpisodeGrader(erroneous.truth).grade({"episode_id": erroneous.episode_id, "findings": swapped}, 0)
     assert g["tp"] == 0 and g["fp"] == len(good)
 

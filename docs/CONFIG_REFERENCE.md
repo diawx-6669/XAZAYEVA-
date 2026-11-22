@@ -46,11 +46,12 @@ python -m auditenv validate-config configs/dev-mixed.json
 | `distractors.weekend_fx` | number | 0…1 | `0.5` | |
 | `clean_probability` | number | 0…1 | `0.2` | вероятность чистого эпизода (эталон пуст) |
 | `n_errors` | array of integer | [мин, макс] 0…12 | `[1, 4]` | число ошибок в нечистом эпизоде [мин, макс] |
-| `errors` | object | ключи: `duplicate_invoice`, `payment_allocation`, `fx_rate`, `period_cutoff` | `{"duplicate_invoice": 1.0, "payment_allocation": 1.0, "fx…` | веса четырёх типов ошибок (0 — тип выключен) |
+| `errors` | object | ключи: `duplicate_invoice`, `payment_allocation`, `fx_rate`, `period_cutoff`, `vat_error` | `{"duplicate_invoice": 1.0, "payment_allocation": 1.0, "fx…` | веса пяти типов ошибок (0 — тип выключен) |
 | `errors.duplicate_invoice` | number | ≥ 0 | `1.0` | |
 | `errors.payment_allocation` | number | ≥ 0 | `1.0` | |
 | `errors.fx_rate` | number | ≥ 0 | `1.0` | |
 | `errors.period_cutoff` | number | ≥ 0 | `1.0` | |
+| `errors.vat_error` | number | ≥ 0 | `1.0` | |
 | `interactions` | object | ключи: `partial_fx_cutoff`, `duplicate_fx` | `{"partial_fx_cutoff": 0.0, "duplicate_fx": 0.0}` | вероятность сценариев взаимодействующих ошибок |
 | `interactions.partial_fx_cutoff` | number | 0…1 | `0.0` | |
 | `interactions.duplicate_fx` | number | 0…1 | `0.0` | |
@@ -73,6 +74,7 @@ python -m auditenv validate-config configs/dev-mixed.json
 | `cutoff_variants.utc_trap` | number | ≥ 0 | `0.6` | |
 | `cutoff_variants.backdated_posting` | number | ≥ 0 | `0.2` | |
 | `cutoff_variants.prior_period` | number | ≥ 0 | `0.2` | |
+| `vat_share` | number | 0…1 | `0.35` | share of base-currency invoices with a 'VAT 12%' line |
 | `min_lookalikes_per_type` | integer | 0…3 | `1` | минимум корректных «двойников» каждого типа ошибки в эпизоде |
 | `max_steps` | const | `100` | `100` | лимит шагов агента (кейс: ровно 100) |
 | `tolerance_minor` | integer | 0…49 | `1` | допуск по сумме в минимальных единицах |
@@ -95,10 +97,10 @@ python -m auditenv validate-config configs/dev-mixed.json
 
 | Файл | Версия | Отличия от значений по умолчанию |
 |---|---|---|
-| `configs/clean-only.json` | 2.1 | `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `n_invoices`, `distractors`, `clean_probability`, `n_errors` |
-| `configs/dev-global.json` | 2.1 | `base_currencies`, `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `period_starts`, `period_months`, `n_invoices`, `clean_probability`, `n_errors`, `interactions` |
-| `configs/dev-mixed.json` | 2.1 | `base_currencies`, `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `n_invoices`, `distractors`, `clean_probability`, `n_errors`, `interactions` |
-| `configs/interaction-heavy.json` | 2.1 | `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `n_invoices`, `distractors`, `clean_probability`, `n_errors`, `interactions`, `min_interactions` |
-| `configs/stress.json` | 2.1 | `foreign_currencies`, `n_foreign`, `period_months`, `period_starts`, `n_entities`, `n_invoices`, `clean_probability`, `n_errors`, `interactions` |
-| `configs/train-easy.json` | 2.1 | `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `n_invoices`, `distractors`, `clean_probability`, `n_errors`, `errors`, `interactions`, `fx_variants`, `allocation_variants`, `cutoff_variants`, `duplicate_variants` |
-| `configs/train-global.json` | 2.1 | `base_currencies`, `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `period_starts`, `period_months`, `n_invoices`, `clean_probability`, `n_errors`, `interactions` |
+| `configs/clean-only.json` | 2.3 | `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `n_invoices`, `distractors`, `clean_probability`, `n_errors` |
+| `configs/dev-global.json` | 2.3 | `base_currencies`, `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `period_starts`, `period_months`, `n_invoices`, `clean_probability`, `n_errors`, `interactions` |
+| `configs/dev-mixed.json` | 2.3 | `base_currencies`, `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `n_invoices`, `distractors`, `clean_probability`, `n_errors`, `interactions` |
+| `configs/interaction-heavy.json` | 2.3 | `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `n_invoices`, `distractors`, `clean_probability`, `n_errors`, `interactions`, `min_interactions` |
+| `configs/stress.json` | 2.3 | `foreign_currencies`, `n_foreign`, `period_months`, `period_starts`, `n_entities`, `n_invoices`, `clean_probability`, `n_errors`, `interactions` |
+| `configs/train-easy.json` | 2.3 | `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `n_invoices`, `distractors`, `clean_probability`, `n_errors`, `errors`, `interactions`, `fx_variants`, `allocation_variants`, `cutoff_variants`, `duplicate_variants` |
+| `configs/train-global.json` | 2.3 | `base_currencies`, `foreign_currencies`, `n_foreign`, `foreign_share`, `timezones`, `period_starts`, `period_months`, `n_invoices`, `clean_probability`, `n_errors`, `interactions` |

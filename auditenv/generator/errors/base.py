@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 MIN_AMOUNT = 100  # every injected distortion is >= 100x the default tolerance (1 minor unit)
 
 REGISTRY: dict = {}
-ORDER = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff"]
+ORDER = ["duplicate_invoice", "payment_allocation", "fx_rate", "period_cutoff", "vat_error"]
 
 
 def register(cls):

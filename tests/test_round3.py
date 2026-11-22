@@ -121,16 +121,14 @@ def test_doc_commands_tests_and_paths_exist(doc):
 
 
 # ------------------------------------------------------------------ 6) the vat_error rehearsal patch stays applicable
-def test_vat_rehearsal_patch_applies_cleanly():
+def test_vat_rehearsal_patch_is_merged():
+    """v1.1: the rehearsal patch (a 5th error type added by one module + registry) is merged into main and
+    switched on in the configs; the patch file stays as the record of how long that took."""
     patch = ROOT / "docs" / "rehearsal" / "vat_error.patch"
-    import shutil
-
-    if not (ROOT / ".git").exists() or not shutil.which("git"):
-        pytest.skip("no git checkout (e.g. inside the image): git apply --check needs the work tree")
-    out = subprocess.run(["git", "apply", "--check", str(patch)], cwd=ROOT, capture_output=True, text=True, timeout=60)
-    if out.returncode != 0:  # on branch final-rehearsal the patch is already in: then it must reverse cleanly
-        rev = subprocess.run(["git", "apply", "--check", "--reverse", str(patch)], cwd=ROOT, capture_output=True,
-                             text=True, timeout=60)
-        assert rev.returncode == 0, out.stderr
     text = patch.read_text("utf-8")
     assert "auditenv/generator/errors/vat_error.py" in text and text.count("diff --git") >= 20
+    assert (ROOT / "auditenv" / "generator" / "errors" / "vat_error.py").exists()
+    from auditenv.config import DEFAULT_CONFIG
+    from auditenv.generator.errors import REGISTRY
+
+    assert "vat_error" in REGISTRY and DEFAULT_CONFIG["errors"]["vat_error"] > 0 and DEFAULT_CONFIG["vat_share"] > 0

@@ -270,6 +270,15 @@ class StoryBuilder:
         for _ in range(n_inv):
             self.regular_invoice(self.first_day, self.last_day - timedelta(days=2))
 
+        if cfg.get("vat_share", 0) > 0:  # rehearsal: VAT lines on base-currency invoices
+            from .errors.vat_error import VAT_DESC, vat_of
+
+            for inv in list(self.invoices.values()):
+                if inv.currency == self.base and not inv.tags and self.chance(cfg["vat_share"]):
+                    v = vat_of(inv.total)
+                    inv.line_items.append({"description": VAT_DESC, "service_period": inv.line_items[0]["service_period"],
+                                           "quantity": 1, "unit_price_minor": v, "amount_minor": v})
+
         if "recurring_rent" in present:
             ent = r.choice(self.entities)
             unit = self.price(self.base)

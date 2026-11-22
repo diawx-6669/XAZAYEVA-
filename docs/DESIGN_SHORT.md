@@ -34,6 +34,7 @@ RL‑среда и оценщик для ИИ‑аудитора. По `(seed, c
 | `payment_allocation` | `payment_id` | нераспределённая часть | `allocation` |
 | `fx_rate` | ID документа | \|проведено − правильно\| | `fx_conversion` |
 | `period_cutoff` | `invoice_id` | сумма счёта в базе | `period` |
+| `vat_error` (v1.1) | `invoice_id` | \|строка «VAT 12%» − 12 % от остальных строк\| | `vat` |
 
 Плюс сценарии `partial_fx_cutoff` и `duplicate_fx` (две ошибки с независимыми суммами). Каждый
 issue несёт 1–3 минимальных набора доказательств ≤ 6 ID; по любому набору сумма пересчитывается
@@ -67,7 +68,7 @@ HMAC‑курсоры), `get_record`, `get_document`, `calculator` (AST + `Decim
 
 ## Как проверено
 
-`make check`: <!--fact:n_tests-->691<!--/fact--> тестов, табло <!--fact:selfcheck_total-->90/90<!--/fact-->
+`make check`: <!--fact:n_tests-->699<!--/fact--> тестов, табло <!--fact:selfcheck_total-->90/90<!--/fact-->
 (контракт, данные, награда, воспроизводимость), leakscan, побайтовый replay, независимый
 проверяльщик, откат мутаций по provenance, docs‑check. Вне `make check`: 23/23 мутаций оценщика
 пойманы (`make mutation`), автопоиск эксплойтов, симуляция жюри чёрным ящиком (`reports/jury_sim.md`).

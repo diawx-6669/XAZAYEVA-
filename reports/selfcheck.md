@@ -1,8 +1,8 @@
 # AuditEnv self-check
 
-commit `08c7d6bd6b91` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
+commit `148b15f78bf3` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
 
-Хеши конфигов: `clean-only` 888d9b2efe8dabab, `dev-global` 3e5719530ff397f6, `dev-mixed` 58d390229a2b5ad5, `interaction-heavy` 11d80441ae5df73a, `stress` 60b0fe2dbb0fcdfe, `train-easy` 8946748a75222c01, `train-global` 54ed4c6d541dc3f9
+Хеши конфигов: `clean-only` 75364dea035f003d, `dev-global` 6758725924324bb2, `dev-mixed` 5e1f417bd366cf52, `interaction-heavy` 0b4a5ffba66d6c72, `stress` 0e3fc9f073c43cfd, `train-easy` d9c840b728596a92, `train-global` 3a25e26fa41cce5b
 
 Эпизоды: 20 (5 clean-only, 5 interaction-heavy, 5 dev-mixed, 5 dev-global). Всё до раздела «Замеры времени» детерминировано: повторный прогон на том же коммите даёт те же байты.
 
@@ -115,13 +115,13 @@ P, R — макро (среднее по эпизодам, где величин
 | Политика | P | R | F1 | микро P | микро R | микро F1 | Возврат | на чистых | на ошибочных | Возврат (эксп.) | Шаги | Агент видел награду |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | random_explorer | n/a | 0.000 | 0.350 | n/a | 0.000 | 0.000 | -0.320 | 0.942 | -1.000 | -0.320 | 30.0 | нет |
-| simple_reconcile | 0.473 | 0.901 | 0.511 | 0.589 | 0.892 | 0.710 | 0.003 | -1.000 | 0.543 | 0.003 | 14.6 | нет |
-| careful_reconcile | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 0.973 | 0.975 | 0.972 | 0.973 | 14.6 | нет |
+| simple_reconcile | 0.487 | 0.959 | 0.537 | 0.614 | 0.946 | 0.745 | 0.056 | -1.000 | 0.624 | 0.056 | 14.5 | нет |
+| careful_reconcile | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 0.973 | 0.974 | 0.972 | 0.973 | 14.5 | нет |
 | flag_all | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | -1.000 | -1.000 | 3.0 | нет |
 | oracle | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | -0.300 | 1.0 | нет |
-| oracle_observing | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 0.989 | 1.000 | 0.983 | 0.989 | 6.4 | нет |
+| oracle_observing | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 0.990 | 1.000 | 0.985 | 0.990 | 6.0 | нет |
 | attack:twins | 0.022 | 0.471 | 0.040 | 0.022 | 0.351 | 0.041 | -0.921 | -1.000 | -0.878 | -1.000 | 1.0 | нет |
-| attack:type_bruteforce | 0.250 | 1.000 | 0.610 | 0.250 | 1.000 | 0.400 | 0.220 | 1.000 | -0.200 | -0.300 | 1.0 | нет |
+| attack:type_bruteforce | 0.200 | 1.000 | 0.567 | 0.200 | 1.000 | 0.333 | 0.133 | 1.000 | -0.333 | -0.300 | 1.0 | нет |
 | attack:amount_bruteforce | 0.097 | 0.912 | 0.464 | 0.098 | 0.865 | 0.177 | -0.072 | 1.000 | -0.650 | -0.300 | 1.0 | нет |
 | attack:guess_ids | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | -1.000 | -1.000 | 1.0 | нет |
 | attack:evidence_spam | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | -1.000 | -1.000 | 1.0 | нет |
@@ -130,41 +130,42 @@ P, R — макро (среднее по эпизодам, где величин
 | attack:wrong_currency | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | -1.000 | -1.000 | 1.0 | нет |
 | attack:all_types_all_docs | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | -1.000 | -1.000 | 1.0 | нет |
 | attack:empty | n/a | 0.000 | 0.350 | n/a | 0.000 | 0.000 | -0.300 | 1.000 | -1.000 | -0.300 | 1.0 | нет |
-| attack:cem_best | 0.003 | 0.019 | 0.004 | 0.003 | 0.027 | 0.005 | -0.992 | -1.000 | -0.988 | -1.000 | 4.0 | нет |
+| attack:cem_best | 0.007 | 0.054 | 0.012 | 0.007 | 0.081 | 0.014 | -0.976 | -1.000 | -0.963 | -1.000 | 4.0 | нет |
 
 ## Разбор сбоев simple_reconcile
 
 | Тип ошибки | Найдено / всего |
 |---|---|
-| duplicate_invoice | 12 / 12 |
-| fx_rate | 7 / 11 |
+| duplicate_invoice | 10 / 10 |
+| fx_rate | 9 / 11 |
 | payment_allocation | 5 / 5 |
-| period_cutoff | 9 / 9 |
+| period_cutoff | 5 / 5 |
+| vat_error | 6 / 6 |
 
-Коды причин ложных выводов: `ids_mismatch`: 5, `unmatched`: 14, `wrong_type`: 4
+Коды причин ложных выводов: `ids_mismatch`: 5, `unmatched`: 14, `wrong_type`: 3
 
-Журнал оценщика `reports/grader_log.jsonl`: цепочка хешей, голова `123c0f370bb03583c0e079c2ec41268ee8d82d3125388ce00792d7788d8f98dd` (проверка: `python -m auditenv verify-log`).
+Журнал оценщика `reports/grader_log.jsonl`: цепочка хешей, голова `c1b175d83351549473270f0018f6b84744c000f07e11c1d202eed4fb80802574` (проверка: `python -m auditenv verify-log`).
 
 ## Замеры времени (недетерминированно, зависит от машины)
 
-Полный self-check: 13.6 c.
+Полный self-check: 14.1 c.
 
 | Политика | ср, мс | p50, мс | p95, мс | макс, мс |
 |---|---|---|---|---|
-| random_explorer | 115 | 109 | 135 | 168 |
-| simple_reconcile | 116 | 107 | 137 | 147 |
-| careful_reconcile | 103 | 101 | 115 | 124 |
-| flag_all | 100 | 99 | 110 | 128 |
-| oracle | 2 | 2 | 3 | 3 |
-| oracle_observing | 2 | 2 | 3 | 3 |
-| attack:twins | 5 | 4 | 6 | 12 |
-| attack:type_bruteforce | 4 | 4 | 4 | 5 |
-| attack:amount_bruteforce | 4 | 4 | 5 | 6 |
-| attack:guess_ids | 4 | 4 | 5 | 9 |
-| attack:evidence_spam | 4 | 4 | 5 | 6 |
-| attack:junk_explanation | 4 | 4 | 9 | 12 |
-| attack:persuasive_wrong | 4 | 4 | 6 | 6 |
-| attack:wrong_currency | 4 | 4 | 5 | 5 |
-| attack:all_types_all_docs | 5 | 4 | 5 | 7 |
-| attack:empty | 5 | 5 | 7 | 7 |
-| attack:cem_best | 5 | 4 | 6 | 7 |
+| random_explorer | 116 | 111 | 137 | 140 |
+| simple_reconcile | 123 | 119 | 140 | 144 |
+| careful_reconcile | 117 | 115 | 135 | 150 |
+| flag_all | 99 | 96 | 109 | 122 |
+| oracle | 3 | 3 | 4 | 4 |
+| oracle_observing | 3 | 3 | 4 | 5 |
+| attack:twins | 7 | 7 | 8 | 13 |
+| attack:type_bruteforce | 4 | 4 | 5 | 5 |
+| attack:amount_bruteforce | 4 | 4 | 5 | 5 |
+| attack:guess_ids | 4 | 4 | 4 | 5 |
+| attack:evidence_spam | 4 | 4 | 5 | 5 |
+| attack:junk_explanation | 4 | 4 | 5 | 5 |
+| attack:persuasive_wrong | 4 | 4 | 5 | 5 |
+| attack:wrong_currency | 4 | 4 | 4 | 9 |
+| attack:all_types_all_docs | 4 | 4 | 5 | 5 |
+| attack:empty | 4 | 4 | 5 | 6 |
+| attack:cem_best | 6 | 6 | 7 | 7 |

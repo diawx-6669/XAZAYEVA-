@@ -12,7 +12,7 @@ trajectories` → `python -m auditenv docs-check --fix` → `make check` (дол
 текущий код (после слияния с `main`: построчная выручка, свой валидатор схем) — при переносе вручную
 доделаны 2 места (`grader/validate_truth.py::verify_evidence`, `tools/verify_independent.py::evidence_amount`)
 и версии конфигов 2.1 → 2.2. Теперь он применяется без правок: `git apply docs/rehearsal/vat_error.patch`
-(проверяется тестом `tests/test_round3.py::test_vat_rehearsal_patch_applies_cleanly`). После него — общее правило выше
+(**в v1.1, 22.11, патч влит в `main` и тип `vat_error` включён в конфиги**; тест `tests/test_round3.py::test_vat_rehearsal_patch_is_merged`). После него — общее правило выше
 (`lock-configs`, `export`, `golden`, `trajectories`, `python tools/build_replay.py`, `export-audit`,
 `docs-check --fix`, ≈ 15 с); в ветке `final-rehearsal` весь pytest зелёный и `make check` — `ALL GREEN`.
 Время от создания ветки до зелёного pytest — **242 с** (Claude Code; человеку по этому списку —

@@ -191,7 +191,22 @@ class Episode:
             if not self.in_period(r["ts"]):
                 key = r["inv"] if (r["inv"] and not r["pay"]) else (r["pay"] or r["row_id"])
                 found.setdefault(("period_cutoff", key), r["dr"] or r["cr"])
+        # vat (rehearsal): a 'VAT 12%' line = round_half_even(12 % x the other lines)
+        for i in self.invoices:
+            if i["total_minor"] > 0:
+                got = self.vat_gap(i)
+                if got:
+                    found[("vat_error", i["invoice_id"])] = got
         return found
+
+    @staticmethod
+    def vat_gap(inv):
+        vat = [li for li in inv["line_items"] if li["description"] == "VAT 12%"]
+        if not vat:
+            return 0
+        net = sum(li["amount_minor"] for li in inv["line_items"] if li["description"] != "VAT 12%")
+        want = int((Decimal(net) * Decimal("0.12")).quantize(Decimal(1), rounding=ROUND_HALF_EVEN))
+        return abs(vat[0]["amount_minor"] - want)
 
     # ---- evidence: recompute from the set ONLY
     def evidence_amount(self, issue, ids):
@@ -280,6 +295,11 @@ class Episode:
                 return None, "document_inside_period"
             amt = self.posting_in(rows, d[0])
             return (amt, "ok") if amt is not None else (None, "no_posting_row")
+        if typ == "vat_error":
+            d = [i for i in invs if i["invoice_id"] == aid]
+            if not d or not pol:
+                return None, "no_document_or_policy"
+            return self.vat_gap(d[0]), "ok"
         return None, "unknown_type"
 
 

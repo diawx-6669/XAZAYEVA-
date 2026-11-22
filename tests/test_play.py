@@ -63,7 +63,7 @@ def test_nothing_from_the_grader_is_shown_before_the_episode_ends():
 
 
 def test_budget_runs_out_like_for_an_agent():
-    ep = DEV[0]
+    ep = next(e for e in DEV if json.loads((e / "grader" / "truth.json").read_text("utf-8"))["issues"])
     summary, out, traj = _run(ep, ["get policy"] * 150)
     assert summary["steps"] == 100 and summary["truncated"] is True
     assert summary["reward"] == -1.0  # empty answer, full budget charged

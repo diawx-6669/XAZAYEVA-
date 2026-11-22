@@ -1,6 +1,6 @@
 {
   "name": "dev-mixed",
-  "version": "2.1",
+  "version": "2.3",
   "base_currencies": ["KZT"],
   "foreign_currencies": ["USD", "EUR", "JPY", "KWD"],
   "n_foreign": [2, 3],

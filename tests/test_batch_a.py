@@ -103,7 +103,7 @@ def test_tolerance_schema_bounds():
 
 # -------------------------------------------------- A4 cutoff service period
 def test_cutoff_service_period_follows_local_month():
-    cfg = {"name": "cut", "errors": {"duplicate_invoice": 0, "payment_allocation": 0, "fx_rate": 0, "period_cutoff": 1},
+    cfg = {"name": "cut", "errors": {"duplicate_invoice": 0, "payment_allocation": 0, "fx_rate": 0, "period_cutoff": 1, "vat_error": 0},
            "clean_probability": 0.0, "n_errors": [1, 3]}
     n = 0
     for seed in range(12):
@@ -247,9 +247,9 @@ def test_policy_states_explicit_utc_offset():
 
 # ------------------------------------------------- A6 infeasible configs
 @pytest.mark.parametrize("raw,msg", [
-    ({"errors": {"duplicate_invoice": 0, "payment_allocation": 0, "fx_rate": 1, "period_cutoff": 0},
+    ({"errors": {"duplicate_invoice": 0, "payment_allocation": 0, "fx_rate": 1, "period_cutoff": 0, "vat_error": 0},
       "foreign_currencies": [], "clean_probability": 0.0}, "no foreign currency"),
-    ({"errors": {"duplicate_invoice": 0, "payment_allocation": 0, "fx_rate": 0, "period_cutoff": 0},
+    ({"errors": {"duplicate_invoice": 0, "payment_allocation": 0, "fx_rate": 0, "period_cutoff": 0, "vat_error": 0},
       "clean_probability": 0.5}, "every error weight"),
     ({"n_errors": [0, 0], "clean_probability": 0.5}, "n_errors"),
     ({"min_interactions": 2, "interactions": {"partial_fx_cutoff": 1.0, "duplicate_fx": 0.0}}, "min_interactions"),

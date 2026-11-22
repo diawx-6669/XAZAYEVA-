@@ -15,6 +15,7 @@ TYPE_OF_INVARIANT = {
     "allocation": "payment_allocation",
     "fx_conversion": "fx_rate",
     "period": "period_cutoff",
+    "vat": "vat_error",
 }
 
 
@@ -151,6 +152,16 @@ def verify_evidence(pd, issue: dict, ev: list):
         amount = posting_from_rows(rows, d[0])
         if amount is None:
             return False, "missing_ledger_row", None
+    elif typ == "vat_error":
+        from ..generator.errors.vat_error import split_vat, vat_of
+
+        d = [i for i in invoices if i["invoice_id"] == aid]
+        if not d or not pols:
+            return False, "missing_document", None
+        vat, net = split_vat(d[0]["line_items"])
+        if vat is None:
+            return False, "no_vat_line", None
+        amount = abs(vat["amount_minor"] - vat_of(net))
     else:
         return False, "unknown_type", None
     if abs(amount - issue["expected_amount_minor"]) > 1:

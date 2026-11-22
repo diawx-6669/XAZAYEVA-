@@ -193,6 +193,8 @@ def test_historical_rate_has_no_7900_line():
     for ep, m in mutations(only("fx_rate", fx_variants=fv, n_errors=[3, 5]), range(12)):
         if m["variant"] == "historical_rate":
             accounts = {r["account"] for r in m["after"][0]["rows"]}
+            if "2400" in accounts:  # an overpaid receipt: its unapplied part is converted at the policy rate,
+                continue            # so a 7900 line is expected there (found by the v1.1 regeneration)
             assert "7900" not in accounts and "1000" in accounts
             return
     pytest.fail("no historical_rate")

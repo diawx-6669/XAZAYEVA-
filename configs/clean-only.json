@@ -1,6 +1,6 @@
 {
   "name": "clean-only",
-  "version": "2.1",
+  "version": "2.3",
   "foreign_currencies": ["USD", "EUR", "JPY"],
   "n_foreign": [1, 3],
   "foreign_share": 0.35,

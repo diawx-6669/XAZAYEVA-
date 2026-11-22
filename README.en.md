@@ -18,8 +18,9 @@ model improvement.
 
 * Money is always an `int` in minor units; FX rates are decimal strings computed with `Decimal`,
   `ROUND_HALF_EVEN`. Base currency KZT, USD, JPY (exponent 0) or KWD (exponent 3).
-* 4 error types, each one module in `auditenv/generator/errors/`: `duplicate_invoice`,
-  `payment_allocation`, `fx_rate`, `period_cutoff` (incl. the UTC trap at the period boundary);
+* 5 error types, each one module in `auditenv/generator/errors/`: `duplicate_invoice`,
+  `payment_allocation`, `fx_rate`, `period_cutoff` (incl. the UTC trap at the period boundary) and, since
+  v1.1, `vat_error` (a 'VAT 12%' line computed at 10 % or 20 %);
   2 interaction scenarios (`partial_fx_cutoff`, `duplicate_fx`); 14 kinds of *correct* look-alike
   cases; every episode has at least one correct look-alike of every error type.
 * Tools: `list_records(table, cursor, limit≤50)`, `get_record(table, id)`, `get_document(doc_id)`,
@@ -114,7 +115,7 @@ commands: [`docs/JURY.md`](docs/JURY.md).
 | What was checked | Result | Where |
 |---|---|---|
 | Jury-style scoreboard | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
-| Tests (pytest + hypothesis) | <!--fact:n_tests-->691<!--/fact--> | `make check` |
+| Tests (pytest + hypothesis) | <!--fact:n_tests-->699<!--/fact--> | `make check` |
 | Deliberate grader bugs caught by the tests | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` |
 | Independent verifier (no `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> episodes, 0 disagreements | `make check` |
 | Black-box jury simulation (own policies and grader) | <!--fact:jury_sim_open-->0<!--/fact--> open findings | `reports/jury_sim.md` |
@@ -140,8 +141,8 @@ forecast written before the jury run: `docs/PREDICTION.md`.
 
 * A high reward means "found the distortions this generator planted, with the required evidence" —
   not fitness for real-world audit. All companies, people and money are fictional.
-* A narrow world: 4 error types, 7 accounts, 5 currencies, fixed-offset time zones (no DST), no VAT,
-  no holidays in the FX calendar (business days = Mon–Fri).
+* A narrow world: 5 error types, 7 accounts, 5 currencies, fixed-offset time zones (no DST), one flat VAT
+  rate (12 %), no holidays in the FX calendar (business days = Mon–Fri).
 * The generator, the solver and the independent verifier were written by the same team: a shared
   misreading of a rule would not be caught by code; `docs/MANUAL_AUDIT.md` is the human cross-check.
 * Process isolation is layered (non-dumpable evaluator, rlimits, `nobody` when run as root) but is
