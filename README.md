@@ -128,6 +128,17 @@ the answer key and computes F1 and the reward; everything runs offline with one 
 доверять всем трём видам «двойников» — credit note, переплатам и дублям с неверным курсом
 ([docs/TRAINING.md](docs/TRAINING.md), [reports/training.md](reports/training.md)). Это не LLM и не нейросеть.
 
+## Подключение жюри: `judge_adapter.py`
+
+По «Определениям проверок» (20.11.2026). Рабочая директория — корень репозитория (в образе `/app`), запуск —
+`import judge_adapter`. `generate_episode(seed, config, output_dir)` пишет `public/` и `private/`
+(`truth.json`, `provenance.json`); `make_env()` → `reset(seed, {"mode": "closed"|"train", "episode_dir", "team_config"})`
+и `step({"name", "args"})`; `score_episode(episode_dir, findings, inspection_steps)` →
+`{"tp","fp","fn","precision","recall","f1","return"}`. В закрытом режиме среда не читает `private/`, награда политике — 0.
+Типы ошибок: `duplicate_invoice`, `payment_allocation`, `fx_rate` (пересчёт валюты), `period_cutoff`, `vat_error`.
+Коды ошибок: `UNKNOWN_ID`, `UNKNOWN_ACTION`, `MALFORMED_ACTION`, `INVALID_CURSOR`, `CALC_ERROR`, `EPISODE_ENDED`.
+Калькулятор возвращает десятичную строку (`"0.3"`).
+
 ## Запуск одной командой
 
 ```bash
