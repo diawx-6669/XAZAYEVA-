@@ -13,10 +13,11 @@ cause → closed answer key (`truth.json`).
 
 An agent reads records through five narrow tools (at most 100 steps) and submits findings with
 evidence. A grader **outside the agent's process** matches findings to the answer key and computes
-the reward. This is an **environment and a grader**. To show the reward is learnable, `make train` (~15 s, no GPU)
-trains a small policy by REINFORCE on the terminal reward alone (12 weights, from zero): on 160 held-out
-episodes with a new salt it scores **+0.893** vs +0.058 for `simple_reconcile` (95 % CI of the
-difference [+0.705, +0.966]). It is not an LLM or a neural network (docs/TRAINING.md).
+the reward. This is an **environment and a grader**. To show the reward is learnable, `make train` (~30 s, no GPU)
+trains a 12-weight policy from zero on the env reward alone (advantage-weighted policy improvement): on 180
+held-out episodes with a new salt it scores **+0.957** vs +0.200 for `simple_reconcile` and +0.970 for the
+hand-written `careful_reconcile` (95 % CI of learned - simple [+0.647, +0.874]). It is not an LLM or a
+neural network (docs/TRAINING.md).
 
 * Money is always an `int` in minor units; FX rates are decimal strings computed with `Decimal`,
   `ROUND_HALF_EVEN`. Base currency KZT, USD, JPY (exponent 0) or KWD (exponent 3).
@@ -144,7 +145,7 @@ forecast written before the jury run: `docs/PREDICTION.md`.
 * A high reward means "found the distortions this generator planted, with the required evidence" —
   not fitness for real-world audit. All companies, people and money are fictional.
 * A narrow world: 5 error types, 7 accounts, 5 currencies, fixed-offset time zones (no DST), one flat VAT
-  rate (12 %), no holidays in the FX calendar (business days = Mon–Fri).
+  rate (12 %); the FX calendar has weekends and a fixed list of public holidays (`policy.fx_holidays`).
 * The generator, the solver and the independent verifier were written by the same team: a shared
   misreading of a rule would not be caught by code; `docs/MANUAL_AUDIT.md` is the human cross-check.
 * Process isolation is layered (non-dumpable evaluator, rlimits, `nobody` when run as root) but is

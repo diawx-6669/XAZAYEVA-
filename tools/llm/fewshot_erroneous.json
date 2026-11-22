@@ -8,10 +8,10 @@
      "config_hash": "5e1f417bd366cf52",
      "config_version": "2.3",
      "counts": {
-      "fx": 160,
-      "invoices": 37,
-      "ledger": 293,
-      "payments": 25
+      "fx": 156,
+      "invoices": 40,
+      "ledger": 291,
+      "payments": 22
      },
      "currencies": {
       "JPY": 0,
@@ -26,11 +26,17 @@
       "fx_conversion": "per_document",
       "mode": "ROUND_HALF_EVEN"
      },
-     "schema_version": "1.1",
+     "schema_version": "1.2",
      "timezone": "Asia/Almaty"
     },
     "policy_summary": {
      "credit_notes": "an invoice whose line_items carry cancels_invoice_id cancels that invoice; both stay in the books",
+     "fx_business_days": "Monday-Friday except fx_holidays; fx.csv has no rows on other days",
+     "fx_holidays": [
+      "2026-07-06",
+      "2026-08-31",
+      "2026-10-26"
+     ],
      "fx_missing_rate": "previous_business_day",
      "fx_rate_date": "transaction_date",
      "fx_rate_date_basis": "local calendar date in the company timezone; invoice: issued_at, payment: timestamp",
@@ -57,7 +63,7 @@
   },
   {
    "args": {
-    "doc_id": "DC-4CKP4X"
+    "doc_id": "DC-347T7T"
    },
    "role": "assistant",
    "tool": "get_document"
@@ -66,14 +72,14 @@
    "observation": {
     "result": {
      "document": {
-      "amount_minor": 2764444,
+      "amount_minor": 2660000,
       "currency": "KWD",
-      "doc_id": "DC-4CKP4X",
+      "doc_id": "DC-347T7T",
       "invoice_refs": [
-       "SF-F7HR7QZ"
+       "SF-PK6ZD2D"
       ],
-      "payment_id": "BNK-6QF7D6",
-      "timestamp": "2026-10-30T22:35:33+00:00"
+      "payment_id": "BNK-TAM4YY",
+      "timestamp": "2026-10-30T21:29:12+00:00"
      },
      "kind": "payment"
     },
@@ -84,7 +90,7 @@
   },
   {
    "args": {
-    "id": "JE-TGNW4E3",
+    "id": "JE-75NVAYB",
     "table": "ledger"
    },
    "role": "assistant",
@@ -97,12 +103,12 @@
       "account": "1000",
       "credit_minor": 0,
       "currency": "KZT",
-      "debit_minor": 412305765,
-      "entity_id": "CL-P9P8DEK",
+      "debit_minor": 427765240,
+      "entity_id": "CL-FV9WAQN",
       "invoice_id": null,
-      "payment_id": "BNK-6QF7D6",
-      "row_id": "JE-TGNW4E3",
-      "timestamp": "2026-10-30T22:35:33+00:00"
+      "payment_id": "BNK-TAM4YY",
+      "row_id": "JE-75NVAYB",
+      "timestamp": "2026-10-30T21:29:12+00:00"
      },
      "table": "ledger"
     },
@@ -125,7 +131,7 @@
      "record": {
       "date": "2026-10-30",
       "fx_id": "fx:2026-10-30:KWD:KZT",
-      "rate": "1492.36",
+      "rate": "1610.87",
       "source_currency": "KWD",
       "target_currency": "KZT"
      },
@@ -159,8 +165,14 @@
       },
       "ar_relief_rate": "rate of the invoice transaction date",
       "credit_notes": "an invoice whose line_items carry cancels_invoice_id cancels that invoice; both stay in the books",
+      "fx_business_days": "Monday-Friday except fx_holidays; fx.csv has no rows on other days",
       "fx_conversion": "base_minor = round(amount_minor * rate * 10^(exp_base - exp_src)), once per document",
       "fx_difference_account": "7900",
+      "fx_holidays": [
+       "2026-07-06",
+       "2026-08-31",
+       "2026-10-26"
+      ],
       "fx_missing_rate": "previous_business_day",
       "fx_rate_date": "transaction_date",
       "fx_rate_date_basis": "local calendar date in the company timezone; invoice: issued_at, payment: timestamp",
@@ -190,7 +202,7 @@
   },
   {
    "args": {
-    "doc_id": "DC-XQYNCQ"
+    "doc_id": "DC-JNQA5W"
    },
    "role": "assistant",
    "tool": "get_document"
@@ -200,63 +212,35 @@
     "result": {
      "document": {
       "currency": "KWD",
-      "doc_id": "DC-XQYNCQ",
-      "due_at": "2026-10-16T18:03:56+05:00",
-      "entity_id": "CL-P9P8DEK",
-      "invoice_id": "SF-F7HR7QZ",
-      "issued_at": "2026-09-16T18:03:56+05:00",
+      "doc_id": "DC-JNQA5W",
+      "due_at": "2026-10-14T14:40:00+05:00",
+      "entity_id": "CL-FV9WAQN",
+      "invoice_id": "SF-PK6ZD2D",
+      "issued_at": "2026-08-30T14:40:00+05:00",
       "line_items": [
        {
-        "amount_minor": 334476,
-        "description": "Technical support",
-        "quantity": 6,
-        "service_period": "2026-09",
-        "unit_price_minor": 55746
-       },
-       {
-        "amount_minor": 1020000,
-        "description": "Cloud hosting",
-        "quantity": 4,
-        "service_period": "2026-09",
-        "unit_price_minor": 255000
-       },
-       {
-        "amount_minor": 765000,
-        "description": "Logistics services",
+        "amount_minor": 960000,
+        "description": "Audit preparation",
         "quantity": 5,
-        "service_period": "2026-09",
-        "unit_price_minor": 153000
+        "service_period": "2026-08",
+        "unit_price_minor": 192000
        },
        {
-        "amount_minor": 165000,
-        "description": "Software license",
+        "amount_minor": 755000,
+        "description": "Data processing",
         "quantity": 5,
-        "service_period": "2026-09",
-        "unit_price_minor": 33000
+        "service_period": "2026-08",
+        "unit_price_minor": 151000
        },
        {
-        "amount_minor": 159968,
+        "amount_minor": 945000,
         "description": "Marketing services",
-        "quantity": 4,
-        "service_period": "2026-09",
-        "unit_price_minor": 39992
-       },
-       {
-        "amount_minor": 106000,
-        "description": "Consulting services",
-        "quantity": 1,
-        "service_period": "2026-09",
-        "unit_price_minor": 106000
-       },
-       {
-        "amount_minor": 214000,
-        "description": "Staff training",
-        "quantity": 2,
-        "service_period": "2026-09",
-        "unit_price_minor": 107000
+        "quantity": 5,
+        "service_period": "2026-08",
+        "unit_price_minor": 189000
        }
       ],
-      "total_minor": 2764444
+      "total_minor": 2660000
      },
      "kind": "invoice"
     },
@@ -267,7 +251,7 @@
   },
   {
    "args": {
-    "id": "JE-F64SKBF",
+    "id": "JE-NN2G9PC",
     "table": "ledger"
    },
    "role": "assistant",
@@ -278,14 +262,14 @@
     "result": {
      "record": {
       "account": "2400",
-      "credit_minor": 251658308,
+      "credit_minor": 261379766,
       "currency": "KZT",
       "debit_minor": 0,
-      "entity_id": "CL-P9P8DEK",
+      "entity_id": "CL-FV9WAQN",
       "invoice_id": null,
-      "payment_id": "BNK-6QF7D6",
-      "row_id": "JE-F64SKBF",
-      "timestamp": "2026-10-30T22:35:33+00:00"
+      "payment_id": "BNK-TAM4YY",
+      "row_id": "JE-NN2G9PC",
+      "timestamp": "2026-10-30T21:29:12+00:00"
      },
      "table": "ledger"
     },
@@ -301,13 +285,13 @@
      "findings": [
       {
        "affected_ids": [
-        "BNK-6QF7D6"
+        "BNK-TAM4YY"
        ],
-       "claimed_amount_minor": 248800,
+       "claimed_amount_minor": 726180,
        "currency": "KZT",
        "evidence_ids": [
-        "DC-4CKP4X",
-        "JE-TGNW4E3",
+        "DC-347T7T",
+        "JE-75NVAYB",
         "fx:2026-10-30:KWD:KZT",
         "policy"
        ],
@@ -316,14 +300,14 @@
       },
       {
        "affected_ids": [
-        "BNK-6QF7D6"
+        "BNK-TAM4YY"
        ],
-       "claimed_amount_minor": 251658308,
+       "claimed_amount_minor": 261379766,
        "currency": "KZT",
        "evidence_ids": [
-        "DC-4CKP4X",
-        "DC-XQYNCQ",
-        "JE-F64SKBF"
+        "DC-347T7T",
+        "DC-JNQA5W",
+        "JE-NN2G9PC"
        ],
        "explanation": "Receipt references the invoice but part of it was credited to 2400 Unapplied Cash instead of 1200; amount = the part left on 2400.",
        "type": "payment_allocation"

@@ -1,1 +1,1 @@
-{"episode_id":"ep-vhywwrgxx2","issues":[{"affected_ids":["RCV-ZX8EQT"],"currency":"KZT","evidence_sets":[["DC-CB4WY4QV","DC-A5BH4R59","LR-JKCW8W"]],"expected_amount_minor":97052318,"issue_id":"ISS-001","type":"payment_allocation"}],"tolerance_minor":1}
+{"episode_id":"ep-vhywwrgxx2","issues":[{"affected_ids":["RCV-XWHA7B"],"currency":"KZT","evidence_sets":[["DC-9VTVA7B7","DC-4CZ8A4NE","LR-TJWJWN"]],"expected_amount_minor":658490885,"issue_id":"ISS-001","type":"payment_allocation"}],"tolerance_minor":1}

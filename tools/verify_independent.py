@@ -72,10 +72,10 @@ class Episode:
     def local_day(self, ts):
         return datetime.fromisoformat(ts).astimezone(self.tz).date()
 
-    @staticmethod
-    def rate_day(d):
-        """fx_missing_rate = previous_business_day (business days are Monday-Friday)."""
-        while d.weekday() >= 5:
+    def rate_day(self, d):
+        """fx_missing_rate = previous_business_day; business days = Monday-Friday except policy.fx_holidays."""
+        hol = set(self.policy.get("fx_holidays", []))
+        while d.weekday() >= 5 or d.isoformat() in hol:
             d -= timedelta(days=1)
         return d
 

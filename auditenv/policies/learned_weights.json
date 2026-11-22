@@ -2,58 +2,58 @@
  "curve": [
   {
    "epoch": 0,
-   "heldout": 0.1197,
-   "train": 0.6554
+   "heldout": 0.2732,
+   "train": 0.5903
   },
   {
    "epoch": 1,
-   "heldout": 0.8929,
-   "train": 0.9716
+   "heldout": 0.9116,
+   "train": 0.9089
   },
   {
    "epoch": 2,
-   "heldout": 0.8911,
-   "train": 0.9716
+   "heldout": 0.9572,
+   "train": 0.9537
   },
   {
    "epoch": 3,
-   "heldout": 0.8929,
-   "train": 0.9716
+   "heldout": 0.9572,
+   "train": 0.9537
   },
   {
    "epoch": 4,
-   "heldout": 0.8929,
-   "train": 0.9716
+   "heldout": 0.9572,
+   "train": 0.9537
   },
   {
    "epoch": 5,
-   "heldout": 0.8929,
-   "train": 0.9716
+   "heldout": 0.9572,
+   "train": 0.9537
   },
   {
    "epoch": 10,
-   "heldout": 0.8929,
-   "train": 0.9716
+   "heldout": 0.9302,
+   "train": 0.9193
   },
   {
    "epoch": 15,
-   "heldout": 0.8929,
-   "train": 0.9716
+   "heldout": 0.9572,
+   "train": 0.9537
   },
   {
    "epoch": 20,
-   "heldout": 0.8929,
-   "train": 0.9716
+   "heldout": 0.9572,
+   "train": 0.9537
   },
   {
    "epoch": 25,
-   "heldout": 0.8929,
-   "train": 0.9716
+   "heldout": 0.9572,
+   "train": 0.9537
   },
   {
    "epoch": 30,
-   "heldout": 0.8929,
-   "train": 0.9716
+   "heldout": 0.9572,
+   "train": 0.9537
   }
  ],
  "epochs": 30,
@@ -72,81 +72,99 @@
   "log_amount"
  ],
  "heldout_configs": [
+  "train-easy",
+  "train-global",
   "dev-mixed",
-  "dev-global",
   "interaction-heavy",
+  "dev-global",
   "clean-only"
  ],
  "heldout_salt": "auditenv-train-heldout-2026-11-22",
  "heldout_seeds": [
   810000,
-  810040
+  810030
  ],
  "lr": 0.5,
- "n_train": 120,
+ "n_train": 160,
  "seed": 20261122,
  "summary": {
   "all": {
-   "careful_reconcile": 0.9723,
-   "empty": -0.2601,
-   "learned": 0.8929,
-   "simple_reconcile": 0.0582,
-   "submit_all": 0.1197
+   "careful_reconcile": 0.9703,
+   "empty": -0.342,
+   "learned": 0.9572,
+   "simple_reconcile": 0.1997,
+   "submit_all": 0.2732
   },
   "ci95_learned_minus_simple": [
-   0.705,
-   0.9659
+   0.6475,
+   0.8738
   ],
   "clean-only": {
-   "careful_reconcile": 0.9732,
-   "empty": 0.9732,
-   "learned": 0.9732,
-   "simple_reconcile": -1.0,
-   "submit_all": -1.0
+   "careful_reconcile": 0.973,
+   "empty": 0.973,
+   "learned": 0.973,
+   "simple_reconcile": -0.8684,
+   "submit_all": -0.8684
   },
   "dev-global": {
-   "careful_reconcile": 0.9737,
-   "empty": -0.5065,
-   "learned": 0.9254,
-   "simple_reconcile": 0.4007,
-   "submit_all": 0.4544
+   "careful_reconcile": 0.9741,
+   "empty": -0.4078,
+   "learned": 0.9741,
+   "simple_reconcile": 0.2984,
+   "submit_all": 0.4641
   },
   "dev-mixed": {
    "careful_reconcile": 0.9711,
-   "empty": -0.5071,
-   "learned": 0.9228,
-   "simple_reconcile": 0.3355,
-   "submit_all": 0.4425
+   "empty": -0.4083,
+   "learned": 0.9504,
+   "simple_reconcile": 0.3228,
+   "submit_all": 0.3956
   },
   "interaction-heavy": {
-   "careful_reconcile": 0.9713,
+   "careful_reconcile": 0.9717,
    "empty": -1.0,
-   "learned": 0.75,
-   "simple_reconcile": 0.4965,
-   "submit_all": 0.582
+   "learned": 0.9582,
+   "simple_reconcile": 0.5319,
+   "submit_all": 0.6126
   },
-  "n_heldout": 160
+  "n_heldout": 180,
+  "train-easy": {
+   "careful_reconcile": 0.9773,
+   "empty": -0.6045,
+   "learned": 0.9773,
+   "simple_reconcile": 0.4626,
+   "submit_all": 0.5516
+  },
+  "train-global": {
+   "careful_reconcile": 0.9549,
+   "empty": -0.6044,
+   "learned": 0.9105,
+   "simple_reconcile": 0.451,
+   "submit_all": 0.4837
+  }
  },
  "train_configs": [
   "train-easy",
-  "train-global"
+  "train-global",
+  "dev-mixed",
+  "interaction-heavy"
  ],
  "train_seeds": [
   800000,
-  800060
+  800040
  ],
  "weights": [
-  4.534885,
-  -1.66125,
-  -0.297457,
-  2.508496,
-  1.786043,
-  2.199052,
-  -10.332642,
-  -11.216124,
-  0.0,
-  0.463641,
-  1.092678,
-  2.371182
+  6.482347,
+  0.343073,
+  0.641114,
+  1.030529,
+  2.545127,
+  1.922504,
+  -8.647024,
+  -11.205033,
+  -8.013213,
+  -1.247666,
+  1.889321,
+  -2.372599
  ]
 }

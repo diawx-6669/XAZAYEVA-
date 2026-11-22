@@ -101,6 +101,8 @@ def read_tables(folder: Path) -> tuple[dict, dict, dict]:
     policy["period_boundary"] = pb
     policy["accounts"] = accounts
     policy.setdefault("policy_id", "policy")
+    hol = policy.get("fx_holidays", "")  # "2026-08-31; 2026-10-26" or "(none)" in the sheet -> a list
+    policy["fx_holidays"] = [] if hol in ("", "(none)") else [d.strip() for d in hol.split(";") if d.strip()]
 
     ledger = []
     for n, r in enumerate(_rows(folder, "ledger.csv")):

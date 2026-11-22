@@ -145,7 +145,7 @@ One row of ledger.csv after parsing (empty cell = null). Amounts are base-curren
 
 | Поле | Тип и ограничения | Обязательное |
 |---|---|---|
-| `schema_version` | = `1.1` | да |
+| `schema_version` | = `1.2` | да |
 | `episode_id` | string (шаблон `^ep-[a-z0-9]{10}$`) | да |
 | `base_currency` | string (шаблон `^[A-Z]{3}$`) | да |
 | `currencies` | object | да |
@@ -190,6 +190,8 @@ One row of ledger.csv after parsing (empty cell = null). Amounts are base-curren
 | `fx_rate_date` | = `transaction_date` | да |
 | `fx_rate_date_basis` | string | да |
 | `fx_missing_rate` | = `previous_business_day` | да |
+| `fx_business_days` | string | да |
+| `fx_holidays` | array of (string (шаблон `^[0-9]{4}-[0-9]{2}-[0-9]{2}$`)) | да |
 | `fx_rate_meaning` | string | да |
 | `fx_conversion` | string | да |
 | `period_boundary` | object {start, end, timezone, utc_offset, inclusive_start, inclusive_end} | да |

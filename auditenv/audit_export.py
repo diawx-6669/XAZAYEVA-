@@ -67,6 +67,7 @@ def export_one(src: Path, out: Path) -> dict:
     pol = dict(pd.policy)
     pol.update({f"period_boundary.{k}": v for k, v in pol.pop("period_boundary").items()})
     pol.update({f"account.{k}": v for k, v in pol.pop("accounts").items()})
+    pol["fx_holidays"] = "; ".join(pol.get("fx_holidays", [])) or "(none)"
     pol["currency_exponents"] = json.dumps(pd.exponents)
     pol["base_currency"] = base
     _w(out / "policy.csv", ["key", "value"], sorted(pol.items()))

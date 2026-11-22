@@ -10,8 +10,10 @@ ar_relief_rate,rate of the invoice transaction date
 base_currency,KZT
 credit_notes,an invoice whose line_items carry cancels_invoice_id cancels that invoice; both stay in the books
 currency_exponents,"{""EUR"": 2, ""KZT"": 2, ""USD"": 2}"
+fx_business_days,Monday-Friday except fx_holidays; fx.csv has no rows on other days
 fx_conversion,"base_minor = round(amount_minor * rate * 10^(exp_base - exp_src)), once per document"
 fx_difference_account,7900
+fx_holidays,2026-07-06; 2026-08-31; 2026-10-26
 fx_missing_rate,previous_business_day
 fx_rate_date,transaction_date
 fx_rate_date_basis,"local calendar date in the company timezone; invoice: issued_at, payment: timestamp"

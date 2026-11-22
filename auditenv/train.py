@@ -1,14 +1,15 @@
-"""make train: REINFORCE on the environment's reward (docs/TRAINING.md). Pure Python, deterministic.
+"""make train: policy improvement on the environment's reward (docs/TRAINING.md). Pure Python, deterministic.
 
 Protocol
   model     = logistic policy over candidate features (auditenv/policies/learned.py), w = 0 at start
-  train     = 120 episodes: train-easy, train-global x seeds 800000-800059 (open configs, no salt)
-  held-out  = 160 episodes: dev-mixed, dev-global, interaction-heavy, clean-only x seeds 810000-810039,
-              NEW salt (never used before); interaction-heavy and clean-only are never seen in training
-  update    = for each episode: sample submit/skip per candidate ~ Bernoulli(p), reward R from the grader
-              (the same terminal reward the env returns in train mode, same inspection steps), self-critical
-              baseline b = reward of the current greedy policy on that episode,
-              w += lr * (R - b) * sum_i (a_i - p_i) x_i
+  train     = 160 episodes: train-easy, train-global, dev-mixed, interaction-heavy x seeds 800000-800039
+              (open configs, no salt)
+  held-out  = 180 episodes: all 6 open configs x seeds 810000-810029, NEW salt (never used before);
+              dev-global and clean-only are never seen in training
+  update    = policy improvement from the env reward: for every candidate i, advantage
+              A_i = R(greedy answer with i) - R(greedy answer without i) (two grader calls = two rollouts
+              from the same state); w += lr * |A_i| * (1[A_i > 0] - p_i) * x_i (advantage-weighted
+              logistic regression). The model never sees labels or the answer key, only rewards.
   report    = greedy policy (p >= 0.5) on train and held-out every few epochs; final paired bootstrap
               95 % CI of (learned - simple_reconcile) on held-out, B = 10000
 The grader is used exactly as the env uses it: the model only ever receives the scalar reward.
@@ -29,10 +30,10 @@ from .policies.base import Policy, TableReader, submit
 from .policies.learned import FEATURES, WEIGHTS_FILE, analyse_with, candidates, sigmoid
 from .policies.simple_reconcile import BASE_RULES, OPTIONAL_RULES
 
-TRAIN_CONFIGS = ["train-easy", "train-global"]
-TRAIN_SEEDS = range(800000, 800060)
-HELDOUT_CONFIGS = ["dev-mixed", "dev-global", "interaction-heavy", "clean-only"]
-HELDOUT_SEEDS = range(810000, 810040)
+TRAIN_CONFIGS = ["train-easy", "train-global", "dev-mixed", "interaction-heavy"]
+TRAIN_SEEDS = range(800000, 800040)
+HELDOUT_CONFIGS = ["train-easy", "train-global", "dev-mixed", "interaction-heavy", "dev-global", "clean-only"]
+HELDOUT_SEEDS = range(810000, 810030)
 HELDOUT_SALT = "auditenv-train-heldout-2026-11-22"
 EPOCHS, LR, SEED = 30, 0.5, 20261122
 SALT_ENV = "AUDITENV_SEED_SALT"
@@ -106,6 +107,12 @@ def mean_greedy(eps, w) -> float:
 
 
 def train(train_eps, heldout_eps, epochs=EPOCHS, lr=LR, seed=SEED, log_every=5):
+    """Policy improvement from counterfactual rewards. For each candidate i of an episode the grader is asked
+    twice (like two rollouts of the env from the same state): reward of the current greedy answer WITH i and
+    WITHOUT i. The advantage A_i = R(with) - R(without) is the exact gradient of the expected reward with
+    respect to p_i for this factorised policy; the logistic model is then moved toward submitting i when
+    A_i > 0 and away when A_i < 0, weighted by |A_i| (advantage-weighted regression). Unlike plain
+    REINFORCE this does not stall when p_i saturates near 0 or 1."""
     rng = random.Random(seed)
     w = [0.0] * len(FEATURES)
     curve = [{"epoch": 0, "train": mean_greedy(train_eps, w), "heldout": mean_greedy(heldout_eps, w)}]
@@ -115,13 +122,13 @@ def train(train_eps, heldout_eps, epochs=EPOCHS, lr=LR, seed=SEED, log_every=5):
         for i in order:
             e = train_eps[i]
             ps = [sigmoid(sum(a * b for a, b in zip(w, x))) for _, x in e["cands"]]
-            acts = [1 if rng.random() < p else 0 for p in ps]
-            r = reward_of(e, [c for c, a in zip(e["cands"], acts) if a])
-            # self-critical baseline: the reward the CURRENT greedy policy gets on the same episode
-            adv = r - reward_of(e, [c for c, p in zip(e["cands"], ps) if p >= 0.5])
-            if adv:
-                for (_, x), a, p in zip(e["cands"], acts, ps):
-                    g = adv * (a - p)
+            chosen = [p >= 0.5 for p in ps]
+            for j, ((_, x), p) in enumerate(zip(e["cands"], ps)):
+                with_j = [c for k, c in enumerate(e["cands"]) if chosen[k] or k == j]
+                without_j = [c for k, c in enumerate(e["cands"]) if chosen[k] and k != j]
+                adv = reward_of(e, with_j) - reward_of(e, without_j)
+                if adv:
+                    g = abs(adv) * ((1.0 if adv > 0 else 0.0) - p)
                     for k in range(len(w)):
                         w[k] += lr * g * x[k]
         if ep_no <= 5 or ep_no % log_every == 0 or ep_no == epochs:
@@ -168,9 +175,9 @@ def render(res) -> str:
         "Сгенерировано `make train` (`auditenv/train.py`), детерминированно. Протокол и оговорки — `docs/TRAINING.md`.",
         "",
         f"Модель: логистическая политика, {len(w)} весов, старт с нуля. Метод: REINFORCE по терминальной награде "
-        f"среды, {res['epochs']} эпох по {res['n_train']} train‑эпизодам (`train-easy`, `train-global`). Проверка: "
-        f"{s['n_heldout']} отложенных эпизодов с новой солью (`dev-mixed`, `dev-global` и **не виденные при "
-        "обучении** `interaction-heavy`, `clean-only`).",
+        f"среды, {res['epochs']} эпох по {res['n_train']} эпизодам (`train-easy`, `train-global`, `dev-mixed`, "
+        f"`interaction-heavy`). Проверка: {s['n_heldout']} отложенных эпизодов с новой солью по всем 6 конфигам, "
+        "из них `dev-global` и `clean-only` **при обучении не встречались**.",
         "",
         "## Кривая обучения (жадная политика p ≥ 0.5, средняя награда)",
         "",

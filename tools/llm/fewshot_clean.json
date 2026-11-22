@@ -8,10 +8,10 @@
      "config_hash": "6758725924324bb2",
      "config_version": "2.3",
      "counts": {
-      "fx": 177,
-      "invoices": 39,
-      "ledger": 317,
-      "payments": 25
+      "fx": 162,
+      "invoices": 44,
+      "ledger": 378,
+      "payments": 27
      },
      "currencies": {
       "JPY": 0,
@@ -27,11 +27,19 @@
       "fx_conversion": "per_document",
       "mode": "ROUND_HALF_EVEN"
      },
-     "schema_version": "1.1",
+     "schema_version": "1.2",
      "timezone": "Asia/Tokyo"
     },
     "policy_summary": {
      "credit_notes": "an invoice whose line_items carry cancels_invoice_id cancels that invoice; both stay in the books",
+     "fx_business_days": "Monday-Friday except fx_holidays; fx.csv has no rows on other days",
+     "fx_holidays": [
+      "2026-10-26",
+      "2026-12-16",
+      "2027-01-01",
+      "2027-01-04",
+      "2027-01-07"
+     ],
      "fx_missing_rate": "previous_business_day",
      "fx_rate_date": "transaction_date",
      "fx_rate_date_basis": "local calendar date in the company timezone; invoice: issued_at, payment: timestamp",

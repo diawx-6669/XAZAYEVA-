@@ -70,7 +70,8 @@ def submission_from_args(args):
 
 
 def policy_summary(policy: dict) -> dict:
-    keys = ("fx_rate_date", "fx_rate_date_basis", "fx_missing_rate", "fx_rate_meaning", "period_boundary",
+    keys = ("fx_rate_date", "fx_rate_date_basis", "fx_missing_rate", "fx_business_days", "fx_holidays", "fx_rate_meaning",
+            "period_boundary",
             "rounding", "recognition", "payment_allocation", "unapplied_cash", "credit_notes", "vat")
     return {k: policy[k] for k in keys}
 

@@ -5,12 +5,13 @@ from __future__ import annotations
 import csv
 import io
 import json
+from datetime import timedelta
 from pathlib import Path
 
 from .. import GENERATOR_VERSION, SCHEMA_VERSION
 from ..canon import dumps_bytes, jsonl_bytes
 from ..money import EXPONENTS
-from ..timeutil import fmt_ts, utc_offset_str
+from ..timeutil import fmt_ts, fx_holidays_between, utc_offset_str
 from .books import ACCOUNTS
 
 LEDGER_COLUMNS = ["row_id", "timestamp", "account", "debit_minor", "credit_minor", "currency", "entity_id",
@@ -26,6 +27,8 @@ def make_policy(book) -> dict:
         "fx_rate_date": "transaction_date",
         "fx_rate_date_basis": "local calendar date in the company timezone; invoice: issued_at, payment: timestamp",
         "fx_missing_rate": "previous_business_day",
+        "fx_business_days": "Monday-Friday except fx_holidays; fx.csv has no rows on other days",
+        "fx_holidays": fx_holidays_between(s.first_day - timedelta(days=40), s.last_day + timedelta(days=40)),
         "fx_rate_meaning": "units of target_currency per 1 unit of source_currency",
         "fx_conversion": "base_minor = round(amount_minor * rate * 10^(exp_base - exp_src)), once per document",
         "period_boundary": {

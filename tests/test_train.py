@@ -11,7 +11,7 @@ from auditenv.runner import run_episode
 def test_weights_file_matches_features_and_learned_the_look_alikes():
     w = dict(zip(FEATURES, load_weights()))
     # learned from reward alone: credit-note context and overpayments mark look-alikes
-    assert w["credit_note_context"] < -1 and w["overpayment"] < -1
+    assert w["credit_note_context"] < -1 and w["overpayment"] < -1 and w["also_duplicate"] < -1
 
 
 @pytest.mark.slow

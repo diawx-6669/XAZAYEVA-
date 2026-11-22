@@ -1,8 +1,19 @@
 issue_id,type,evidence_set,evidence_id,record_kind,what_it_says
-ISS-001,fx_rate,1,DC-3VZBGN7Y,invoice,invoice SF-M8PPGCS client CP-RF326R issued 2026-07-11T05:27:20+00:00 (local 2026-07-11T09:27:20+04:00) total 12913.35 EUR
-ISS-001,fx_rate,1,LR-H884GKC,ledger,account 1200 Dr 6831110.50 Cr 0.00 KZT at 2026-07-11T05:27:20+00:00 invoice=SF-M8PPGCS payment=None
-ISS-001,fx_rate,1,fx:2026-07-10:EUR:KZT,fx,rate 529.260 KZT per 1 EUR on 2026-07-10
+ISS-001,fx_rate,1,DC-8ACF56NZ,invoice,invoice SF-E66KPSR client CP-GGHBVZ issued 2026-08-04T12:37:15+04:00 (local 2026-08-04T12:37:15+04:00) total 686.000 KWD
+ISS-001,fx_rate,1,LR-92H5GYV,ledger,account 1200 Dr 986920.76 Cr 0.00 KZT at 2026-08-04T12:37:15+04:00 invoice=SF-E66KPSR payment=None
+ISS-001,fx_rate,1,fx:2026-08-04:KWD:KZT,fx,rate 1435.49 KZT per 1 KWD on 2026-08-04
 ISS-001,fx_rate,1,policy,policy,"policy.json (rules: rate date, previous business day, period, rounding)"
-ISS-002,duplicate_invoice,1,DC-3VZBGN7Y,invoice,invoice SF-M8PPGCS client CP-RF326R issued 2026-07-11T05:27:20+00:00 (local 2026-07-11T09:27:20+04:00) total 12913.35 EUR
-ISS-002,duplicate_invoice,1,DC-9WVDC4M9,invoice,invoice SF-24AFAY9 client CP-RF326R issued 2026-07-12T10:24:24+04:00 (local 2026-07-12T10:24:24+04:00) total 12913.35 EUR
-ISS-002,duplicate_invoice,1,LR-VFV2VWM,ledger,account 1200 Dr 6831110.50 Cr 0.00 KZT at 2026-07-12T10:24:24+04:00 invoice=SF-24AFAY9 payment=None
+ISS-001,fx_rate,2,DC-8ACF56NZ,invoice,invoice SF-E66KPSR client CP-GGHBVZ issued 2026-08-04T12:37:15+04:00 (local 2026-08-04T12:37:15+04:00) total 686.000 KWD
+ISS-001,fx_rate,2,LR-H6CBTA8,ledger,account 4000 Dr 0.00 Cr 638765.04 KZT at 2026-08-04T12:37:15+04:00 invoice=SF-E66KPSR payment=None
+ISS-001,fx_rate,2,LR-34FRT56,ledger,account 4000 Dr 0.00 Cr 48914.44 KZT at 2026-08-04T12:37:15+04:00 invoice=SF-E66KPSR payment=None
+ISS-001,fx_rate,2,LR-4GNDGJY,ledger,account 4000 Dr 0.00 Cr 299241.28 KZT at 2026-08-04T12:37:15+04:00 invoice=SF-E66KPSR payment=None
+ISS-001,fx_rate,2,fx:2026-08-04:KWD:KZT,fx,rate 1435.49 KZT per 1 KWD on 2026-08-04
+ISS-001,fx_rate,2,policy,policy,"policy.json (rules: rate date, previous business day, period, rounding)"
+ISS-002,duplicate_invoice,1,DC-8ACF56NZ,invoice,invoice SF-E66KPSR client CP-GGHBVZ issued 2026-08-04T12:37:15+04:00 (local 2026-08-04T12:37:15+04:00) total 686.000 KWD
+ISS-002,duplicate_invoice,1,DC-XKAB3QVZ,invoice,invoice SF-J4M89YZ client CP-GGHBVZ issued 2026-08-05T10:24:24+04:00 (local 2026-08-05T10:24:24+04:00) total 686.000 KWD
+ISS-002,duplicate_invoice,1,LR-ZFTXFC7,ledger,account 1200 Dr 986920.76 Cr 0.00 KZT at 2026-08-05T10:24:24+04:00 invoice=SF-J4M89YZ payment=None
+ISS-002,duplicate_invoice,2,DC-8ACF56NZ,invoice,invoice SF-E66KPSR client CP-GGHBVZ issued 2026-08-04T12:37:15+04:00 (local 2026-08-04T12:37:15+04:00) total 686.000 KWD
+ISS-002,duplicate_invoice,2,DC-XKAB3QVZ,invoice,invoice SF-J4M89YZ client CP-GGHBVZ issued 2026-08-05T10:24:24+04:00 (local 2026-08-05T10:24:24+04:00) total 686.000 KWD
+ISS-002,duplicate_invoice,2,LR-NNF678Y,ledger,account 4000 Dr 0.00 Cr 638765.04 KZT at 2026-08-05T10:24:24+04:00 invoice=SF-J4M89YZ payment=None
+ISS-002,duplicate_invoice,2,LR-B42Y54X,ledger,account 4000 Dr 0.00 Cr 48914.44 KZT at 2026-08-05T10:24:24+04:00 invoice=SF-J4M89YZ payment=None
+ISS-002,duplicate_invoice,2,LR-A95F4YZ,ledger,account 4000 Dr 0.00 Cr 299241.28 KZT at 2026-08-05T10:24:24+04:00 invoice=SF-J4M89YZ payment=None

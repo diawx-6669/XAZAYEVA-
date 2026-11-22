@@ -32,7 +32,7 @@ help:
 	@echo "make selfcheck     scoreboard only -> reports/selfcheck.md"
 	@echo "make golden        rewrite tests/golden_hashes.json (only after an intended generator change)"
 	@echo "make verify-independent  independent verifier on committed + selfcheck + 500 fresh episodes"
-	@echo "make train         RL training of learned_reconcile on the env reward (docs/TRAINING.md, ~15 s)"
+	@echo "make train         RL training of learned_reconcile on the env reward (docs/TRAINING.md, ~30 s)"
 	@echo "make train-check   retrain and compare the weights byte-exact"
 	@echo "make experiment    optional E6 experiment (docs/EXPERIMENT.md); experiment-v2: docs/EXPERIMENT_v2.md"
 	@echo "make experiment-v2 E6 v2 on the current generator (new salt)"
@@ -162,8 +162,8 @@ shortcut-probe:
 
 submission-tag:
 	@echo "Run on 22.11 after the final make check (docs/SUBMISSION.md):"
-	@echo "  git tag -a v1.3-submission -m 'Genesis Hackathon submission'"
-	@echo "  git push origin v1.3-submission"
+	@echo "  git tag -a v1.4-submission -m 'Genesis Hackathon submission'"
+	@echo "  git push origin v1.4-submission"
 	@git log -1 --format='  SHA for the form: %H'
 
 version:

@@ -6,7 +6,7 @@
   "required": ["schema_version", "episode_id", "base_currency", "currencies", "period_start", "period_end", "timezone",
                "counts", "rounding", "config_version", "config_hash", "generator_version"],
   "properties": {
-    "schema_version": {"const": "1.1"},
+    "schema_version": {"const": "1.2"},
     "episode_id": {"type": "string", "pattern": "^ep-[a-z0-9]{10}$"},
     "base_currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
     "currencies": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0, "maximum": 4}},

@@ -53,8 +53,33 @@ def local_date(dt: datetime, tz) -> date:
     return dt.astimezone(tz).date()
 
 
+# FX calendar (v1.4): no rates are published on weekends AND on these public holidays (official dates of the
+# Republic of Kazakhstan, every year; one that falls on a weekend moves to Monday). policy.json lists the
+# concrete dates of an episode as `fx_holidays`, so an agent never needs this table.
+FX_HOLIDAYS_MMDD = frozenset({"01-01", "01-02", "01-07", "03-08", "03-21", "03-22", "03-23", "05-01", "05-07",
+                              "05-09", "07-06", "08-30", "10-25", "12-16"})
+
+
+def is_fx_holiday(d: date) -> bool:
+    """A listed date, or the Monday after a listed date that fell on a weekend (the day off is moved)."""
+    if d.strftime("%m-%d") in FX_HOLIDAYS_MMDD:
+        return True
+    if d.weekday() == 0:
+        return any((d - timedelta(days=k)).strftime("%m-%d") in FX_HOLIDAYS_MMDD for k in (1, 2))
+    return False
+
+
 def is_business_day(d: date) -> bool:
-    return d.weekday() < 5
+    return d.weekday() < 5 and not is_fx_holiday(d)
+
+
+def fx_holidays_between(d0: date, d1: date) -> list:
+    out, d = [], d0
+    while d <= d1:
+        if d.weekday() < 5 and is_fx_holiday(d):
+            out.append(d.isoformat())
+        d += timedelta(days=1)
+    return out
 
 
 def prev_business_day(d: date) -> date:

@@ -2,7 +2,7 @@
 
 Копируйте блоки как есть. Длины описаний проверяет `tests/test_round4_docs.py::test_submission_form_lengths`
 (в знаках, считая пробелы). Поля «тег» и «SHA» заполняются в момент тега: `make submission-tag`
-печатает SHA, его же показывает `git rev-parse v1.3-submission`.
+печатает SHA, его же показывает `git rev-parse v1.4-submission`.
 
 ## Название
 
@@ -44,10 +44,10 @@ AuditEnv — среда для обучения ИИ-аудитора с под�
 | Поле | Значение |
 |---|---|
 | Репозиторий | https://github.com/diawx-6669/XAZAYEVA- |
-| Тег | `v1.3-submission` |
-| SHA коммита | `<вставить вывод: git rev-parse v1.3-submission>` |
-| Ссылка на тег (её — в форму) | https://github.com/diawx-6669/XAZAYEVA-/tree/v1.3-submission |
-| Предыдущие теги | `v1.0-submission` (`0c8c012`) — страховка; `v1.1-submission` (`148b15f`) — секунды `00`, `episode_id` по конфигу, `careful_reconcile`; `v1.2-submission` (`a4d80ce`) — пятый тип ошибки `vat_error` (НДС); v1.3 — обучение политики с подкреплением (`make train`, `docs/TRAINING.md`) |
+| Тег | `v1.4-submission` |
+| SHA коммита | `<вставить вывод: git rev-parse v1.4-submission>` |
+| Ссылка на тег (её — в форму) | https://github.com/diawx-6669/XAZAYEVA-/tree/v1.4-submission |
+| Предыдущие теги | `v1.0-submission` (`0c8c012`) — страховка; `v1.1-submission` (`148b15f`) — секунды `00`, `episode_id` по конфигу, `careful_reconcile`; `v1.2-submission` (`a4d80ce`) — пятый тип ошибки `vat_error` (НДС); `v1.3-submission` (`3e036c2`) — обучение политики; v1.4 — праздники в календаре курсов, обучение на всех сценариях, слепая проверка эталона |
 | Видео-демо | https://github.com/diawx-6669/XAZAYEVA-/releases/download/v1.0-submission/XAZAYEVA_AuditEnv_music_only.mp4 |
 | Единая команда проверки | `make docker-check` (без Docker: `make venv && make check`) |
 | Лицензия | MIT (`LICENSE`); сторонние пакеты — `THIRD_PARTY_NOTICES.md` |

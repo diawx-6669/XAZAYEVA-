@@ -1,1 +1,1 @@
-{"episode_id":"ep-ta6bbcpyts","issues":[{"affected_ids":["SF-A4FBTJ8"],"currency":"KZT","evidence_sets":[["DC-2WREJWYE","JE-F44WRB73","fx:2026-09-24:JPY:KZT","policy"]],"expected_amount_minor":2260479,"issue_id":"ISS-001","type":"fx_rate"}],"tolerance_minor":1}
+{"episode_id":"ep-ta6bbcpyts","issues":[{"affected_ids":["SF-A4FBTJ8"],"currency":"KZT","evidence_sets":[["DC-2WREJWYE","JE-RJV8S6ZB","fx:2026-08-21:JPY:KZT","policy"]],"expected_amount_minor":1626108,"issue_id":"ISS-001","type":"fx_rate"}],"tolerance_minor":1}

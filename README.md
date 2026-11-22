@@ -108,7 +108,7 @@ the answer key and computes F1 and the reward; everything runs offline with one 
 |---|---|---|---|
 | Запуск одной командой | `Makefile`, `scripts/check.sh`, `Dockerfile` (образ по дайджесту), `.github/workflows/check.yml` | `make quick` (полная: `make check` / `make docker-check`) | `quick smoke: …s`; у полной — табло <!--fact:selfcheck_total-->90/90<!--/fact--> и `check: ALL GREEN` |
 | Версии конфигураций | `configs/*.json` (`version`), `configs/LOCK.json`, `configs/CHANGELOG.md`, `config_version` + `config_hash` в каждом `manifest.json` | `python -m pytest -q tests/test_configs_lock.py` | `5 passed`: содержимое без смены версии не пройдёт |
-| Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1200<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
+| Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1201<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
 | Измеренный разбор сбоев | [`docs/FAILURES.md`](docs/FAILURES.md): <!--fact:failures_closed-->18<!--/fact--> закрытых уязвимостей с тестами‑сторожами, полнота по вариантам с интервалами Уилсона, seed каждого примера | `python -m auditenv analyze --n 60` | таблицы признаков и вариантов; oracle и независимый проверяльщик решают 100 % |
 | Честные ограничения | [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) | `python -m auditenv docs-check` | `0 mismatches`: числа в документах совпадают с реальностью |
 
@@ -121,10 +121,11 @@ the answer key and computes F1 and the reward; everything runs offline with one 
 доказательствами. Оценщик вне процесса агента сопоставляет выводы с эталоном и считает награду.
 
 Это **среда и оценщик**, а не платёжное приложение или чат‑бот. Чтобы показать, что по награде среды
-**можно учиться**, мы обучили на ней небольшую политику с подкреплением (`make train`, ~15 с, без GPU):
-REINFORCE по одной только терминальной награде, 12 весов, старт с нуля. На 160 отложенных эпизодах с
-новой солью её награда **+0.893** против +0.058 у `simple_reconcile` (95 % ДИ разности
-[+0.705; +0.966]); веса сами научились не доверять «двойникам» — credit note и переплатам
+**можно учиться**, мы обучили на ней политику (`make train`, ~30 с, без GPU): 12 весов, старт с нуля,
+обновление только по награде среды (advantage‑weighted policy improvement). На 180 отложенных эпизодах с
+новой солью её награда **+0.957** против +0.200 у `simple_reconcile` и +0.970 у ручного эталона
+`careful_reconcile` (95 % ДИ разности с `simple_reconcile` [+0.647; +0.874]). Веса сами научились не
+доверять всем трём видам «двойников» — credit note, переплатам и дублям с неверным курсом
 ([docs/TRAINING.md](docs/TRAINING.md), [reports/training.md](reports/training.md)). Это не LLM и не нейросеть.
 
 ## Запуск одной командой
@@ -168,7 +169,7 @@ make check
 проверяет собственный валидатор `auditenv/jsonschema_lite.py`. В контейнере проверка идёт от
 пользователя `auditor`, писать можно только в `reports/` и `trajectories/`.
 
-Размеры открытых эпизодов: <!--fact:ep_ledger_range-->244–364<!--/fact--> проводок, <!--fact:ep_docs_range-->53–71<!--/fact--> документов,
+Размеры открытых эпизодов: <!--fact:ep_ledger_range-->257–378<!--/fact--> проводок, <!--fact:ep_docs_range-->52–73<!--/fact--> документов,
 <!--fact:ep_issues_range-->0–4<!--/fact--> ошибок; oracle тратит 1 шаг, simple_reconcile — 11–16 из 100.
 
 **Закрытый прогон (жюри).** Генератор открыт, поэтому для скрытых seed задайте секретную соль —
@@ -244,7 +245,7 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12
 | `python -m auditenv import-csv --src tests/fixtures/<имя> --out D` | компания, собранная вручную в Google Таблицах (CSV) → эпизод (`tests/fixtures/README.md`) |
 | `python tools/build_replay.py` | пересобрать `site/replay.html` — офлайн‑просмотрщик траекторий 5 эпизодов (без эталона) |
 | `make finale-preflight` | офлайн‑проверка перед финалом за минуту: образ, тесты контракта, демо |
-| `make submission-tag` | команды для тега `v1.3-submission` и SHA для формы (`docs/SUBMISSION.md`) |
+| `make submission-tag` | команды для тега `v1.4-submission` и SHA для формы (`docs/SUBMISSION.md`) |
 
 ## Раунд 4: инструменты проверки (вне `make check`, кроме отмеченных)
 
