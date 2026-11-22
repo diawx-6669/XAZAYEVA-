@@ -1,0 +1,481 @@
+[
+ {
+  "id": "D01",
+  "team_config": {
+   "name": "d01-clean",
+   "clean_probability": 1.0
+  }
+ },
+ {
+  "id": "D02",
+  "team_config": {
+   "name": "d02-clean-split",
+   "clean_probability": 1.0,
+   "distractors": {
+    "split_payment": 1.0,
+    "multi_invoice_payment": 1.0
+   }
+  }
+ },
+ {
+  "id": "D03",
+  "team_config": {
+   "name": "d03-clean-refund",
+   "clean_probability": 1.0,
+   "distractors": {
+    "refund": 1.0,
+    "overpayment": 1.0
+   }
+  }
+ },
+ {
+  "id": "D04",
+  "team_config": {
+   "name": "d04-clean-repeats",
+   "clean_probability": 1.0,
+   "distractors": {
+    "recurring_rent": 1.0,
+    "repeat_amount": 1.0
+   }
+  }
+ },
+ {
+  "id": "D05",
+  "team_config": {
+   "name": "d05-clean-boundary",
+   "clean_probability": 1.0,
+   "distractors": {
+    "boundary_time": 1.0,
+    "weekend_fx": 1.0,
+    "night_fx": 1.0
+   }
+  }
+ },
+ {
+  "id": "D06",
+  "team_config": {
+   "name": "d06-dup-copy",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 1.0,
+    "payment_allocation": 0,
+    "fx_rate": 0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 0,
+   "duplicate_variants": {
+    "copy": 1.0,
+    "paid_twice": 0.0
+   }
+  }
+ },
+ {
+  "id": "D07",
+  "team_config": {
+   "name": "d07-dup-paid-twice",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 1.0,
+    "payment_allocation": 0,
+    "fx_rate": 0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 0,
+   "duplicate_variants": {
+    "copy": 0.0,
+    "paid_twice": 1.0
+   }
+  }
+ },
+ {
+  "id": "D08",
+  "team_config": {
+   "name": "d08-dup-among-repeats",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 1.0,
+    "payment_allocation": 0,
+    "fx_rate": 0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 0,
+   "distractors": {
+    "recurring_rent": 1.0,
+    "repeat_amount": 1.0
+   }
+  }
+ },
+ {
+  "id": "D09",
+  "team_config": {
+   "name": "d09-alloc-missing",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 1.0,
+    "fx_rate": 0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 0,
+   "allocation_variants": {
+    "unallocated": 1.0,
+    "partial": 0.0,
+    "wrong_invoice": 0.0
+   }
+  }
+ },
+ {
+  "id": "D10",
+  "team_config": {
+   "name": "d10-alloc-partial",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 1.0,
+    "fx_rate": 0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 0,
+   "allocation_variants": {
+    "unallocated": 0.0,
+    "partial": 1.0,
+    "wrong_invoice": 0.0
+   }
+  }
+ },
+ {
+  "id": "D11",
+  "team_config": {
+   "name": "d11-alloc-partial-near-split",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 1.0,
+    "fx_rate": 0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 0,
+   "allocation_variants": {
+    "unallocated": 0.0,
+    "partial": 1.0,
+    "wrong_invoice": 0.0
+   },
+   "distractors": {
+    "split_payment": 1.0
+   }
+  }
+ },
+ {
+  "id": "D12",
+  "team_config": {
+   "name": "d12-fx-date",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 0,
+    "fx_rate": 1.0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 0,
+   "fx_variants": {
+    "adjacent_day": 1.0,
+    "utc_date": 1.0,
+    "inverted": 0.0,
+    "historical_rate": 0.0,
+    "wrong_pair": 0.0,
+    "due_date": 0.0
+   }
+  }
+ },
+ {
+  "id": "D13",
+  "team_config": {
+   "name": "d13-fx-pair",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 0,
+    "fx_rate": 1.0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 0,
+   "fx_variants": {
+    "adjacent_day": 0.0,
+    "utc_date": 0.0,
+    "inverted": 1.0,
+    "historical_rate": 0.0,
+    "wrong_pair": 1.0,
+    "due_date": 0.0
+   }
+  }
+ },
+ {
+  "id": "D14",
+  "team_config": {
+   "name": "d14-cutoff-end",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 0,
+    "fx_rate": 0,
+    "period_cutoff": 1.0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 0,
+   "cutoff_variants": {
+    "utc_trap": 1.0,
+    "backdated_posting": 0.0,
+    "prior_period": 0.0
+   }
+  }
+ },
+ {
+  "id": "D15",
+  "team_config": {
+   "name": "d15-cutoff-start",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 0,
+    "fx_rate": 0,
+    "period_cutoff": 1.0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 0,
+   "cutoff_variants": {
+    "utc_trap": 0.0,
+    "backdated_posting": 0.0,
+    "prior_period": 1.0
+   }
+  }
+ },
+ {
+  "id": "D16",
+  "team_config": {
+   "name": "d16-x1-almaty",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 0,
+    "fx_rate": 0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 1.0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 1,
+   "timezones": [
+    "Asia/Almaty"
+   ]
+  }
+ },
+ {
+  "id": "D17",
+  "team_config": {
+   "name": "d17-x1-bogota",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 0,
+    "fx_rate": 0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 1.0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 1,
+   "timezones": [
+    "America/Bogota"
+   ],
+   "foreign_currencies": [
+    "USD",
+    "EUR"
+   ]
+  }
+ },
+ {
+  "id": "D18",
+  "team_config": {
+   "name": "d18-x1-tokyo",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 0,
+    "fx_rate": 0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 1.0,
+    "duplicate_fx": 0
+   },
+   "min_interactions": 1,
+   "timezones": [
+    "Asia/Tokyo"
+   ],
+   "foreign_currencies": [
+    "EUR",
+    "JPY"
+   ]
+  }
+ },
+ {
+  "id": "D19",
+  "team_config": {
+   "name": "d19-x2-almaty",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 0,
+    "fx_rate": 0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 1.0
+   },
+   "min_interactions": 1,
+   "timezones": [
+    "Asia/Almaty"
+   ]
+  }
+ },
+ {
+  "id": "D20",
+  "team_config": {
+   "name": "d20-x2-dubai",
+   "clean_probability": 0.0,
+   "n_errors": [
+    1,
+    1
+   ],
+   "errors": {
+    "duplicate_invoice": 0,
+    "payment_allocation": 0,
+    "fx_rate": 0,
+    "period_cutoff": 0,
+    "vat_error": 0
+   },
+   "interactions": {
+    "partial_fx_cutoff": 0,
+    "duplicate_fx": 1.0
+   },
+   "min_interactions": 1,
+   "timezones": [
+    "Asia/Dubai"
+   ],
+   "foreign_currencies": [
+    "USD"
+   ]
+  }
+ }
+]

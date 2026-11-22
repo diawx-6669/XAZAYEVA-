@@ -139,6 +139,12 @@ the answer key and computes F1 and the reward; everything runs offline with one 
 Коды ошибок: `UNKNOWN_ID`, `UNKNOWN_ACTION`, `MALFORMED_ACTION`, `INVALID_CURSOR`, `CALC_ERROR`, `EPISODE_ENDED`.
 Калькулятор возвращает десятичную строку (`"0.3"`).
 
+**Рецепты закрытых эпизодов D01–D20:** [`recipes/jury_d01_d20.json`](recipes/jury_d01_d20.json) — готовый
+`team_config` для каждого сценария блока 2 (передайте его в `generate_episode` с любым seed): D01–D05 чистые
+(разбитый платёж, возврат, повторы сумм, граница периода/курса), D06–D08 дубль, D09–D11 распределение
+(пропуск/частичное), D12–D13 курс (дата/пара), D14–D15 период, D16–D18 сценарий `partial_fx_cutoff`, D19–D20
+сценарий `duplicate_fx` с разными часовыми поясами и валютами.
+
 ## Запуск одной командой
 
 ```bash
