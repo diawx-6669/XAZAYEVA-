@@ -1,6 +1,6 @@
 # AuditEnv self-check
 
-commit `148b15f78bf3` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
+commit `c8bdc677907b` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
 
 Хеши конфигов: `clean-only` 75364dea035f003d, `dev-global` 6758725924324bb2, `dev-mixed` 5e1f417bd366cf52, `interaction-heavy` 0b4a5ffba66d6c72, `stress` 0e3fc9f073c43cfd, `train-easy` d9c840b728596a92, `train-global` 3a25e26fa41cce5b
 
@@ -148,24 +148,24 @@ P, R — макро (среднее по эпизодам, где величин
 
 ## Замеры времени (недетерминированно, зависит от машины)
 
-Полный self-check: 14.1 c.
+Полный self-check: 14.0 c.
 
 | Политика | ср, мс | p50, мс | p95, мс | макс, мс |
 |---|---|---|---|---|
-| random_explorer | 116 | 111 | 137 | 140 |
-| simple_reconcile | 123 | 119 | 140 | 144 |
-| careful_reconcile | 117 | 115 | 135 | 150 |
-| flag_all | 99 | 96 | 109 | 122 |
-| oracle | 3 | 3 | 4 | 4 |
-| oracle_observing | 3 | 3 | 4 | 5 |
-| attack:twins | 7 | 7 | 8 | 13 |
-| attack:type_bruteforce | 4 | 4 | 5 | 5 |
-| attack:amount_bruteforce | 4 | 4 | 5 | 5 |
-| attack:guess_ids | 4 | 4 | 4 | 5 |
-| attack:evidence_spam | 4 | 4 | 5 | 5 |
-| attack:junk_explanation | 4 | 4 | 5 | 5 |
-| attack:persuasive_wrong | 4 | 4 | 5 | 5 |
-| attack:wrong_currency | 4 | 4 | 4 | 9 |
-| attack:all_types_all_docs | 4 | 4 | 5 | 5 |
-| attack:empty | 4 | 4 | 5 | 6 |
-| attack:cem_best | 6 | 6 | 7 | 7 |
+| random_explorer | 119 | 118 | 133 | 138 |
+| simple_reconcile | 121 | 117 | 142 | 151 |
+| careful_reconcile | 113 | 110 | 130 | 135 |
+| flag_all | 115 | 116 | 130 | 137 |
+| oracle | 3 | 3 | 3 | 4 |
+| oracle_observing | 2 | 2 | 4 | 4 |
+| attack:twins | 5 | 4 | 5 | 9 |
+| attack:type_bruteforce | 5 | 5 | 7 | 7 |
+| attack:amount_bruteforce | 6 | 6 | 8 | 8 |
+| attack:guess_ids | 6 | 6 | 7 | 7 |
+| attack:evidence_spam | 6 | 6 | 7 | 7 |
+| attack:junk_explanation | 6 | 6 | 7 | 7 |
+| attack:persuasive_wrong | 5 | 5 | 7 | 7 |
+| attack:wrong_currency | 6 | 5 | 11 | 12 |
+| attack:all_types_all_docs | 7 | 7 | 8 | 8 |
+| attack:empty | 6 | 6 | 7 | 8 |
+| attack:cem_best | 5 | 6 | 7 | 7 |
