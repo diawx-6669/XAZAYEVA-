@@ -576,7 +576,19 @@ def main(argv=None) -> int:
     gr.add_argument("findings")
     gr.add_argument("--steps", type=int, default=0, help="inspection steps to charge (default 0)")
     gr.add_argument("--json", action="store_true")
+    pl = sub.add_parser("play", help="a person plays the auditor: same tools, 100 steps, same grader (docs/HUMAN_BASELINE.md)")
+    pl.add_argument("--episode-dir")
+    pl.add_argument("--seed", type=int, default=1)
+    pl.add_argument("--config", default="train-easy")
+    pl.add_argument("--player", default="human", help="name for the human-baseline protocol")
+    pl.add_argument("--time-limit", type=float, default=1800.0, help="wall-clock limit, s (agents: 60)")
+    pl.add_argument("--out", help="append the trajectory (JSON lines) here")
+    pl.add_argument("--summary", help="append a one-line result (TP/FP/FN/F1/reward/steps/time) here")
     a = ap.parse_args(argv)
+    if a.cmd == "play":
+        from .play import main as play_main
+
+        return play_main(a)
     if a.cmd == "grade":
         from .grade_cli import main as grade_main
 
