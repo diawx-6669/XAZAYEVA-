@@ -1,8 +1,8 @@
 """Shortcut probe (tools/shortcut_probe.py): format-only features of the records must not give the errors away.
 
 The positive control proves the probe can see a planted tell; the real AUC must stay far from it. The one
-weak tell the probe found (00 seconds on the partial_fx_cutoff receipt) is pinned here, so fixing it in the
-generator is a visible, deliberate change of this test."""
+weak tell the probe found (00 seconds on the partial_fx_cutoff receipt) was fixed in v1.1; the test below
+keeps it fixed."""
 
 import importlib.util
 import json
@@ -31,9 +31,11 @@ def test_no_strong_shortcut_in_real_episodes(small):
     assert small["real"]["auc"] < 0.7
 
 
-def test_known_weak_tell_is_pinned(small):
+def test_seconds_tell_is_fixed(small):
+    """Before v1.1: 36.5% of payment_allocation receipts had 00 seconds vs 8.0% of clean ones."""
     kt = sp.known_tell(small)
-    assert kt["payment_allocation_seconds_zero"] > kt["clean_payment_seconds_zero"]
+    assert kt["payment_allocation_seconds_zero"] is None or kt["payment_allocation_seconds_zero"] <= 0.10
+    assert kt["clean_payment_seconds_zero"] <= 0.10
 
 
 def test_auc_is_the_mann_whitney_statistic():

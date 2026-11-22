@@ -16,8 +16,8 @@ make venv && make quick
 python -m auditenv run --policy simple_reconcile --seed 12 --config dev-mixed
 ```
 
-Ожидаемо (~2 с): `{"episode_id": "ep-y2r4r23pqg", "tp": 2, "fp": 0, "fn": 1, "f1": 0.8, "reward": 0.574, "steps": 14}` —
-честный скриптовый аудитор нашёл 2 из 3 ошибок без ложных обвинений за 14 шагов из 100.
+Ожидаемо (~2 с): `{"episode_id": "ep-dtqmg4evwn", "tp": 3, "fp": 0, "fn": 0, "f1": 1.0, "reward": 0.974, "steps": 14}` —
+честный скриптовый аудитор нашёл все 3 ошибки без ложных обвинений за 14 шагов из 100.
 
 ```bash
 make check
@@ -30,7 +30,7 @@ make check
 | Что проверено | Результат | Где смотреть / как повторить |
 |---|---|---|
 | Табло самопроверки в духе жюри (контракт, данные, награда, воспроизводимость) | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
-| Тестов (pytest + hypothesis) | <!--fact:n_tests-->686<!--/fact--> | `make check` |
+| Тестов (pytest + hypothesis) | <!--fact:n_tests-->691<!--/fact--> | `make check` |
 | Намеренные ошибки в оценщике, пойманные тестами | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` → `reports/mutation.md` |
 | Независимый проверяльщик эталона и доказательств (без `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> эпизодов, 0 расхождений | шаг `verify-independent` в `make check` |
 | Симуляция жюри чёрным ящиком (свои политики и оценщик) | <!--fact:jury_sim_open-->0<!--/fact--> открытых находок | [`reports/jury_sim.md`](reports/jury_sim.md) |
@@ -108,7 +108,7 @@ the answer key and computes F1 and the reward; everything runs offline with one 
 |---|---|---|---|
 | Запуск одной командой | `Makefile`, `scripts/check.sh`, `Dockerfile` (образ по дайджесту), `.github/workflows/check.yml` | `make quick` (полная: `make check` / `make docker-check`) | `quick smoke: …s`; у полной — табло <!--fact:selfcheck_total-->90/90<!--/fact--> и `check: ALL GREEN` |
 | Версии конфигураций | `configs/*.json` (`version`), `configs/LOCK.json`, `configs/CHANGELOG.md`, `config_version` + `config_hash` в каждом `manifest.json` | `python -m pytest -q tests/test_configs_lock.py` | `5 passed`: содержимое без смены версии не пройдёт |
-| Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1195<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
+| Журналы траекторий | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1198<!--/fact--> строк, <!--fact:traj_runs-->64<!--/fact--> прогонов, `run_id` и метаданные), `reports/grader_log.jsonl` (цепочка хешей) | `python -m auditenv replay && python -m auditenv verify-log` | `replay: 64 runs, 0 mismatches`, `chain OK (matches published head)` |
 | Измеренный разбор сбоев | [`docs/FAILURES.md`](docs/FAILURES.md): <!--fact:failures_closed-->18<!--/fact--> закрытых уязвимостей с тестами‑сторожами, полнота по вариантам с интервалами Уилсона, seed каждого примера | `python -m auditenv analyze --n 60` | таблицы признаков и вариантов; oracle и независимый проверяльщик решают 100 % |
 | Честные ограничения | [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) | `python -m auditenv docs-check` | `0 mismatches`: числа в документах совпадают с реальностью |
 
@@ -143,7 +143,7 @@ make check
 
 `make check` — это по порядку:
 
-1. весь pytest (<!--fact:n_tests-->686<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
+1. весь pytest (<!--fact:n_tests-->691<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
    поверхностных признаков, атаки на песочницу агента);
 2. табло self‑check в духе жюри: 4 блока × 20 проверок на 20 эпизодах и 20 парных преобразованиях,
    диагностика P/R/F1 (макро и микро), возврат на чистых и ошибочных книгах, шаги, время p50/p95;
@@ -164,7 +164,7 @@ make check
 проверяет собственный валидатор `auditenv/jsonschema_lite.py`. В контейнере проверка идёт от
 пользователя `auditor`, писать можно только в `reports/` и `trajectories/`.
 
-Размеры открытых эпизодов: <!--fact:ep_ledger_range-->235–335<!--/fact--> проводок, <!--fact:ep_docs_range-->54–72<!--/fact--> документов,
+Размеры открытых эпизодов: <!--fact:ep_ledger_range-->235–360<!--/fact--> проводок, <!--fact:ep_docs_range-->50–77<!--/fact--> документов,
 <!--fact:ep_issues_range-->0–4<!--/fact--> ошибок; oracle тратит 1 шаг, simple_reconcile — 11–16 из 100.
 
 **Закрытый прогон (жюри).** Генератор открыт, поэтому для скрытых seed задайте секретную соль —
@@ -346,7 +346,7 @@ auditenv/
               interactions.py transforms.py episode.py export.py
   env/        env.py tools.py calculator.py cursors.py errors.py data.py
   grader/     schema.py normalize.py matcher.py reward.py validate_truth.py log.py core.py
-  policies/   random_explorer.py simple_reconcile.py flag_all.py oracle.py attacks.py stress.py base.py
+  policies/   random_explorer.py simple_reconcile.py (+ careful_reconcile) flag_all.py oracle.py attacks.py stress.py base.py
               truth_hunter.py (враждебная политика только для тестов изоляции)
   runner.py serve.py selfcheck.py leakscan.py lint.py analysis.py verify_provenance.py docs_check.py cli.py
 tools/        verify_independent.py   (независимый проверяльщик: только stdlib)

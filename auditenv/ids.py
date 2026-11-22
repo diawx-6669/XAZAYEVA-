@@ -58,7 +58,14 @@ class IdFactory:
                 self.used.add(s)
                 return s
 
-    def episode_id(self) -> str:
-        s = "ep-" + self.token(10).lower()
+    def episode_id(self, config_hash: str = "") -> str:
+        """The naming stream gives the token; config_hash is mixed in so that one seed with two
+        different configs never shares an episode_id (jury simulation finding #4). The RNG draw is
+        the same either way, so every other ID of the episode is unaffected by this mixing."""
+        tok = self.token(10)
+        if config_hash:
+            h = hashlib.sha256(f"{tok}:{config_hash}".encode("utf-8")).digest()
+            tok = "".join(ALPHABET[b % len(ALPHABET)] for b in h[:10])
+        s = "ep-" + tok.lower()
         self.used.add(s)
         return s

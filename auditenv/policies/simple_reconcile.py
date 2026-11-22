@@ -162,3 +162,15 @@ class SimpleReconcile(Policy):
                     out.append(finding("period_cutoff", [i["invoice_id"]], row["debit_minor"], base,
                                        [i["doc_id"], row["row_id"], "policy"], "issued outside the period (local time)"))
         return out[:30]
+
+
+class CarefulReconcile(SimpleReconcile):
+    """simple_reconcile with every documented refinement switched on (credit notes, previous business
+    day FX, overpayments, no FX re-check of duplicates). Not one of the four case baselines: a reference
+    point that shows the environment's distractors are separable by correct bookkeeping, and that the
+    weak baseline loses reward for the right reasons (docs/FAILURES.md)."""
+
+    name = "careful_reconcile"
+
+    def __init__(self, seed: int = 0):
+        super().__init__(seed, rules=BASE_RULES | frozenset(OPTIONAL_RULES))

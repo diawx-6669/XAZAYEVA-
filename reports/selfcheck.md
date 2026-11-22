@@ -1,6 +1,6 @@
 # AuditEnv self-check
 
-commit `43dbc3d86b34` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
+commit `0c8c01220c01` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
 
 Хеши конфигов: `clean-only` 888d9b2efe8dabab, `dev-global` 3e5719530ff397f6, `dev-mixed` 58d390229a2b5ad5, `interaction-heavy` 11d80441ae5df73a, `stress` 60b0fe2dbb0fcdfe, `train-easy` 8946748a75222c01, `train-global` 54ed4c6d541dc3f9
 
@@ -115,7 +115,8 @@ P, R — макро (среднее по эпизодам, где величин
 | Политика | P | R | F1 | микро P | микро R | микро F1 | Возврат | на чистых | на ошибочных | Возврат (эксп.) | Шаги | Агент видел награду |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | random_explorer | n/a | 0.000 | 0.350 | n/a | 0.000 | 0.000 | -0.320 | 0.942 | -1.000 | -0.320 | 30.0 | нет |
-| simple_reconcile | 0.490 | 0.888 | 0.519 | 0.604 | 0.865 | 0.711 | 0.019 | -1.000 | 0.568 | 0.019 | 14.5 | нет |
+| simple_reconcile | 0.473 | 0.901 | 0.511 | 0.589 | 0.892 | 0.710 | 0.003 | -1.000 | 0.543 | 0.003 | 14.6 | нет |
+| careful_reconcile | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 0.973 | 0.975 | 0.972 | 0.973 | 14.6 | нет |
 | flag_all | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | -1.000 | -1.000 | 3.0 | нет |
 | oracle | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | -0.300 | 1.0 | нет |
 | oracle_observing | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 0.989 | 1.000 | 0.983 | 0.989 | 6.4 | нет |
@@ -129,40 +130,41 @@ P, R — макро (среднее по эпизодам, где величин
 | attack:wrong_currency | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | -1.000 | -1.000 | 1.0 | нет |
 | attack:all_types_all_docs | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | -1.000 | -1.000 | 1.0 | нет |
 | attack:empty | n/a | 0.000 | 0.350 | n/a | 0.000 | 0.000 | -0.300 | 1.000 | -1.000 | -0.300 | 1.0 | нет |
-| attack:cem_best | 0.005 | 0.096 | 0.009 | 0.005 | 0.054 | 0.009 | -0.983 | -1.000 | -0.973 | -1.000 | 4.0 | нет |
+| attack:cem_best | 0.003 | 0.019 | 0.004 | 0.003 | 0.027 | 0.005 | -0.992 | -1.000 | -0.988 | -1.000 | 4.0 | нет |
 
 ## Разбор сбоев simple_reconcile
 
 | Тип ошибки | Найдено / всего |
 |---|---|
-| duplicate_invoice | 11 / 11 |
-| fx_rate | 7 / 12 |
+| duplicate_invoice | 12 / 12 |
+| fx_rate | 7 / 11 |
 | payment_allocation | 5 / 5 |
 | period_cutoff | 9 / 9 |
 
-Коды причин ложных выводов: `ids_mismatch`: 5, `unmatched`: 13, `wrong_type`: 3
+Коды причин ложных выводов: `ids_mismatch`: 5, `unmatched`: 14, `wrong_type`: 4
 
-Журнал оценщика `reports/grader_log.jsonl`: цепочка хешей, голова `a9f87c7fec92d41f7351b884eee61221ea9f6e80c231e70ea5dbfe9db34c26c5` (проверка: `python -m auditenv verify-log`).
+Журнал оценщика `reports/grader_log.jsonl`: цепочка хешей, голова `123c0f370bb03583c0e079c2ec41268ee8d82d3125388ce00792d7788d8f98dd` (проверка: `python -m auditenv verify-log`).
 
 ## Замеры времени (недетерминированно, зависит от машины)
 
-Полный self-check: 11.3 c.
+Полный self-check: 14.2 c.
 
 | Политика | ср, мс | p50, мс | p95, мс | макс, мс |
 |---|---|---|---|---|
-| random_explorer | 120 | 116 | 139 | 142 |
-| simple_reconcile | 124 | 117 | 145 | 147 |
-| flag_all | 109 | 105 | 131 | 132 |
-| oracle | 3 | 3 | 4 | 4 |
-| oracle_observing | 3 | 3 | 4 | 4 |
-| attack:twins | 5 | 5 | 8 | 9 |
+| random_explorer | 122 | 122 | 148 | 157 |
+| simple_reconcile | 120 | 117 | 137 | 143 |
+| careful_reconcile | 115 | 108 | 138 | 142 |
+| flag_all | 104 | 101 | 125 | 129 |
+| oracle | 2 | 2 | 3 | 3 |
+| oracle_observing | 2 | 2 | 3 | 3 |
+| attack:twins | 5 | 5 | 5 | 11 |
 | attack:type_bruteforce | 4 | 4 | 5 | 5 |
-| attack:amount_bruteforce | 4 | 4 | 5 | 10 |
-| attack:guess_ids | 4 | 4 | 5 | 5 |
+| attack:amount_bruteforce | 5 | 5 | 6 | 7 |
+| attack:guess_ids | 4 | 4 | 5 | 6 |
 | attack:evidence_spam | 4 | 4 | 5 | 5 |
-| attack:junk_explanation | 4 | 4 | 5 | 5 |
-| attack:persuasive_wrong | 4 | 4 | 6 | 7 |
-| attack:wrong_currency | 6 | 6 | 7 | 7 |
-| attack:all_types_all_docs | 6 | 5 | 7 | 13 |
-| attack:empty | 4 | 4 | 5 | 5 |
-| attack:cem_best | 4 | 4 | 5 | 5 |
+| attack:junk_explanation | 4 | 4 | 5 | 9 |
+| attack:persuasive_wrong | 4 | 4 | 5 | 7 |
+| attack:wrong_currency | 4 | 4 | 5 | 5 |
+| attack:all_types_all_docs | 5 | 4 | 6 | 7 |
+| attack:empty | 4 | 3 | 4 | 5 |
+| attack:cem_best | 5 | 4 | 8 | 10 |

@@ -22,11 +22,11 @@ OUT = ROOT / "site" / "replay.html"
 
 # (episode_id, label) — chosen to show different situations; labels describe the PUBLIC setting only.
 EPISODES = [
-    ("ep-vq9n3qwk8v", "KWD, экспонента 3"),
-    ("ep-vw9vceq4qf", ""),
-    ("ep-ap6e6dpf7p", ""),
-    ("ep-p2ndc2nyey", "+ обрыв политик"),
-    ("ep-wtma6rce3f", ""),
+    ("ep-pdawh48ngm", "KWD, экспонента 3"),
+    ("ep-83ty6jrf5c", ""),
+    ("ep-wz2abaewnk", ""),
+    ("ep-hg7nbxf7rj", "+ обрыв политик"),
+    ("ep-qmagfmdtgk", ""),
 ]
 POLICY_ORDER = ["simple_reconcile", "random_explorer", "flag_all", "step_burner", "hung"]
 STEP_KEYS = ("step", "action", "observation", "reward", "terminated", "truncated", "truncation_reason")

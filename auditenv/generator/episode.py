@@ -151,7 +151,7 @@ def generate_episode(seed, config=None) -> Episode:
     rejections = []
     for attempt in range(cfg["max_attempts"]):
         story = build_story(seed, cfg, attempt)
-        book = build_book(story, seed, attempt)
+        book = build_book(story, seed, attempt, chash)
         clean_files = _export(book, cfg, chash, seed, attempt)
         from ..env.data import PublicData
         from ..grader.validate_truth import solve

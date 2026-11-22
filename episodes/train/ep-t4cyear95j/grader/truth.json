@@ -1,0 +1,1 @@
+{"episode_id":"ep-t4cyear95j","issues":[{"affected_ids":["SF-HSB84S"],"currency":"USD","evidence_sets":[["FD-K538EFX7","GL-D3YAPP7","fx:2026-02-13:KWD:USD","policy"],["FD-K538EFX7","GL-2HGMN6D","GL-XHFFB45","GL-B2B7NAT","fx:2026-02-13:KWD:USD","policy"]],"expected_amount_minor":1974,"issue_id":"ISS-001","type":"fx_rate"}],"tolerance_minor":1}

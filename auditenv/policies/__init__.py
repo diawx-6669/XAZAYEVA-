@@ -2,11 +2,12 @@
 
 from .flag_all import FlagAll
 from .random_explorer import RandomExplorer
-from .simple_reconcile import SimpleReconcile
+from .simple_reconcile import CarefulReconcile, SimpleReconcile
 from .stress import Hung, StepBurner
 from .truth_hunter import TruthHunter
 
 AGENT_POLICIES = {"random_explorer": RandomExplorer, "simple_reconcile": SimpleReconcile, "flag_all": FlagAll,
+                  "careful_reconcile": CarefulReconcile,
                   "step_burner": StepBurner, "hung": Hung,
                   "truth_hunter": TruthHunter}  # truth_hunter: adversary for isolation tests only
 BASELINES = ["random_explorer", "simple_reconcile", "flag_all", "oracle"]

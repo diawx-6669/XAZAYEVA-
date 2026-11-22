@@ -41,52 +41,52 @@ a { color: var(--violet); }
     <h2>Два одинаковых счёта одному клиенту</h2>
     <pre>INV-769H2Q  CUST-HP5CDAE4  2026-02-26T09:20:41-11:00
   6 строк, service_period 2026-02, итого 1 824 465 JPY
-INV-HH2YP3  CUST-HP5CDAE4  2026-02-27T22:03:43+00:00
+INV-C84BRW  CUST-HP5CDAE4  2026-02-27T22:03:43+00:00
   6 строк, service_period 2026-02, итого 1 824 465 JPY</pre>
     <details>
       <summary>Ошибка или ловушка? Показать ответ</summary>
       <p class="error"><b>Ошибка.</b> duplicate_invoice (ISS-003). Те же клиент, строки и service_period, разница в датах 1 дн. Оба счёта проведены, выручка завышена на 1 824 465 JPY.</p>
       <p class="rule">Дубль — это та же услуга за тот же период, выставленная дважды.</p>
-      <p class="src">Эпизод <code>ep-ghqjfb86vj</code></p>
+      <p class="src">Эпизод <code>ep-n5y6es2vx3</code></p>
     </details>
   </article>
   <article class="card">
     <h2>Два одинаковых счёта одному клиенту</h2>
-    <pre>SF-KEP584Y  CP-NCDG46  2026-07-01T10:22:00+04:00
+    <pre>SF-KEP584Y  CP-NCDG46  2026-07-01T10:22:31+04:00
   1 строка, service_period 2026-07, итого 87 218,00 KZT
-SF-QJKZB9P  CP-NCDG46  2026-08-03T10:13:00+04:00
+SF-QJKZB9P  CP-NCDG46  2026-08-03T06:32:12+00:00
   1 строка, service_period 2026-08, итого 87 218,00 KZT</pre>
     <details>
       <summary>Ошибка или ловушка? Показать ответ</summary>
       <p class="trap"><b>Ловушка.</b> ежемесячная аренда. Сумма та же, но service_period разный (2026-07 и 2026-08): это две разные услуги.</p>
       <p class="rule">Совпадение суммы и клиента — повод проверить период услуги, а не обвинение.</p>
-      <p class="src">Эпизод <code>ep-3bwbxj4nsy</code></p>
+      <p class="src">Эпизод <code>ep-4e8gzahap8</code></p>
     </details>
   </article>
   <article class="card">
     <h2>Счёт в последний вечер периода</h2>
-    <pre>SF-S4PJ2AW  CP-D3SQHF  2026-09-30T19:53:00+00:00
-  5 строк, service_period 2026-09, итого 2 430 758,12 KZT
+    <pre>SF-S4PJ2AW  CP-BPP4HC  2026-09-30T19:52:39+00:00
+  5 строк, service_period 2026-09, итого 3 101 177,67 KZT
 граница периода: 2026-10-01T00:00:00+04:00 (не включая)
 проведён в этом периоде</pre>
     <details>
       <summary>Ошибка или ловушка? Показать ответ</summary>
-      <p class="trap"><b>Ловушка.</b> по местному времени (Asia/Dubai) счёт выписан 2026-09-30 23:53 — до полуночи, внутри периода. Проведён правильно.</p>
+      <p class="trap"><b>Ловушка.</b> по местному времени (Asia/Dubai) счёт выписан 2026-09-30 23:52 — до полуночи, внутри периода. Проведён правильно.</p>
       <p class="rule">Поздний час — не ошибка. Ошибка — только если местное время за границей.</p>
-      <p class="src">Эпизод <code>ep-3bwbxj4nsy</code></p>
+      <p class="src">Эпизод <code>ep-4e8gzahap8</code></p>
     </details>
   </article>
   <article class="card">
     <h2>Счёт в последний вечер периода</h2>
-    <pre>INV-54YRZJB  CUST-WN3QX4  2026-10-31T19:48:35+00:00
-  4 строки, service_period 2026-11, итого 2 883 235,96 KZT
+    <pre>INV-734N63R  CUST-WY3RPB  2026-10-31T20:01:04+00:00
+  4 строки, service_period 2026-11, итого 3 162 342,28 KZT
 граница периода: 2026-11-01T00:00:00+05:00 (не включая)
 проведён в этом периоде</pre>
     <details>
       <summary>Ошибка или ловушка? Показать ответ</summary>
-      <p class="error"><b>Ошибка.</b> period_cutoff (ISS-003). По местному времени (Asia/Almaty) счёт выписан 2026-11-01 00:48, уже после границы.</p>
+      <p class="error"><b>Ошибка.</b> period_cutoff (ISS-002). По местному времени (Asia/Almaty) счёт выписан 2026-11-01 01:01, уже после границы.</p>
       <p class="rule">Дату сравнивают с границей периода в часовом поясе компании, а не в UTC.</p>
-      <p class="src">Эпизод <code>ep-rmhcqsyns9</code></p>
+      <p class="src">Эпизод <code>ep-8jyef897pe</code></p>
     </details>
   </article>
   <article class="card">
@@ -99,7 +99,7 @@ SF-QJKZB9P  CP-NCDG46  2026-08-03T10:13:00+04:00
       <summary>Ошибка или ловушка? Показать ответ</summary>
       <p class="error"><b>Ошибка.</b> fx_rate (ISS-001). По политике нужен курс fx:2026-09-24:JPY:KZT = 3.29583; проведено по курсу другого дня, искажение 22 604,79 KZT.</p>
       <p class="rule">Курс — на местную дату операции; нет курса — последний рабочий день до неё.</p>
-      <p class="src">Эпизод <code>ep-3bwbxj4nsy</code></p>
+      <p class="src">Эпизод <code>ep-4e8gzahap8</code></p>
     </details>
   </article>
   <article class="card">
@@ -107,38 +107,40 @@ SF-QJKZB9P  CP-NCDG46  2026-08-03T10:13:00+04:00
     <pre>BL-QWSXMNE  CUST-8AXBD2  2026-11-17T15:46:54+00:00
   6 строк, service_period 2026-11, итого 3 307,080 KWD
 местная дата: 2026-11-18
-проведено в USD: 11 081,36 (строка JE-HGPPN4N2)</pre>
+проведено в USD: 11 081,36 (строка JE-R32D5SCD)</pre>
     <details>
       <summary>Ошибка или ловушка? Показать ответ</summary>
       <p class="trap"><b>Ловушка.</b> по UTC это 2026-11-17, но курс берётся на местную дату 2026-11-18: fx:2026-11-18:KWD:USD = 3.35080. Пересчёт даёт ровно проведённую сумму.</p>
       <p class="rule">Ночной валютный документ — проверка, что курс взят по местной дате, а не по UTC.</p>
-      <p class="src">Эпизод <code>ep-eedmc2zyem</code></p>
+      <p class="src">Эпизод <code>ep-9m7sfznpsr</code></p>
     </details>
   </article>
   <article class="card">
     <h2>Платёж закрыл счёт не полностью</h2>
-    <pre>BNK-CYGYG6  2026-08-07T14:05:36+04:00  1 774 200,20 KZT  ссылки: SF-GYE7ZNR
-  JE-52CRP8C4  1200  Dr 0,00  Cr 1 774 200,20  invoice SF-GYE7ZNR
-  JE-8C7KCD84  1000  Dr 1 774 200,20  Cr 0,00  invoice -</pre>
+    <pre>BNK-V6S9NC  2026-09-22T10:10:24+04:00  758 654 JPY  ссылки: SF-8Y5TZKJ
+  JE-6WPPRF6F  7900  Dr 9 968,72  Cr 0,00  invoice -
+  JE-JPQ94SCY  1000  Dr 2 482 983,50  Cr 0,00  invoice -
+  JE-HY5H7AB4  1200  Dr 0,00  Cr 2 492 952,22  invoice SF-8Y5TZKJ</pre>
     <details>
       <summary>Ошибка или ловушка? Показать ответ</summary>
-      <p class="trap"><b>Ловушка.</b> законная частичная оплата. Счёт SF-GYE7ZNR на 5 544 375,64 KZT; всё полученное ушло на 1200, остаток честно открыт у клиента. На 2400 ничего нет.</p>
+      <p class="trap"><b>Ловушка.</b> законная частичная оплата. Счёт SF-8Y5TZKJ на 1 243 696 JPY; всё полученное ушло на 1200, остаток честно открыт у клиента. На 2400 ничего нет.</p>
       <p class="rule">Открытый остаток — не ошибка. Ошибка — деньги, которые пришли и не разнесены.</p>
-      <p class="src">Эпизод <code>ep-3bwbxj4nsy</code></p>
+      <p class="src">Эпизод <code>ep-4e8gzahap8</code></p>
     </details>
   </article>
   <article class="card">
     <h2>Платёж закрыл счёт не полностью</h2>
-    <pre>BNK-XTPA5C  2027-01-19T10:46:34-05:00  1 425 159 JPY  ссылки: BL-9E7PF3
-  LR-7MHC34P  1000  Dr 10 050,61  Cr 0,00  invoice -
-  LR-CB7AX3R  2400  Dr 0,00  Cr 4 522,78  invoice -
-  LR-P5WGGQ8  7900  Dr 0,00  Cr 15,79  invoice -
-  LR-QT3S7TZ  1200  Dr 0,00  Cr 5 512,04  invoice BL-9E7PF3</pre>
+    <pre>BNK-XTPA5C  2027-01-20T17:52:51+00:00  2 549,46 USD  ссылки: BL-JEPZBD
+  LR-FPVTC8G  2400  Dr 0,00  Cr 1 147,26  invoice -
+  LR-ERB9MD9  6500  Dr 5,00  Cr 0,00  invoice -
+  LR-GJKQDG8  1000  Dr 2 549,46  Cr 0,00  invoice -
+  LR-WYYHPH7  1200  Dr 0,00  Cr 1 402,20  invoice BL-JEPZBD
+  LR-V8R9T76  1000  Dr 0,00  Cr 5,00  invoice -</pre>
     <details>
       <summary>Ошибка или ловушка? Показать ответ</summary>
-      <p class="error"><b>Ошибка.</b> payment_allocation (ISS-002). Платёж ссылается на счёт, но часть денег осталась на 2400 «Unapplied Cash»: 4 522,78 USD. Дебиторка завышена на эту сумму.</p>
+      <p class="error"><b>Ошибка.</b> payment_allocation (ISS-002). Платёж ссылается на счёт, но часть денег осталась на 2400 «Unapplied Cash»: 1 147,26 USD. Дебиторка завышена на эту сумму.</p>
       <p class="rule">Деньги со ссылкой на счёт должны уменьшать 1200, а не висеть на 2400.</p>
-      <p class="src">Эпизод <code>ep-mt68p5wbd2</code></p>
+      <p class="src">Эпизод <code>ep-kcjvzycstz</code></p>
     </details>
   </article>
   <p class="src">Собрано <code>tools/cards.py</code>: ошибки — из <code>truth.json</code>, двойники — по тегам истории в

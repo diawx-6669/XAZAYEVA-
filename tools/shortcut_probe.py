@@ -110,7 +110,7 @@ def plant_tell(eps, seed=0):
 
 
 def known_tell(r) -> dict:
-    """The one format tell this probe found (see the report): seconds == 0 on partially applied receipts."""
+    """The format tell this probe found before v1.1 (see the report): seconds == 0 on partially applied receipts."""
     rates = r["real"]["rates"]
     alloc, clean = rates.get("payments:payment_allocation"), rates["payments:clean"]
     return {"payment_allocation_seconds_zero": alloc["seconds_zero"] / alloc["n"] if alloc else None,
@@ -273,18 +273,13 @@ def render(r) -> str:
         "`boundary_start` and `night_fx` in UTC too, so UTC writing alone is a weak signal (see the rates).",
         "2. **Round amounts** are a currency proxy: foreign documents are converted, so their base-currency "
         "postings are rarely round; an FX error needs a foreign document. Legitimate.",
-        "3. **Seconds = 00 on partially applied receipts is a real tell.** The carrier payment of "
-        "`partial_fx_cutoff` (`auditenv/generator/story.py`, carriers block) is timestamped "
-        "`midnight + timedelta(minutes=...)` without seconds, so its seconds are always 00: "
+        "3. **Seconds = 00 was a real tell, fixed on 22.11 (v1.1).** The carrier payment of "
+        "`partial_fx_cutoff` used to be timestamped `midnight + timedelta(minutes=...)` without seconds "
+        "(36.5% of `payment_allocation` receipts had 00 seconds against 8.0% of clean ones). Every generated "
+        "timestamp now draws its seconds, the look-alikes `boundary_end` / `boundary_start` / boundary "
+        "payments included, so 00 seconds no longer mark either errors or their twins: now "
         f"{kt['payment_allocation_seconds_zero']:.1%} of `payment_allocation` receipts vs "
-        f"{kt['clean_payment_seconds_zero']:.1%} of clean receipts. The same 00 seconds also mark records "
-        "built at a fixed minute that are NOT errors - the look-alikes `boundary_end` / `boundary_start` "
-        "(23:50 and 00:05 local) - which is why clean invoices have more 00-second timestamps than "
-        "duplicates. So it is weak as a strategy: most 00-second records are clean, and flagging them "
-        "costs false positives (one FP outweighs 333 steps, `docs/AUDIT_STANDARDS.md` section 3); it does "
-        "not touch the grader. Fix for v1.1: draw the seconds like every other timestamp. Not fixed in "
-        "the submission because it changes the bytes of committed episodes, golden hashes and trajectories; "
-        "`tests/test_shortcut_probe.py` pins it, so the fix will show up as a deliberate test change.",
+        f"{kt['clean_payment_seconds_zero']:.1%} of clean receipts. `tests/test_shortcut_probe.py` pins the fix.",
         "",
     ]
     return "\n".join(lines)

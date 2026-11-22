@@ -1,6 +1,6 @@
 # Статистика записанных траекторий
 
-Сгенерировано `python tools/trajectory_stats.py` из `trajectories/trajectories.jsonl` (1195 строк, 64 прогонов).
+Сгенерировано `python tools/trajectory_stats.py` из `trajectories/trajectories.jsonl` (1198 строк, 64 прогонов).
 Награда — терминальная в режиме train (как записана в траектории).
 
 | Политика | Прогонов | Шагов: медиана / макс | list_records | get_record | get_document | calculator | submit | Ошибки инструментов | Как закончился | Средняя награда |
@@ -8,7 +8,7 @@
 | `flag_all` | 20 | 3 / 3 | 40 | 0 | 0 | 0 | 20 | — | submitted 20 | -1.000 |
 | `hung` | 2 | 0 / 0 | 0 | 0 | 0 | 0 | 0 | `episode_over` 2 | truncated: policy_unresponsive 2 | -0.100 |
 | `random_explorer` | 20 | 30 / 30 | 285 | 125 | 20 | 105 | 20 | `unknown_tool` 45, `not_found` 35 | submitted 20 | -0.515 |
-| `simple_reconcile` | 20 | 14 / 16 | 229 | 20 | 0 | 0 | 20 | — | submitted 20 | +0.429 |
+| `simple_reconcile` | 20 | 14 / 17 | 232 | 20 | 0 | 0 | 20 | — | submitted 20 | +0.410 |
 | `step_burner` | 2 | 100 / 100 | 200 | 0 | 0 | 0 | 0 | — | truncated: max_steps 2 | -0.100 |
 
 ## Какие таблицы листают
@@ -17,7 +17,7 @@
 |---|---|---|---|---|
 | `flag_all` | 0 | 20 | 20 | 0 |
 | `random_explorer` | 115 | 75 | 25 | 70 |
-| `simple_reconcile` | 122 | 20 | 20 | 67 |
+| `simple_reconcile` | 125 | 20 | 20 | 67 |
 | `step_burner` | 200 | 0 | 0 | 0 |
 
 Наблюдения: честный `simple_reconcile` читает все таблицы постранично и не делает ни одной ошибки инструмента;

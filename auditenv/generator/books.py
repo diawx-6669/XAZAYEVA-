@@ -295,9 +295,9 @@ class Book:
         return {"document": doc, "rows": [self.row_public(r) for r in self.rows_of(owner)]}
 
 
-def build_book(story, seed, attempt: int = 0) -> Book:
+def build_book(story, seed, attempt: int = 0, config_hash: str = "") -> Book:
     ids = IdFactory(make_rng(seed, "naming", attempt))
-    episode_id = ids.episode_id()
+    episode_id = ids.episode_id(config_hash)
     book = Book(story, ids, episode_id)
     ent = {e: ids.new("entity") for e in story.entities}
     for inv in story.invoices.values():

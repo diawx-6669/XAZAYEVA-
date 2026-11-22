@@ -32,4 +32,4 @@
 | Кто | Что нашёл | Строка в `docs/FAILURES.md` |
 |---|---|---|
 | команда AuditEnv, симуляция жюри | неканонический курсор проходил HMAC | 18 |
-| команда AuditEnv, `tools/shortcut_probe.py` | секунды `00` у платежа сценария `partial_fx_cutoff` | открыто, `docs/ROADMAP.md` R0 |
+| команда AuditEnv, `tools/shortcut_probe.py` | секунды `00` у платежа сценария `partial_fx_cutoff` | исправлено в v1.1 (22.11), `docs/ROADMAP.md` R0 |

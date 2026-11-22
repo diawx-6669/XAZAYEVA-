@@ -503,7 +503,7 @@ def _micro(tp, fp, fn):
     return p, r, f1
 
 
-DIAG_POLICIES = ["random_explorer", "simple_reconcile", "flag_all", "oracle", "oracle_observing"]
+DIAG_POLICIES = ["random_explorer", "simple_reconcile", "careful_reconcile", "flag_all", "oracle", "oracle_observing"]
 
 
 def diagnostics(eps: Episodes, log_path=None) -> tuple:

@@ -21,12 +21,12 @@
   (`public/`): `manifest.json`, `ledger.csv`, `invoices.jsonl`, `payments.jsonl`, `fx.csv`,
   `policy.json`. Закрытая (`grader/`): `truth.json` (эталон) и `provenance.json` (история мутаций).
 * **Сколько.** <!--fact:ds_n_episodes-->20<!--/fact--> эпизодов: <!--fact:ds_n_train-->10<!--/fact--> train и <!--fact:ds_n_dev-->10<!--/fact--> dev. Конфиги: <!--fact:ds_configs-->train-easy 6, train-global 4, dev-mixed 3, interaction-heavy 3, clean-only 2, dev-global 2<!--/fact-->.
-* **Объём.** <!--fact:ds_ledger_total-->5665<!--/fact--> строк книги, <!--fact:ds_invoices_total-->770<!--/fact--> счетов, <!--fact:ds_payments_total-->466<!--/fact--> платежей,
-  <!--fact:ds_fx_total-->2736<!--/fact--> строк курсов; <!--fact:ds_public_mb-->1.3<!--/fact--> МБ открытых файлов. На эпизод: <!--fact:ep_ledger_range-->235–335<!--/fact--> проводок,
-  <!--fact:ep_docs_range-->54–72<!--/fact--> документов, <!--fact:ep_issues_range-->0–4<!--/fact--> ошибок; чистых эпизодов <!--fact:ep_clean_count-->5<!--/fact-->.
+* **Объём.** <!--fact:ds_ledger_total-->5734<!--/fact--> строк книги, <!--fact:ds_invoices_total-->770<!--/fact--> счетов, <!--fact:ds_payments_total-->469<!--/fact--> платежей,
+  <!--fact:ds_fx_total-->2736<!--/fact--> строк курсов; <!--fact:ds_public_mb-->1.3<!--/fact--> МБ открытых файлов. На эпизод: <!--fact:ep_ledger_range-->235–360<!--/fact--> проводок,
+  <!--fact:ep_docs_range-->50–77<!--/fact--> документов, <!--fact:ep_issues_range-->0–4<!--/fact--> ошибок; чистых эпизодов <!--fact:ep_clean_count-->5<!--/fact-->.
 * **Метки** — `truth.json`: <!--fact:ds_issues_total-->35<!--/fact--> ошибок (<!--fact:ds_issue_types-->fx_rate 10, payment_allocation 10, period_cutoff 8, duplicate_invoice 7<!--/fact-->),
   <!--fact:ds_variants-->11<!--/fact--> различных вариантов мутаций. У каждой: тип, каноничный ID, сумма искажения в
-  базовой валюте (<!--fact:ds_amount_range-->833–11904336533<!--/fact--> мин. единиц), <!--fact:ds_evidence_sets_range-->1–2<!--/fact--> набора доказательств по
+  базовой валюте (<!--fact:ds_amount_range-->604–795518700<!--/fact--> мин. единиц), <!--fact:ds_evidence_sets_range-->1–2<!--/fact--> набора доказательств по
   <!--fact:ds_evidence_size_range-->3–6<!--/fact--> ID.
 * **Разнообразие.** Базовые валюты: <!--fact:ds_base_currencies-->KZT 14, USD 5, JPY 1<!--/fact-->. Часовые пояса: <!--fact:ds_timezones-->Asia/Almaty 9, America/Lima 2, Asia/Dubai 2, Asia/Tokyo 2, Pacific/Pago_Pago 2, Asia/Kathmandu 1, Asia/Kolkata 1, Pacific/Kiritimati 1<!--/fact-->.
   Периоды покрывают <!--fact:ds_period_span-->2026-02-01 … 2027-02-01<!--/fact--> (в том числе через Новый год).

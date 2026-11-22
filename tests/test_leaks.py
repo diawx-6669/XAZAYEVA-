@@ -78,7 +78,10 @@ def test_seed_salt_blocks_seed_bruteforce(monkeypatch):
     monkeypatch.delenv("AUDITENV_SEED_SALT")
     from auditenv.ids import IdFactory, make_rng
 
-    assert all(IdFactory(make_rng(s, "naming", 0)).episode_id() != salted.episode_id for s in range(2000))
+    import json
+
+    chash = json.loads(salted.files["manifest.json"])["config_hash"]  # public, so the attacker has it
+    assert all(IdFactory(make_rng(s, "naming", 0)).episode_id(chash) != salted.episode_id for s in range(2000))
 
 
 @pytest.mark.salt
@@ -102,3 +105,13 @@ def test_agent_process_gets_no_salt_and_no_paths(monkeypatch):
 def test_manifest_has_no_config_name(clean):
     m = clean.public().manifest
     assert "config_name" not in m and "clean" not in str(m)
+
+
+def test_same_seed_different_config_gives_different_episode_id():
+    """Jury simulation finding #4: episode_id must tell configs apart, or grader logs are ambiguous."""
+    from auditenv.generator.episode import generate_episode
+
+    a = generate_episode(7, "dev-mixed")
+    b = generate_episode(7, "train-easy")
+    assert a.episode_id != b.episode_id
+    assert generate_episode(7, "dev-mixed").episode_id == a.episode_id

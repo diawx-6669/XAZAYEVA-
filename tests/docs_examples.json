@@ -7,7 +7,7 @@
   "--log log.jsonl": "--log {TMP}/log.jsonl", "/tmp/twin": "{TMP}/twin", "/tmp/pairs.json": "{TMP}/pairs.json", "/tmp/my_findings.json": "{TMP}/my_findings.json"
  },
  "rules": [
-  {"first_line": "python -m auditenv run --policy simple_reconcile --seed 12", "action": "run", "expect": "\"f1\": 0.8, \"reward\": 0.574, \"steps\": 14"},
+  {"first_line": "python -m auditenv run --policy simple_reconcile --seed 12", "action": "run", "expect": "\"f1\": 1.0, \"reward\": 0.974, \"steps\": 14"},
   {"first_line": "python -m auditenv run --policy-cmd \"python examples/minimal_agent.py\" --seed 12", "action": "run", "expect": "\"episode_id\""},
   {"first_line": "python -m auditenv run --policy-cmd \"python examples/minimal_agent.py\" --episode-dir", "action": "run", "expect": "eval mode: see grader log"},
   {"first_line": "export AUDITENV_SEED_SALT=", "action": "run", "expect": "eval mode: see grader log"},

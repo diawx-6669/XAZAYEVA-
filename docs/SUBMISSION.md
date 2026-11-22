@@ -8,9 +8,9 @@
 | README: инструкции контейнера и единая команда проверки | `README.md` (блок критериев в начале), `make docker-check`, `make check`, `scripts/check.sh` | CI `.github/workflows/check.yml` (тот же `docker run --network none --cpus 2 --memory 4g`); локальный прогон образа: табло <!--fact:selfcheck_total-->90/90<!--/fact-->, `check: ALL GREEN` |
 | Matcher и награда: общий код сопоставления и награды, схемы и политики | `auditenv/grader/` (normalize, matcher, reward), `schemas/` (15 схем), `auditenv/policies/` | `tests/test_reward.py`, `tests/test_batch_c.py::test_jury_oracles_score_max`, блок «Надёжность награды» табло |
 | Эпизоды: 10 train + 10 dev | `episodes/train/`, `episodes/dev/` (+ `index.json` с дайджестами public и grader) | `tests/test_repro.py::test_exported_episodes_match_generator`, `check-schemas`, `verify-independent`, `verify-provenance` |
-| Тесты среды, сопоставления и награды | `tests/` (<!--fact:n_tests-->686<!--/fact--> тестов) | `make check` |
+| Тесты среды, сопоставления и награды | `tests/` (<!--fact:n_tests-->691<!--/fact--> тестов) | `make check` |
 | Четыре адаптера базовых политик | `random_explorer.py`, `simple_reconcile.py`, `flag_all.py`, `oracle.py` в `auditenv/policies/`; свой агент — `--policy-cmd` (`docs/ADAPTER.md`) | `tests/test_runner.py`, диагностика в `reports/selfcheck.md` |
-| Траектории: `trajectories.jsonl` с episode_id, step, action, observation, reward, terminated, truncated, без эталона в наблюдениях | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1195<!--/fact--> строк, `run_id` + метаданные) | `leakscan`, `replay`, `check-schemas` (схема `trajectory`), `tests/test_leaks.py::test_committed_trajectories_are_clean` |
+| Траектории: `trajectories.jsonl` с episode_id, step, action, observation, reward, terminated, truncated, без эталона в наблюдениях | `trajectories/trajectories.jsonl` (<!--fact:traj_lines-->1198<!--/fact--> строк, `run_id` + метаданные) | `leakscan`, `replay`, `check-schemas` (схема `trajectory`), `tests/test_leaks.py::test_committed_trajectories_are_clean` |
 | Записка о дизайне | `docs/DESIGN.md` (+ `docs/CONTRACT.md`, `docs/ADAPTER.md`) | ревью; `make docs-check` сверяет числа |
 | Демо (достаточно скриптовой политики) | `make demo` (`scripts/demo.sh`), `make finale-preflight` | ручной прогон 22.11 (см. план) |
 
@@ -31,7 +31,7 @@
 | `make venv` без сети | исправлено | раньше ставил пакеты из PyPI, хотя README обещает «без сети»; теперь `--no-index --find-links vendor/wheels --no-deps`, как в Dockerfile; тест `tests/test_guards.py` |
 | Секреты в истории | готово | `make prepublish`: 0 находок |
 | Личная почта в коммитах | **решить** | в 5 коммитах — личный e‑mail участника; после открытия репозитория он станет виден. Историю **не переписывать** (меняются все SHA, ломаются заголовок self‑check, сертификат и цепочка журнала) — только согласовать с участником |
-| Подсказки в данных | найдено и описано | `reports/shortcut_probe.md`: одна слабая подсказка (секунды `00`), исправление — `docs/ROADMAP.md` R0 |
+| Подсказки в данных | найдено и исправлено (v1.1) | `reports/shortcut_probe.md`: единственная найденная подсказка (секунды `00`) исправлена, тест `test_seconds_tell_is_fixed` |
 
 Удалить старые ветки (после смены основной ветки). Для читателя: `claude/*` — служебные ветки ИИ‑ассистента Claude Code,
 `beka*` — ветки участника, `round3`/`round4` — внутренние циклы доработки; всё из них уже в `main`.

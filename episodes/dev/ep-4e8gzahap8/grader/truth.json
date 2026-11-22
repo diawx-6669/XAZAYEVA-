@@ -1,0 +1,1 @@
+{"episode_id":"ep-4e8gzahap8","issues":[{"affected_ids":["SF-A4FBTJ8"],"currency":"KZT","evidence_sets":[["DC-2WREJWYE","JE-JQ6CWHT9","fx:2026-09-24:JPY:KZT","policy"]],"expected_amount_minor":2260479,"issue_id":"ISS-001","type":"fx_rate"}],"tolerance_minor":1}

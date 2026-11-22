@@ -1,0 +1,14 @@
+issue_id,type,evidence_set,evidence_id,record_kind,what_it_says
+ISS-001,fx_rate,1,DC-4CKP4X,payment,payment BNK-6QF7D6 at 2026-10-30T20:46:08+00:00 (local 2026-10-31T01:46:08+05:00) amount 310.914 KWD refs ['SF-F7HR7QZ']
+ISS-001,fx_rate,1,JE-P42EWND,ledger,account 1000 Dr 463715.79 Cr 0.00 KZT at 2026-10-30T20:46:08+00:00 invoice=None payment=BNK-6QF7D6
+ISS-001,fx_rate,1,fx:2026-10-30:KWD:KZT,fx,rate 1492.36 KZT per 1 KWD on 2026-10-30
+ISS-001,fx_rate,1,policy,policy,"policy.json (rules: rate date, previous business day, period, rounding)"
+ISS-001,fx_rate,2,DC-4CKP4X,payment,payment BNK-6QF7D6 at 2026-10-30T20:46:08+00:00 (local 2026-10-31T01:46:08+05:00) amount 310.914 KWD refs ['SF-F7HR7QZ']
+ISS-001,fx_rate,2,JE-CPNE74M,ledger,account 1200 Dr 0.00 Cr 180732.07 KZT at 2026-10-30T20:46:08+00:00 invoice=SF-F7HR7QZ payment=BNK-6QF7D6
+ISS-001,fx_rate,2,JE-HG68CCY,ledger,account 2400 Dr 0.00 Cr 283038.01 KZT at 2026-10-30T20:46:08+00:00 invoice=None payment=BNK-6QF7D6
+ISS-001,fx_rate,2,JE-Z7AWFYM,ledger,account 7900 Dr 54.29 Cr 0.00 KZT at 2026-10-30T20:46:08+00:00 invoice=None payment=BNK-6QF7D6
+ISS-001,fx_rate,2,fx:2026-10-30:KWD:KZT,fx,rate 1492.36 KZT per 1 KWD on 2026-10-30
+ISS-001,fx_rate,2,policy,policy,"policy.json (rules: rate date, previous business day, period, rounding)"
+ISS-002,payment_allocation,1,DC-4CKP4X,payment,payment BNK-6QF7D6 at 2026-10-30T20:46:08+00:00 (local 2026-10-31T01:46:08+05:00) amount 310.914 KWD refs ['SF-F7HR7QZ']
+ISS-002,payment_allocation,1,DC-XQYNCQ,invoice,invoice SF-F7HR7QZ client CL-P9P8DEK issued 2026-08-15T04:12:05+00:00 (local 2026-08-15T09:12:05+05:00) total 310.914 KWD
+ISS-002,payment_allocation,1,JE-HG68CCY,ledger,account 2400 Dr 0.00 Cr 283038.01 KZT at 2026-10-30T20:46:08+00:00 invoice=None payment=BNK-6QF7D6

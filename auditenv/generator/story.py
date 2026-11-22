@@ -278,7 +278,7 @@ class StoryBuilder:
                 d = month.date()
                 while not is_business_day(d):
                     d += timedelta(days=1)
-                dt = datetime(d.year, d.month, d.day, 10, r.randint(0, 59), 0, tzinfo=self.tz)
+                dt = datetime(d.year, d.month, d.day, 10, r.randint(0, 59), r.randint(0, 59), tzinfo=self.tz)
                 self.add_invoice(ent, dt, self.base, [{"description": RENT_DESC, "service_period": month_str(d),
                                  "quantity": 1, "unit_price_minor": unit, "amount_minor": unit}],
                                  tags=["recurring_rent"])
@@ -329,11 +329,11 @@ class StoryBuilder:
 
         if "boundary_time" in present:
             ld = self.last_day
-            dt = datetime(ld.year, ld.month, ld.day, 23, 50, 0, tzinfo=self.tz) + timedelta(minutes=r.randint(0, 4))
+            dt = datetime(ld.year, ld.month, ld.day, 23, 50, 0, tzinfo=self.tz) + timedelta(minutes=r.randint(0, 4), seconds=r.randint(0, 59))
             self.add_invoice(r.choice(self.entities), dt, self.base, self.lines(self.base, month_str(ld)),
                              utc_fmt=True, tags=["boundary_end"])
             fd = self.first_day
-            dt = datetime(fd.year, fd.month, fd.day, 0, 5, 0, tzinfo=self.tz) + timedelta(minutes=r.randint(0, 15))
+            dt = datetime(fd.year, fd.month, fd.day, 0, 5, 0, tzinfo=self.tz) + timedelta(minutes=r.randint(0, 15), seconds=r.randint(0, 59))
             self.add_invoice(r.choice(self.entities), dt, self.base, self.lines(self.base, month_str(fd)),
                              utc_fmt=True, tags=["boundary_start"])
 
@@ -350,7 +350,8 @@ class StoryBuilder:
             else:
                 mins = 24 * 60 + off + r.randint(10, -off - 10)
             mins = min(mins, 24 * 60 - 1)
-            self.add_payment(inv.entity, midnight + timedelta(minutes=mins), cur, inv.total, [inv.key],
+            # Random seconds like every other record: a fixed :00 here was a format tell (shortcut probe, 22.11).
+            self.add_payment(inv.entity, midnight + timedelta(minutes=mins, seconds=r.randint(0, 59)), cur, inv.total, [inv.key],
                              [(inv.key, inv.total)], utc_fmt=True, tags=["carrier_pfc"])
         if self.foreign and cfg["interactions"].get("duplicate_fx", 0) > 0:
             self.regular_invoice(self.first_day, self.last_day - timedelta(days=5), cur=r.choice(self.foreign),
@@ -477,7 +478,7 @@ class StoryBuilder:
             inv = take(lambda i: i.currency == self.base)
             if inv is not None:
                 ld = self.last_day
-                ts = datetime(ld.year, ld.month, ld.day, 23, 40, 0, tzinfo=self.tz) + timedelta(minutes=r.randint(0, 9))
+                ts = datetime(ld.year, ld.month, ld.day, 23, 40, 0, tzinfo=self.tz) + timedelta(minutes=r.randint(0, 9), seconds=r.randint(0, 59))
                 p = pay([inv], inv.total, ts, ["boundary_time"])
                 p.utc_fmt = True
 

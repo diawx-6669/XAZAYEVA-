@@ -114,7 +114,7 @@ commands: [`docs/JURY.md`](docs/JURY.md).
 | What was checked | Result | Where |
 |---|---|---|
 | Jury-style scoreboard | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
-| Tests (pytest + hypothesis) | <!--fact:n_tests-->686<!--/fact--> | `make check` |
+| Tests (pytest + hypothesis) | <!--fact:n_tests-->691<!--/fact--> | `make check` |
 | Deliberate grader bugs caught by the tests | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` |
 | Independent verifier (no `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> episodes, 0 disagreements | `make check` |
 | Black-box jury simulation (own policies and grader) | <!--fact:jury_sim_open-->0<!--/fact--> open findings | `reports/jury_sim.md` |
@@ -147,5 +147,7 @@ forecast written before the jury run: `docs/PREDICTION.md`.
 * Process isolation is layered (non-dumpable evaluator, rlimits, `nobody` when run as root) but is
   not a full sandbox: no seccomp, no network or filesystem namespaces.
 * `simple_reconcile` is intentionally simple (`docs/FAILURES.md`) and scores about −1 on clean books.
+  `careful_reconcile` (v1.1) is the same auditor with all four refinements: F1 = 1.000 on the 20 dev episodes
+  and no false positive on clean books, so the look-alikes are separable by correct bookkeeping.
 
 License: MIT.

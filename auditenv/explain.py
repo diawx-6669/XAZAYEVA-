@@ -181,7 +181,7 @@ def render(ep_dir: Path, only: str | None = None) -> str:
     return "\n".join(parts)
 
 
-EXAMPLES = ["ep-htfdvq2mvr", "ep-ghqjfb86vj", "ep-vw9vceq4qf"]
+EXAMPLES = ["ep-cc3nbrbwgh", "ep-n5y6es2vx3", "ep-83ty6jrf5c"]
 
 
 def write_examples(root) -> list:
