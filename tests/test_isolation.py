@@ -86,6 +86,8 @@ def test_nobody_layer_hides_a_leaky_episode_from_the_hunter(tmp_path):
 
 
 @pytest.mark.skipif(os.geteuid() == 0, reason="root reads every /proc/*/environ; run as non-root (Docker: auditor)")
+@pytest.mark.skipif(not Path("/proc/self").exists(), reason="truth_hunter reads /proc, which exists only on Linux "
+                    "(the Docker image); on macOS test_agent_process_environment_is_clean checks `ps -E`")
 def test_salt_positive_control_without_hardening(tmp_path):
     """Without PR_SET_DUMPABLE=0 the same hunter DOES read the salt from its parent: the
     protection, not luck, is what keeps the salt secret in the test above."""
@@ -97,7 +99,7 @@ def test_salt_positive_control_without_hardening(tmp_path):
     assert ("LEAK-SALT",) in {tuple(f["affected_ids"]) for f in submitted(tmp_path / "traj.jsonl")}
 
 
-def test_agent_process_environment_is_clean(monkeypatch):
+def test_agent_process_environment_is_clean(monkeypatch, process_environ):
     from auditenv.runner import AGENT_ENV, ChildPolicy
 
     monkeypatch.setenv("AUDITENV_SEED_SALT", "secret")
@@ -105,10 +107,15 @@ def test_agent_process_environment_is_clean(monkeypatch):
     try:
         assert c.env == AGENT_ENV  # exactly what the process was started with
         try:  # the kernel's view, when readable (root without CAP_SYS_PTRACE cannot read a `nobody` agent)
-            env = Path(f"/proc/{c.proc.pid}/environ").read_bytes().split(b"\0")
-            env = dict(x.decode().split("=", 1) for x in env if b"=" in x)
-            assert env == AGENT_ENV
-            assert os.listdir(Path(f"/proc/{c.proc.pid}/cwd")) == []
+            if Path("/proc/self").exists():
+                env = Path(f"/proc/{c.proc.pid}/environ").read_bytes().split(b"\0")
+                env = dict(x.decode().split("=", 1) for x in env if b"=" in x)
+                assert env == AGENT_ENV
+                assert os.listdir(Path(f"/proc/{c.proc.pid}/cwd")) == []
+            else:  # macOS: no /proc; `ps -E` shows the environment (with OS-added keys), the cwd is our temp dir
+                env = process_environ(c.proc.pid) or ""
+                assert "AUDITENV_SEED_SALT" not in env and "secret" not in env and str(ROOT) not in env
+                assert os.listdir(c.tmp.name) == []
         except PermissionError:
             assert os.listdir(c.tmp.name) == []
         assert "-I" in c.proc.args and "-S" in c.proc.args

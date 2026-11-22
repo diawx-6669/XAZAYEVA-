@@ -11,6 +11,25 @@ os.environ.setdefault("TZ", "UTC")
 from auditenv.generator.episode import generate_episode  # noqa: E402
 
 
+def _process_environ_text(pid):
+    """The kernel's view of another process's environment as text, or None when the OS does not show it.
+    Linux: /proc/<pid>/environ (PermissionError propagates: root without CAP_SYS_PTRACE, another uid).
+    macOS has no /proc: `ps -E` prints the environment of a same-uid process after its command line."""
+    if Path("/proc/self").exists():
+        return Path(f"/proc/{pid}/environ").read_bytes().decode(errors="replace").replace("\0", "\n")
+    if sys.platform == "darwin":
+        import subprocess
+
+        out = subprocess.run(["ps", "-E", "-ww", "-o", "command=", "-p", str(pid)], capture_output=True, text=True)
+        return out.stdout if out.returncode == 0 else None
+    return None
+
+
+@pytest.fixture
+def process_environ():
+    return _process_environ_text
+
+
 @pytest.fixture(autouse=True)
 def _no_seed_salt(request, monkeypatch):
     """Open tests must see the open (unsalted) generator even if the evaluator's secret salt is set in
