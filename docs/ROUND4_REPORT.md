@@ -13,7 +13,7 @@
 |---|---|---|
 | `make check` (нативно, 4 CPU) | 1:51, ALL GREEN, 90/90 | **1:48**, ALL GREEN, 90/90, docs-check 0 mismatches |
 | `make docker-check` (официальный Dockerfile, `--network none --cpus 2 --memory 4g`) | 2:35, ALL GREEN | **2:42**, ALL GREEN, 90/90, docs-check 0 mismatches |
-| Тестов | 484 | <!--fact:n_tests-->705<!--/fact--> |
+| Тестов | 484 | <!--fact:n_tests-->708<!--/fact--> |
 | Мутации оценщика (`make mutation`) | 23/23 | 23/23 |
 | Симуляция жюри под Linux (`jury_sim/`) | контракт 19/20 (курсор) | 20/20; 8 солей — 8/8 (`make jury-salts`) |
 
