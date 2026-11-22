@@ -30,7 +30,7 @@ make check
 | Что проверено | Результат | Где смотреть / как повторить |
 |---|---|---|
 | Табло самопроверки в духе жюри (контракт, данные, награда, воспроизводимость) | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
-| Тестов (pytest + hypothesis) | <!--fact:n_tests-->699<!--/fact--> | `make check` |
+| Тестов (pytest + hypothesis) | <!--fact:n_tests-->705<!--/fact--> | `make check` |
 | Намеренные ошибки в оценщике, пойманные тестами | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` → `reports/mutation.md` |
 | Независимый проверяльщик эталона и доказательств (без `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> эпизодов, 0 расхождений | шаг `verify-independent` в `make check` |
 | Симуляция жюри чёрным ящиком (свои политики и оценщик) | <!--fact:jury_sim_open-->0<!--/fact--> открытых находок | [`reports/jury_sim.md`](reports/jury_sim.md) |
@@ -120,8 +120,12 @@ the answer key and computes F1 and the reward; everything runs offline with one 
 пять узких инструментов (не больше 100 шагов) читает записи и отправляет выводы с
 доказательствами. Оценщик вне процесса агента сопоставляет выводы с эталоном и считает награду.
 
-Это **среда и оценщик**, а не платёжное приложение, чат‑бот или модель. Веса мы не обучаем и
-об улучшении моделей не заявляем (см. [docs/LIMITATIONS.md](docs/LIMITATIONS.md)).
+Это **среда и оценщик**, а не платёжное приложение или чат‑бот. Чтобы показать, что по награде среды
+**можно учиться**, мы обучили на ней небольшую политику с подкреплением (`make train`, ~15 с, без GPU):
+REINFORCE по одной только терминальной награде, 12 весов, старт с нуля. На 160 отложенных эпизодах с
+новой солью её награда **+0.893** против +0.058 у `simple_reconcile` (95 % ДИ разности
+[+0.705; +0.966]); веса сами научились не доверять «двойникам» — credit note и переплатам
+([docs/TRAINING.md](docs/TRAINING.md), [reports/training.md](reports/training.md)). Это не LLM и не нейросеть.
 
 ## Запуск одной командой
 
@@ -143,7 +147,7 @@ make check
 
 `make check` — это по порядку:
 
-1. весь pytest (<!--fact:n_tests-->699<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
+1. весь pytest (<!--fact:n_tests-->705<!--/fact--> тестов, включая hypothesis‑fuzz действий и конфигов, 300 эпизодов детектора
    поверхностных признаков, атаки на песочницу агента);
 2. табло self‑check в духе жюри: 4 блока × 20 проверок на 20 эпизодах и 20 парных преобразованиях,
    диагностика P/R/F1 (макро и микро), возврат на чистых и ошибочных книгах, шаги, время p50/p95;
@@ -240,7 +244,7 @@ python -m auditenv run --policy-cmd "python examples/minimal_agent.py" --seed 12
 | `python -m auditenv import-csv --src tests/fixtures/<имя> --out D` | компания, собранная вручную в Google Таблицах (CSV) → эпизод (`tests/fixtures/README.md`) |
 | `python tools/build_replay.py` | пересобрать `site/replay.html` — офлайн‑просмотрщик траекторий 5 эпизодов (без эталона) |
 | `make finale-preflight` | офлайн‑проверка перед финалом за минуту: образ, тесты контракта, демо |
-| `make submission-tag` | команды для тега `v1.2-submission` и SHA для формы (`docs/SUBMISSION.md`) |
+| `make submission-tag` | команды для тега `v1.3-submission` и SHA для формы (`docs/SUBMISSION.md`) |
 
 ## Раунд 4: инструменты проверки (вне `make check`, кроме отмеченных)
 

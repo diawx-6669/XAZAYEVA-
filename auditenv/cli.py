@@ -501,7 +501,7 @@ def main(argv=None) -> int:
     g.add_argument("--out", required=True)
     sub.add_parser("export")
     r = sub.add_parser("run")
-    r.add_argument("--policy", choices=["random_explorer", "simple_reconcile", "careful_reconcile", "flag_all", "oracle", "step_burner",
+    r.add_argument("--policy", choices=["random_explorer", "simple_reconcile", "careful_reconcile", "learned_reconcile", "flag_all", "oracle", "step_burner",
                                         "truth_hunter"])
     r.add_argument("--policy-cmd", help="your agent as a command speaking JSON lines (docs/ADAPTER.md)")
     r.add_argument("--time-limit", type=float, default=60.0)
@@ -530,7 +530,7 @@ def main(argv=None) -> int:
     tf.add_argument("--seed", type=int, required=True)
     tf.add_argument("--opaque-ids", action="store_true", help="IDs without prefixes, random length 12-64")
     jp = sub.add_parser("jury-pairs", help="N paired transforms (original vs opaque-ID twin) for any policy")
-    jp.add_argument("--policy", choices=["random_explorer", "simple_reconcile", "careful_reconcile", "flag_all", "oracle"])
+    jp.add_argument("--policy", choices=["random_explorer", "simple_reconcile", "careful_reconcile", "learned_reconcile", "flag_all", "oracle"])
     jp.add_argument("--policy-cmd")
     jp.add_argument("--n", type=int, default=20)
     jp.add_argument("--config", default="dev-mixed")

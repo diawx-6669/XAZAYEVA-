@@ -13,8 +13,10 @@ cause → closed answer key (`truth.json`).
 
 An agent reads records through five narrow tools (at most 100 steps) and submits findings with
 evidence. A grader **outside the agent's process** matches findings to the answer key and computes
-the reward. This is an **environment and a grader**, not a model: we train no weights and claim no
-model improvement.
+the reward. This is an **environment and a grader**. To show the reward is learnable, `make train` (~15 s, no GPU)
+trains a small policy by REINFORCE on the terminal reward alone (12 weights, from zero): on 160 held-out
+episodes with a new salt it scores **+0.893** vs +0.058 for `simple_reconcile` (95 % CI of the
+difference [+0.705, +0.966]). It is not an LLM or a neural network (docs/TRAINING.md).
 
 * Money is always an `int` in minor units; FX rates are decimal strings computed with `Decimal`,
   `ROUND_HALF_EVEN`. Base currency KZT, USD, JPY (exponent 0) or KWD (exponent 3).
@@ -115,7 +117,7 @@ commands: [`docs/JURY.md`](docs/JURY.md).
 | What was checked | Result | Where |
 |---|---|---|
 | Jury-style scoreboard | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
-| Tests (pytest + hypothesis) | <!--fact:n_tests-->699<!--/fact--> | `make check` |
+| Tests (pytest + hypothesis) | <!--fact:n_tests-->705<!--/fact--> | `make check` |
 | Deliberate grader bugs caught by the tests | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` |
 | Independent verifier (no `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> episodes, 0 disagreements | `make check` |
 | Black-box jury simulation (own policies and grader) | <!--fact:jury_sim_open-->0<!--/fact--> open findings | `reports/jury_sim.md` |

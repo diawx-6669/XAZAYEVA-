@@ -4,7 +4,7 @@ export PYTHONPATH := $(CURDIR)
 export PYTHONHASHSEED := 0
 export TZ := UTC
 
-.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check repro-cross prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity ablation verify-release offline-kit targets-timing jury-salts shortcut-probe benford
+.PHONY: help venv quick test check selfcheck episodes trajectories golden demo docker-build docker-check clean docs-check version finale-preflight exploit-search train train-check experiment experiment-v2 mutation verify-independent submission-tag repro-cert repro-cert-check repro-cross prepublish pii-scan min-budget power difficulty bench coverage-map exhaustive sensitivity ablation verify-release offline-kit targets-timing jury-salts shortcut-probe benford
 
 help:
 	@echo "make quick         fast tests + 3 episodes x 4 policies (<30 s)"
@@ -32,6 +32,8 @@ help:
 	@echo "make selfcheck     scoreboard only -> reports/selfcheck.md"
 	@echo "make golden        rewrite tests/golden_hashes.json (only after an intended generator change)"
 	@echo "make verify-independent  independent verifier on committed + selfcheck + 500 fresh episodes"
+	@echo "make train         RL training of learned_reconcile on the env reward (docs/TRAINING.md, ~15 s)"
+	@echo "make train-check   retrain and compare the weights byte-exact"
 	@echo "make experiment    optional E6 experiment (docs/EXPERIMENT.md); experiment-v2: docs/EXPERIMENT_v2.md"
 	@echo "make experiment-v2 E6 v2 on the current generator (new salt)"
 	@echo "make repro-cert-check  recompute the reproducibility certificate and compare with the committed one"
@@ -82,6 +84,12 @@ finale-preflight:
 
 exploit-search:
 	$(PYTHON) -m auditenv exploit-search
+
+train:
+	$(PYTHON) -m auditenv.train
+
+train-check:
+	$(PYTHON) -m auditenv.train --check
 
 experiment:
 	$(PYTHON) -m auditenv experiment
@@ -154,8 +162,8 @@ shortcut-probe:
 
 submission-tag:
 	@echo "Run on 22.11 after the final make check (docs/SUBMISSION.md):"
-	@echo "  git tag -a v1.2-submission -m 'Genesis Hackathon submission'"
-	@echo "  git push origin v1.2-submission"
+	@echo "  git tag -a v1.3-submission -m 'Genesis Hackathon submission'"
+	@echo "  git push origin v1.3-submission"
 	@git log -1 --format='  SHA for the form: %H'
 
 version:

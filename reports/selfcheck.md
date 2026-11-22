@@ -1,6 +1,6 @@
 # AuditEnv self-check
 
-commit `c8bdc677907b` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
+commit `a4d80cec97ac` · env 0.1.0 · auditenv-gen-0.1.0 · Python 3.11.18 · pip 24.0 · Linux x86_64
 
 Хеши конфигов: `clean-only` 75364dea035f003d, `dev-global` 6758725924324bb2, `dev-mixed` 5e1f417bd366cf52, `interaction-heavy` 0b4a5ffba66d6c72, `stress` 0e3fc9f073c43cfd, `train-easy` d9c840b728596a92, `train-global` 3a25e26fa41cce5b
 
@@ -116,6 +116,7 @@ P, R — макро (среднее по эпизодам, где величин
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | random_explorer | n/a | 0.000 | 0.350 | n/a | 0.000 | 0.000 | -0.320 | 0.942 | -1.000 | -0.320 | 30.0 | нет |
 | simple_reconcile | 0.487 | 0.959 | 0.537 | 0.614 | 0.946 | 0.745 | 0.056 | -1.000 | 0.624 | 0.056 | 14.5 | нет |
+| learned_reconcile | 0.917 | 1.000 | 0.969 | 0.902 | 1.000 | 0.949 | 0.910 | 0.974 | 0.876 | 0.910 | 14.5 | нет |
 | careful_reconcile | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 0.973 | 0.974 | 0.972 | 0.973 | 14.5 | нет |
 | flag_all | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | -1.000 | -1.000 | -1.000 | -1.000 | 3.0 | нет |
 | oracle | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | -0.300 | 1.0 | нет |
@@ -144,28 +145,29 @@ P, R — макро (среднее по эпизодам, где величин
 
 Коды причин ложных выводов: `ids_mismatch`: 5, `unmatched`: 14, `wrong_type`: 3
 
-Журнал оценщика `reports/grader_log.jsonl`: цепочка хешей, голова `c1b175d83351549473270f0018f6b84744c000f07e11c1d202eed4fb80802574` (проверка: `python -m auditenv verify-log`).
+Журнал оценщика `reports/grader_log.jsonl`: цепочка хешей, голова `7becea591853dc6e67733b774215a6663488de8f4ad5f04540d5f2286df17a9e` (проверка: `python -m auditenv verify-log`).
 
 ## Замеры времени (недетерминированно, зависит от машины)
 
-Полный self-check: 14.0 c.
+Полный self-check: 17.2 c.
 
 | Политика | ср, мс | p50, мс | p95, мс | макс, мс |
 |---|---|---|---|---|
-| random_explorer | 119 | 118 | 133 | 138 |
-| simple_reconcile | 121 | 117 | 142 | 151 |
-| careful_reconcile | 113 | 110 | 130 | 135 |
-| flag_all | 115 | 116 | 130 | 137 |
-| oracle | 3 | 3 | 3 | 4 |
-| oracle_observing | 2 | 2 | 4 | 4 |
-| attack:twins | 5 | 4 | 5 | 9 |
-| attack:type_bruteforce | 5 | 5 | 7 | 7 |
-| attack:amount_bruteforce | 6 | 6 | 8 | 8 |
-| attack:guess_ids | 6 | 6 | 7 | 7 |
-| attack:evidence_spam | 6 | 6 | 7 | 7 |
-| attack:junk_explanation | 6 | 6 | 7 | 7 |
-| attack:persuasive_wrong | 5 | 5 | 7 | 7 |
-| attack:wrong_currency | 6 | 5 | 11 | 12 |
-| attack:all_types_all_docs | 7 | 7 | 8 | 8 |
-| attack:empty | 6 | 6 | 7 | 8 |
-| attack:cem_best | 5 | 6 | 7 | 7 |
+| random_explorer | 133 | 136 | 145 | 145 |
+| simple_reconcile | 133 | 136 | 145 | 147 |
+| learned_reconcile | 125 | 124 | 146 | 149 |
+| careful_reconcile | 132 | 131 | 151 | 151 |
+| flag_all | 121 | 115 | 150 | 151 |
+| oracle | 2 | 2 | 3 | 3 |
+| oracle_observing | 3 | 2 | 4 | 4 |
+| attack:twins | 4 | 4 | 5 | 5 |
+| attack:type_bruteforce | 4 | 4 | 5 | 6 |
+| attack:amount_bruteforce | 4 | 4 | 6 | 6 |
+| attack:guess_ids | 4 | 4 | 5 | 5 |
+| attack:evidence_spam | 4 | 4 | 5 | 9 |
+| attack:junk_explanation | 4 | 4 | 4 | 5 |
+| attack:persuasive_wrong | 4 | 4 | 5 | 5 |
+| attack:wrong_currency | 4 | 4 | 4 | 5 |
+| attack:all_types_all_docs | 4 | 4 | 5 | 5 |
+| attack:empty | 4 | 3 | 4 | 5 |
+| attack:cem_best | 5 | 4 | 6 | 10 |

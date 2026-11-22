@@ -1,0 +1,152 @@
+{
+ "curve": [
+  {
+   "epoch": 0,
+   "heldout": 0.1197,
+   "train": 0.6554
+  },
+  {
+   "epoch": 1,
+   "heldout": 0.8929,
+   "train": 0.9716
+  },
+  {
+   "epoch": 2,
+   "heldout": 0.8911,
+   "train": 0.9716
+  },
+  {
+   "epoch": 3,
+   "heldout": 0.8929,
+   "train": 0.9716
+  },
+  {
+   "epoch": 4,
+   "heldout": 0.8929,
+   "train": 0.9716
+  },
+  {
+   "epoch": 5,
+   "heldout": 0.8929,
+   "train": 0.9716
+  },
+  {
+   "epoch": 10,
+   "heldout": 0.8929,
+   "train": 0.9716
+  },
+  {
+   "epoch": 15,
+   "heldout": 0.8929,
+   "train": 0.9716
+  },
+  {
+   "epoch": 20,
+   "heldout": 0.8929,
+   "train": 0.9716
+  },
+  {
+   "epoch": 25,
+   "heldout": 0.8929,
+   "train": 0.9716
+  },
+  {
+   "epoch": 30,
+   "heldout": 0.8929,
+   "train": 0.9716
+  }
+ ],
+ "epochs": 30,
+ "features": [
+  "bias",
+  "type:duplicate_invoice",
+  "type:payment_allocation",
+  "type:fx_rate",
+  "type:period_cutoff",
+  "type:vat_error",
+  "credit_note_context",
+  "overpayment",
+  "also_duplicate",
+  "no_exact_rate",
+  "foreign_payment",
+  "log_amount"
+ ],
+ "heldout_configs": [
+  "dev-mixed",
+  "dev-global",
+  "interaction-heavy",
+  "clean-only"
+ ],
+ "heldout_salt": "auditenv-train-heldout-2026-11-22",
+ "heldout_seeds": [
+  810000,
+  810040
+ ],
+ "lr": 0.5,
+ "n_train": 120,
+ "seed": 20261122,
+ "summary": {
+  "all": {
+   "careful_reconcile": 0.9723,
+   "empty": -0.2601,
+   "learned": 0.8929,
+   "simple_reconcile": 0.0582,
+   "submit_all": 0.1197
+  },
+  "ci95_learned_minus_simple": [
+   0.705,
+   0.9659
+  ],
+  "clean-only": {
+   "careful_reconcile": 0.9732,
+   "empty": 0.9732,
+   "learned": 0.9732,
+   "simple_reconcile": -1.0,
+   "submit_all": -1.0
+  },
+  "dev-global": {
+   "careful_reconcile": 0.9737,
+   "empty": -0.5065,
+   "learned": 0.9254,
+   "simple_reconcile": 0.4007,
+   "submit_all": 0.4544
+  },
+  "dev-mixed": {
+   "careful_reconcile": 0.9711,
+   "empty": -0.5071,
+   "learned": 0.9228,
+   "simple_reconcile": 0.3355,
+   "submit_all": 0.4425
+  },
+  "interaction-heavy": {
+   "careful_reconcile": 0.9713,
+   "empty": -1.0,
+   "learned": 0.75,
+   "simple_reconcile": 0.4965,
+   "submit_all": 0.582
+  },
+  "n_heldout": 160
+ },
+ "train_configs": [
+  "train-easy",
+  "train-global"
+ ],
+ "train_seeds": [
+  800000,
+  800060
+ ],
+ "weights": [
+  4.534885,
+  -1.66125,
+  -0.297457,
+  2.508496,
+  1.786043,
+  2.199052,
+  -10.332642,
+  -11.216124,
+  0.0,
+  0.463641,
+  1.092678,
+  2.371182
+ ]
+}
