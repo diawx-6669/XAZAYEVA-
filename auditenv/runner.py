@@ -83,6 +83,9 @@ def harden_evaluator() -> bool:
 
 
 AGENT_ENV = {"PATH": "/usr/local/bin:/usr/bin:/bin", "TZ": "UTC", "LANG": "C.UTF-8"}
+# A bare interpreter name at the start of --policy-cmd runs under the evaluator's own Python. AGENT_ENV's PATH
+# often has no `python` (macOS, Debian without python-is-python3), so "python agent.py" from README would fail.
+PYTHON_ALIASES = ("python", "python3")
 
 
 def _can_drop_privileges() -> bool:
@@ -187,6 +190,8 @@ class ChildPolicy:
         env = dict(AGENT_ENV)
         if cmd:
             argv = shlex.split(cmd) if isinstance(cmd, str) else list(cmd)
+            if argv and argv[0] in PYTHON_ALIASES:
+                argv[0] = sys.executable
             argv = [os.path.abspath(x) if os.path.exists(x) and (i > 0 or os.sep in x) else x for i, x in enumerate(argv)]
         else:
             boot = (f"import sys; sys.path.insert(0, {agent_code_dir()!r}); "

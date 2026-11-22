@@ -85,7 +85,7 @@ def test_seed_salt_blocks_seed_bruteforce(monkeypatch):
 
 
 @pytest.mark.salt
-def test_agent_process_gets_no_salt_and_no_paths(monkeypatch):
+def test_agent_process_gets_no_salt_and_no_paths(monkeypatch, process_environ):
     from auditenv.runner import ChildPolicy
 
     monkeypatch.setenv("AUDITENV_SEED_SALT", "secret")
@@ -94,7 +94,7 @@ def test_agent_process_gets_no_salt_and_no_paths(monkeypatch):
         assert "AUDITENV_SEED_SALT" not in c.proc.args and c.proc.pid
         assert "AUDITENV_SEED_SALT" not in c.env and "secret" not in str(c.env)
         try:  # the kernel's view, when readable (root without CAP_SYS_PTRACE cannot read another uid's environ)
-            env = open(f"/proc/{c.proc.pid}/environ", "rb").read().decode(errors="replace")
+            env = process_environ(c.proc.pid) or ""
             assert "AUDITENV_SEED_SALT" not in env and "secret" not in env
         except PermissionError:
             pass

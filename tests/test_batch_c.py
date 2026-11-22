@@ -118,6 +118,9 @@ def test_jury_oracles_score_max(eps, name):
 def test_child_limits_are_applied_and_python_still_starts(eps):
     c = ChildPolicy("simple_reconcile")
     try:
+        assert os.getpgid(c.proc.pid) == c.proc.pid  # own session / process group
+        if not Path("/proc/self/limits").exists():
+            pytest.skip("no /proc (macOS): another process's rlimits are readable only on Linux, as in the Docker image")
         limits = Path(f"/proc/{c.proc.pid}/limits").read_text()
         row = {line[:26].strip(): line[26:].split() for line in limits.splitlines()[1:]}
         assert int(row["Max address space"][0]) == AS_LIMIT and int(row["Max cpu time"][0]) == CPU_LIMIT_S
@@ -209,6 +212,18 @@ def test_minimal_example_agent_runs():
     res = json.loads(out.stdout)
     assert out.returncode == 0 and res["steps"] <= 100 and res["tp"] >= 1
     assert len((ROOT / "examples" / "minimal_agent.py").read_text().splitlines()) <= 45
+
+
+@pytest.mark.parametrize("alias", ["python", "python3"])
+def test_bare_python_in_policy_cmd_is_the_evaluator_interpreter(alias):
+    """README writes `--policy-cmd "python examples/minimal_agent.py"`. The agent's PATH is fixed
+    (AGENT_ENV) and on macOS has no `python`: a bare interpreter name must mean the evaluator's Python."""
+    c = ChildPolicy(cmd=f"{alias} examples/minimal_agent.py")
+    try:
+        assert c.proc.args[0] == sys.executable
+        assert c.proc.args[1] == str(ROOT / "examples" / "minimal_agent.py")
+    finally:
+        c.close()
 
 
 # --------------------------------------------------------- C10 serve/client

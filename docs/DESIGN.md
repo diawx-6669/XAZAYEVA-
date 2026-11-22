@@ -253,3 +253,11 @@ non-dumpable процесса (seed и конфиг были видны и в Li
 показывал соль. Симуляция жюри (`regen_attack`) так получала награду 1.0 на 15/15 закрытых
 эпизодах; после исправления — 0/15. Запускайте оценщик напрямую, а не через `sh -c` или `make`:
 командная строка и окружение обёртки остаются видны.
+
+**`python` в `--policy-cmd` — интерпретатор оценщика.** Если команда агента начинается с голого
+`python` или `python3`, он заменяется на `sys.executable` оценщика. → Альтернатива: искать `python` в
+`PATH` агента. → `PATH` агента фиксирован (`AGENT_ENV`: `/usr/local/bin:/usr/bin:/bin`), и на macOS
+(и в Debian без `python-is-python3`) там нет `python`: пример из README падал с `FileNotFoundError`
+(повторный прогон симуляции жюри на v1.4). Путь к другому интерпретатору (`/usr/bin/python3.12 …`)
+по-прежнему запускается как есть. Тест
+`tests/test_batch_c.py::test_bare_python_in_policy_cmd_is_the_evaluator_interpreter`.
