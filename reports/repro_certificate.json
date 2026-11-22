@@ -73,8 +73,8 @@
   "golden/interaction-heavy#33/truth": "7fe57d2c47d1ecc95f84a9f6231fce5142d0a1f0fc6ec393e2fc8c3f8aab55c1",
   "golden/train-easy#11/public": "938c294522ee9abdaf3f796374ea2383bdfaf6afc205bc22ce756f5352392ea4",
   "golden/train-easy#11/truth": "7568485ae3a7579f1ef403a79b94e708772e2a91ab45ab059f376cc1929b120b",
-  "selfcheck/deterministic": "4586457843dd4227a6a0b9ba9936f8f83e39a3d83a2c56a75383d231c5392827",
-  "selfcheck/grader_log_head": "c1b175d83351549473270f0018f6b84744c000f07e11c1d202eed4fb80802574",
+  "selfcheck/deterministic": "89bc19e64d053496971dae95a43fbd22c3347f4ebfeb31df4166f5025c5cb30d",
+  "selfcheck/grader_log_head": "7becea591853dc6e67733b774215a6663488de8f4ad5f04540d5f2286df17a9e",
   "selfcheck/total": "90.0/90"
  },
  "machine": {

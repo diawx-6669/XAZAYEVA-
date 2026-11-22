@@ -77,6 +77,6 @@ python tools/repro_cert.py --compare /tmp/mac.json        # здесь: табл
 | `config/stress` | `0e3fc9f073c43cfd` |
 | `config/train-easy` | `d9c840b728596a92` |
 | `config/train-global` | `3a25e26fa41cce5b` |
-| `selfcheck/deterministic` | `4586457843dd4227` |
+| `selfcheck/deterministic` | `89bc19e64d053496` |
 | `selfcheck/total` | `90.0/90` |
-| `selfcheck/grader_log_head` | `c1b175d833515494` |
+| `selfcheck/grader_log_head` | `7becea591853dc6e` |
