@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import subprocess
 import sys
 from importlib.metadata import version
@@ -59,6 +60,8 @@ def test_every_dependency_is_pinned_and_installed_as_pinned():
     assert len(wheels) == len(pins)
     df = (ROOT / "Dockerfile").read_text()
     assert "--no-index" in df and "--no-deps" in df and "vendor/wheels" in df
+    venv = re.search(r"^venv:\n\t(.*)$", (ROOT / "Makefile").read_text(), re.M).group(1)  # README: offline
+    assert "--no-index" in venv and "--no-deps" in venv and "--find-links vendor/wheels" in venv, venv
     assert "@sha256:" in df.split("\nFROM", 1)[1].splitlines()[0]
     import importlib.util
 

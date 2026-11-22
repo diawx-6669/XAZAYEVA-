@@ -47,7 +47,7 @@ help:
 	@echo "make docker-check  build image and run 'make check' with --network none --cpus 2 --memory 4g"
 
 venv:
-	python3.11 -m venv .venv && .venv/bin/pip install -r requirements.txt
+	python3.11 -m venv .venv && .venv/bin/pip install --no-index --find-links vendor/wheels --no-deps -r requirements.txt
 
 quick:
 	$(PYTHON) -m pytest -q -m "not slow" -x
