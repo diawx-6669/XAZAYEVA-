@@ -1,0 +1,199 @@
+{
+ "configs": [
+  "dev-mixed",
+  "interaction-heavy",
+  "train-easy"
+ ],
+ "n_test_seeds": 120,
+ "n_train_seeds": 120,
+ "positive_control": {
+  "auc": 0.9596087717070528,
+  "ci95": [
+   0.9580686914576886,
+   0.9612616202912254
+  ],
+  "n_test_positive": 5392,
+  "n_test_records": 131256,
+  "rates": {
+   "invoices:clean": {
+    "n": 13976,
+    "round_2": 700,
+    "seconds_zero": 1459,
+    "utc_written": 7364
+   },
+   "invoices:duplicate_invoice": {
+    "n": 236,
+    "round_2": 12,
+    "seconds_zero": 1,
+    "utc_written": 127
+   },
+   "invoices:fx_rate": {
+    "n": 203,
+    "round_2": 5,
+    "seconds_zero": 9,
+    "utc_written": 96
+   },
+   "invoices:period_cutoff": {
+    "n": 128,
+    "round_2": 6,
+    "seconds_zero": 3,
+    "utc_written": 94
+   },
+   "ledger:clean": {
+    "n": 103649,
+    "round_2": 21780,
+    "seconds_zero": 8205,
+    "utc_written": 54496
+   },
+   "ledger:duplicate_invoice": {
+    "n": 1406,
+    "round_2": 156,
+    "seconds_zero": 6,
+    "utc_written": 761
+   },
+   "ledger:fx_rate": {
+    "n": 1469,
+    "round_2": 39,
+    "seconds_zero": 65,
+    "utc_written": 710
+   },
+   "ledger:payment_allocation": {
+    "n": 824,
+    "round_2": 82,
+    "seconds_zero": 356,
+    "utc_written": 599
+   },
+   "ledger:period_cutoff": {
+    "n": 830,
+    "round_2": 239,
+    "seconds_zero": 24,
+    "utc_written": 600
+   },
+   "payments:clean": {
+    "n": 8239,
+    "round_2": 437,
+    "seconds_zero": 658,
+    "utc_written": 4286
+   },
+   "payments:fx_rate": {
+    "n": 63,
+    "round_2": 0,
+    "seconds_zero": 1,
+    "utc_written": 34
+   },
+   "payments:payment_allocation": {
+    "n": 233,
+    "round_2": 9,
+    "seconds_zero": 85,
+    "utc_written": 162
+   }
+  },
+  "univariate_auc": {
+   "amount_trailing_zeros": 0.5467462998130808,
+   "doc_id_rank": 0.5012738634534359,
+   "id_length": 0.5054546918288328,
+   "id_rank": 0.5053037278732959,
+   "minute": 0.5077106336256023,
+   "n_line_items": 0.5026642832869768,
+   "position_in_file": 0.9488827777299449,
+   "seconds": 0.5230429821005991,
+   "seconds_is_zero": 0.5099969073113818,
+   "utc_offset_written_as_zero": 0.5323917462322386
+  }
+ },
+ "real": {
+  "auc": 0.5945103078088053,
+  "ci95": [
+   0.5811235223105254,
+   0.6100085666436343
+  ],
+  "n_test_positive": 5392,
+  "n_test_records": 131256,
+  "rates": {
+   "invoices:clean": {
+    "n": 13976,
+    "round_2": 700,
+    "seconds_zero": 1459,
+    "utc_written": 7364
+   },
+   "invoices:duplicate_invoice": {
+    "n": 236,
+    "round_2": 12,
+    "seconds_zero": 1,
+    "utc_written": 127
+   },
+   "invoices:fx_rate": {
+    "n": 203,
+    "round_2": 5,
+    "seconds_zero": 9,
+    "utc_written": 96
+   },
+   "invoices:period_cutoff": {
+    "n": 128,
+    "round_2": 6,
+    "seconds_zero": 3,
+    "utc_written": 94
+   },
+   "ledger:clean": {
+    "n": 103649,
+    "round_2": 21780,
+    "seconds_zero": 8205,
+    "utc_written": 54496
+   },
+   "ledger:duplicate_invoice": {
+    "n": 1406,
+    "round_2": 156,
+    "seconds_zero": 6,
+    "utc_written": 761
+   },
+   "ledger:fx_rate": {
+    "n": 1469,
+    "round_2": 39,
+    "seconds_zero": 65,
+    "utc_written": 710
+   },
+   "ledger:payment_allocation": {
+    "n": 824,
+    "round_2": 82,
+    "seconds_zero": 356,
+    "utc_written": 599
+   },
+   "ledger:period_cutoff": {
+    "n": 830,
+    "round_2": 239,
+    "seconds_zero": 24,
+    "utc_written": 600
+   },
+   "payments:clean": {
+    "n": 8239,
+    "round_2": 437,
+    "seconds_zero": 658,
+    "utc_written": 4286
+   },
+   "payments:fx_rate": {
+    "n": 63,
+    "round_2": 0,
+    "seconds_zero": 1,
+    "utc_written": 34
+   },
+   "payments:payment_allocation": {
+    "n": 233,
+    "round_2": 9,
+    "seconds_zero": 85,
+    "utc_written": 162
+   }
+  },
+  "univariate_auc": {
+   "amount_trailing_zeros": 0.5467462998130808,
+   "doc_id_rank": 0.5012738634534359,
+   "id_length": 0.5054546918288328,
+   "id_rank": 0.5053037278732959,
+   "minute": 0.5077106336256023,
+   "n_line_items": 0.5026642832869768,
+   "position_in_file": 0.5178908834657105,
+   "seconds": 0.5230429821005991,
+   "seconds_is_zero": 0.5099969073113818,
+   "utc_offset_written_as_zero": 0.5323917462322386
+  }
+ }
+}
