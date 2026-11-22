@@ -112,7 +112,7 @@ commands: [`docs/JURY.md`](docs/JURY.md).
 | What was checked | Result | Where |
 |---|---|---|
 | Jury-style scoreboard | <!--fact:selfcheck_total-->90/90<!--/fact--> | `make check` → `reports/selfcheck.md` |
-| Tests (pytest + hypothesis) | <!--fact:n_tests-->661<!--/fact--> | `make check` |
+| Tests (pytest + hypothesis) | <!--fact:n_tests-->686<!--/fact--> | `make check` |
 | Deliberate grader bugs caught by the tests | <!--fact:mutation_killed-->23/23<!--/fact--> | `make mutation` |
 | Independent verifier (no `import auditenv`) | <!--fact:verify_independent_episodes-->540<!--/fact--> episodes, 0 disagreements | `make check` |
 | Black-box jury simulation (own policies and grader) | <!--fact:jury_sim_open-->0<!--/fact--> open findings | `reports/jury_sim.md` |
